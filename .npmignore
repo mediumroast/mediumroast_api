@@ -1,0 +1,38 @@
+# Development files
+.git/
+.github/
+.gitignore
+.eslintrc.js
+.eslintignore
+vitest.config.js
+coverage/
+tests/
+
+# Examples and documentation that shouldn't be published
+examples/
+docs/
+
+# Configuration files
+config.ini
+.env
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Dependency directories
+node_modules/
+
+# Build output
+dist/build-temp/
+
+# OS generated files
+.DS_Store
+Thumbs.db

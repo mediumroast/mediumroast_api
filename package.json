@@ -1,7 +1,7 @@
 {
   "name": "mediumroast_api",
   "version": "1.0.0",
-  "description": "A module for managing Mediumroast API interactions and functionalities.",
+  "description": "Mediumroast for Git(Hub) SDK covering all categories of function.",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
@@ -16,7 +16,16 @@
     "mediumroast",
     "api",
     "github",
-    "cli"
+    "product management",
+    "product discovery",
+    "product development",
+    "product delivery",
+    "product operations",
+    "product leadership",
+    "product strategy",
+    "product marketing",
+    "product analytics",
+    "product design"
   ],
   "author": "Michael Hay",
   "license": "Apache-2.0",
@@ -49,10 +58,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/mediumroast_api.git"
+    "url": "https://github.com/mediumroast/mediumroast_api.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/mediumroast_api/issues"
+    "url": "https://github.com/mediumroast/mediumroast_api/issues"
   },
-  "homepage": "https://github.com/yourusername/mediumroast_api#readme"
+  "homepage": "https://github.com/mediumroast/mediumroast_api#readme"
 }
