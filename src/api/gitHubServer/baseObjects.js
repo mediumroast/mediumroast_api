@@ -753,10 +753,10 @@ export class BaseObjects {
   /**
    * Get the latest commit status for a branch
    * @param {string} branchName - Name of branch to check (default: 'main')
-   * @param {string} repo - Name of the repository (default: 'mediumroast-store')
+   * @param {string} repo - Name of the repository (default: 'Megaroast_discovery')
    * @returns {Promise<Array>} Latest commit information
    */
-  async getBranchStatus(branchName = 'main', repo = 'mediumroast-store') {
+  async getBranchStatus(branchName = 'main', repo = 'MegaRoast_discovery') {
     // Track this operation
     const tracking = logger.trackOperation ? 
       logger.trackOperation(this.objType, 'getBranchStatus') : 
@@ -856,7 +856,7 @@ export class BaseObjects {
    * Check if the branch has been updated since a specific commit
    * @param {string} lastKnownCommitSha - The last known commit SHA
    * @param {string} branchName - Name of the branch to check (default: 'main')
-   * @param {string} repo - Name of the repository (default: 'mediumroast-store')
+   * @param {string} repo - Name of the repository (default: 'MegaRoast_discovery')
    * @returns {Promise<Array>} Status indicating if an update is needed
    */
   async checkForUpdates(lastKnownCommitSha, branchName = 'main', repo = 'MegaRoast_discovery') {

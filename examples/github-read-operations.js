@@ -195,17 +195,14 @@ async function demonstrateBranchOperations(token, org) {
   try {
     const studies = new Studies(token, org, 'example-process');
     
-    // First get status for the default repository
-    console.log('\nFetching branch status for the default repository...');
-    console.log('(Using default: branch="main", repo="mediumroast-store")');
-    const defaultStatus = await studies.getBranchStatus();
-    logResult('getBranchStatus()', defaultStatus);
+    // Create the repository name by appending "_discovery" to the org name
+    const discoveryRepo = `${org}_discovery`;
     
-    // Then get status for a specific repository and branch
-    console.log('\nFetching branch status for a specific repository and branch...');
-    console.log('(Using: branch="main", repo=".github")');
-    const specificStatus = await studies.getBranchStatus('main', '.github');
-    logResult('getBranchStatus(\'main\', \'.github\')', specificStatus);
+    // First get status for the discovery repository
+    console.log('\nFetching branch status for the discovery repository...');
+    console.log(`(Using: branch="main", repo="${discoveryRepo}")`);
+    const defaultStatus = await studies.getBranchStatus('main', discoveryRepo);
+    logResult('getBranchStatus(\'main\', discoveryRepo)', defaultStatus);
     
     // If we have a successful result, demonstrate the checkForUpdates method
     if (defaultStatus[0]) {
@@ -216,13 +213,13 @@ async function demonstrateBranchOperations(token, org) {
       
       // Check for updates using the current SHA (should return no update needed)
       console.log('\nChecking for updates with current SHA (should show no updates needed)...');
-      const upToDate = await studies.checkForUpdates(currentSha);
-      logResult('checkForUpdates(currentSha)', upToDate);
+      const upToDate = await studies.checkForUpdates(currentSha, 'main', discoveryRepo);
+      logResult('checkForUpdates(currentSha, \'main\', discoveryRepo)', upToDate);
       
       // Check for updates using a made-up SHA (should indicate update needed)
       console.log('\nChecking for updates with outdated SHA (should show updates needed)...');
-      const needsUpdate = await studies.checkForUpdates('0000000000000000000000000000000000000000');
-      logResult('checkForUpdates(\'0000...\')', needsUpdate);
+      const needsUpdate = await studies.checkForUpdates('0000000000000000000000000000000000000000', 'main', discoveryRepo);
+      logResult('checkForUpdates(\'0000...\', \'main\', discoveryRepo)', needsUpdate);
       
       // Show an example of how clients could use this information
       console.log('\nExample client implementation:');
@@ -233,7 +230,7 @@ async function synchronizeData(clientSha = null) {
   let commitSha = clientSha || localStorage.getItem('lastCommitSha');
   
   // Step 2: Check if updates are needed
-  const updateCheck = await api.checkForUpdates(commitSha);
+  const updateCheck = await api.checkForUpdates(commitSha, 'main', '${discoveryRepo}');
   
   if (updateCheck.data.updateNeeded) {
     console.log('Repository has changed, downloading latest data...');
