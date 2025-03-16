@@ -1,17 +1,19 @@
-import { Interactions } from './interactions.js';
-import { Companies } from './companies.js';
-import { Studies } from './studies.js';
-import { Users } from './users.js';
-import { GitHubAuth } from './authorize.js';
-import { GitHubFunctions } from './github.js';
-import { GitHubServer } from './gitHubServer.js';
+import { 
+  GitHubAuth } from './authorize.js';
+import { 
+  Interactions, 
+  Companies, 
+  Studies, 
+  Users, 
+  Storage, 
+  Actions } from './gitHubServer.js';
 
 export {
-    Interactions,
-    Companies,
-    Studies,
-    Users,
-    GitHubAuth,
-    GitHubFunctions,
-    GitHubServer
+  Interactions,
+  Companies,
+  Studies,
+  Users,
+  GitHubAuth,
+  Storage,
+  Actions
 };
