@@ -1,6 +1,4 @@
 import { 
-  GitHubAuth } from './authorize.js';
-import { 
   Interactions, 
   Companies, 
   Studies, 
@@ -13,7 +11,6 @@ export {
   Companies,
   Studies,
   Users,
-  GitHubAuth,
   Storage,
   Actions
 };
