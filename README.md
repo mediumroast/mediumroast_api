@@ -134,7 +134,7 @@ To run the examples provided in the `examples` directory, you can use the follow
 node examples/github-device-auth.js
 
 # Run read operations to see if the token is working
-node examples/githug-read-operations.js
+node examples/github-read-operations.js
 ```
 
 These examples are provided to demonstrate how to use the module to interact with the Mediumroast API and are focused on read operations and authentication initially.  The first example must be run first to prompt you for authentication and create a token which will be stored in `examples/config.ini`.  After that the second example can be run to demonstrate read operations for major entities.  **Note:** The examples assume access to a GitHub organization called `MegaRoast` which can be used for the purposes of testing of read operations. The examples will be updated as the module is developed to include Create, Update and Delete operations.
