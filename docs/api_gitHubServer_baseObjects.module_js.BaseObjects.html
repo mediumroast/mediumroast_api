@@ -1,0 +1,2087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>BaseObjects - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Actions_Actions.html">Actions</a></li><li><a href="BillingManager.html">BillingManager</a><ul class='methods'><li data-type='method'><a href="BillingManager.html#getActionsBillings">getActionsBillings</a></li><li data-type='method'><a href="BillingManager.html#getAllBillings">getAllBillings</a></li><li data-type='method'><a href="BillingManager.html#getPackagesBillings">getPackagesBillings</a></li><li data-type='method'><a href="BillingManager.html#getStorageBillings">getStorageBillings</a></li></ul></li><li><a href="BranchManager.html">BranchManager</a><ul class='methods'><li data-type='method'><a href="BranchManager.html#createBranchFromMain">createBranchFromMain</a></li><li data-type='method'><a href="BranchManager.html#mergeBranchToMain">mergeBranchToMain</a></li></ul></li><li><a href="CacheManager.html">CacheManager</a><ul class='methods'><li data-type='method'><a href="CacheManager.html#clear">clear</a></li><li data-type='method'><a href="CacheManager.html#getOrFetch">getOrFetch</a></li><li data-type='method'><a href="CacheManager.html#invalidate">invalidate</a></li></ul></li><li><a href="ContainerOperations.html">ContainerOperations</a><ul class='methods'><li data-type='method'><a href="ContainerOperations.html#catchContainers">catchContainers</a></li><li data-type='method'><a href="ContainerOperations.html#checkForLock">checkForLock</a></li><li data-type='method'><a href="ContainerOperations.html#lockContainer">lockContainer</a></li><li data-type='method'><a href="ContainerOperations.html#releaseContainers">releaseContainers</a></li><li data-type='method'><a href="ContainerOperations.html#unlockContainer">unlockContainer</a></li></ul></li><li><a href="GitHubFunctions.GitHubFunctions.html">GitHubFunctions</a></li><li><a href="RepositoryManager.html">RepositoryManager</a><ul class='methods'><li data-type='method'><a href="RepositoryManager.html#createOrUpdateFile">createOrUpdateFile</a></li><li data-type='method'><a href="RepositoryManager.html#createRepository">createRepository</a></li><li data-type='method'><a href="RepositoryManager.html#deleteFile">deleteFile</a></li><li data-type='method'><a href="RepositoryManager.html#getActionsBilling">getActionsBilling</a></li><li data-type='method'><a href="RepositoryManager.html#getCollaborators">getCollaborators</a></li><li data-type='method'><a href="RepositoryManager.html#getContent">getContent</a></li><li data-type='method'><a href="RepositoryManager.html#getOrganization">getOrganization</a></li><li data-type='method'><a href="RepositoryManager.html#getStorageBilling">getStorageBilling</a></li><li data-type='method'><a href="RepositoryManager.html#getUser">getUser</a></li></ul></li><li><a href="ResponseFactory.html">ResponseFactory</a><ul class='methods'><li data-type='method'><a href="ResponseFactory.html#.error">error</a></li><li data-type='method'><a href="ResponseFactory.html#.success">success</a></li></ul></li><li><a href="Storage_Storage.html">Storage</a></li><li><a href="Studies_Studies.html">Studies</a></li><li><a href="UserManager.html">UserManager</a><ul class='methods'><li data-type='method'><a href="UserManager.html#addUserToRepository">addUserToRepository</a></li><li data-type='method'><a href="UserManager.html#getAllUsers">getAllUsers</a></li><li data-type='method'><a href="UserManager.html#getCurrentUser">getCurrentUser</a></li><li data-type='method'><a href="UserManager.html#removeUserFromRepository">removeUserFromRepository</a></li></ul></li><li><a href="Users_Users.html">Users</a></li><li><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html">BaseObjects</a><ul class='methods'><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_createError">_createError</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_createSuccess">_createSuccess</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_executeTransaction">_executeTransaction</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_invalidateCache">_invalidateCache</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_validateParams">_validateParams</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#batchUpdate">batchUpdate</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#checkForLock">checkForLock</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#checkForUpdates">checkForUpdates</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#getBranchStatus">getBranchStatus</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#search">search</a></li></ul></li><li><a href="module-GitHubAuth-GitHubAuth.html">GitHubAuth</a><ul class='methods'><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#checkTokenExpiration">checkTokenExpiration</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#getAccessTokenDeviceFlow">getAccessTokenDeviceFlow</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#getAccessTokenFromConfig">getAccessTokenFromConfig</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#getAuthTypeFromConfig">getAuthTypeFromConfig</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#getFromConfig">getFromConfig</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#verifyAccessToken">verifyAccessToken</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#verifyGitHubSection">verifyGitHubSection</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="api_gitHubServer.module_js.html">api/gitHubServer.js</a></li><li><a href="api_gitHubServer_baseObjects.module_js.html">api/gitHubServer/baseObjects.js</a><ul class='methods'><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~createObj">createObj</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~deleteObj">deleteObj</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~findById">findById</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~findByName">findByName</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~findByX">findByX</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~getAll">getAll</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~linkObj">linkObj</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~updateObj">updateObj</a></li></ul></li><li><a href="api_gitHubServer_deprecate.module_js.html">api/gitHubServer_deprecate.js</a><ul class='methods'><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~createObj">createObj</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~deleteObj">deleteObj</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~findById">findById</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~findByName">findByName</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~findByX">findByX</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~getAll">getAll</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~linkObj">linkObj</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~updateObj">updateObj</a></li></ul></li><li><a href="module-GitHubAuth.html">GitHubAuth</a></li><li><a href="module-GitHubFunctions.html">GitHubFunctions</a><ul class='methods'><li data-type='method'><a href="module-GitHubFunctions.html#~catchContainer">catchContainer</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~checkForLock">checkForLock</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~createBranchFromMain">createBranchFromMain</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~createContainers">createContainers</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~createRepository">createRepository</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~deleteObject">deleteObject</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getActionsBillings">getActionsBillings</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getAllUsers">getAllUsers</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getGitHubOrg">getGitHubOrg</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getRepoSize">getRepoSize</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getStorageBillings">getStorageBillings</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getUser">getUser</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getWorkflowRuns">getWorkflowRuns</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~lockContainer">lockContainer</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~mergeBranchToMain">mergeBranchToMain</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~readObjects">readObjects</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~releaseContainer">releaseContainer</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~unlockContainer">unlockContainer</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~updateObject">updateObject</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~writeObject">writeObject</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#customEncodeURIComponent">customEncodeURIComponent</a></li><li><a href="global.html#decodeContent">decodeContent</a></li><li><a href="global.html#decodeJsonContent">decodeJsonContent</a></li><li><a href="global.html#encodeContent">encodeContent</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">BaseObjects</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+            <span class="ancestors"><a href="api_gitHubServer_baseObjects.module_js.html">api/gitHubServer/baseObjects.js</a>.</span>
+        
+        
+            BaseObjects
+        
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+    
+
+    <h4 class="name" id="BaseObjects"><span class="type-signature"></span>new BaseObjects<span class="signature">(token, org, processName, objType)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="gitHubServer_baseObjects.js.html">gitHubServer/baseObjects.js</a>, <a href="gitHubServer_baseObjects.js.html#line31">line 31</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>token</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>GitHub API token</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>org</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>GitHub organization name</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>processName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Process name for locking</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>objType</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Object type</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="_createError"><span class="type-signature type-signature-private">(private) </span>_createError<span class="signature">(message, data, statusCode)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Creates a standardized error response</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="gitHubServer_baseObjects.js.html">gitHubServer/baseObjects.js</a>, <a href="gitHubServer_baseObjects.js.html#line123">line 123</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>Error message</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>Error data</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>statusCode</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>400</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>HTTP status code</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Standardized error response</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="_createSuccess"><span class="type-signature type-signature-private">(private) </span>_createSuccess<span class="signature">(message, data, statusCode)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Creates a standardized success response</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="gitHubServer_baseObjects.js.html">gitHubServer/baseObjects.js</a>, <a href="gitHubServer_baseObjects.js.html#line136">line 136</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>Success message</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>null</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>Response data</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>statusCode</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>200</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>HTTP status code</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Standardized success response</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="_executeTransaction"><span class="type-signature type-signature-async, private">(async, private) </span>_executeTransaction<span class="signature">(operations, transactionName)</span><span class="type-signature"> &rarr; {Promise.&lt;Array>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Executes a series of operations as a transaction</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="gitHubServer_baseObjects.js.html">gitHubServer/baseObjects.js</a>, <a href="gitHubServer_baseObjects.js.html#line180">line 180</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>operations</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;function()></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Array of async functions to execute</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>transactionName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Name of the transaction for logging</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Result of the transaction</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;Array></span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="_invalidateCache"><span class="type-signature type-signature-private">(private) </span>_invalidateCache<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Invalidate cache entries when data is modified</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="gitHubServer_baseObjects.js.html">gitHubServer/baseObjects.js</a>, <a href="gitHubServer_baseObjects.js.html#line103">line 103</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="_validateParams"><span class="type-signature type-signature-private">(private) </span>_validateParams<span class="signature">(params, expectedTypes)</span><span class="type-signature"> &rarr; {Array|null}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Validates parameters against expected types</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="gitHubServer_baseObjects.js.html">gitHubServer/baseObjects.js</a>, <a href="gitHubServer_baseObjects.js.html#line148">line 148</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Parameters to validate</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>expectedTypes</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Expected types for each parameter</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Error response or null if valid</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+|
+
+<span class="param-type">null</span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="batchUpdate"><span class="type-signature type-signature-async">(async) </span>batchUpdate<span class="signature">(updates)</span><span class="type-signature"> &rarr; {Promise.&lt;Array>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Perform batch updates on multiple objects</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="gitHubServer_baseObjects.js.html">gitHubServer/baseObjects.js</a>, <a href="gitHubServer_baseObjects.js.html#line614">line 614</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>updates</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Array of update operations</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Results of the update operations</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;Array></span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="checkForLock"><span class="type-signature type-signature-async">(async) </span>checkForLock<span class="signature">()</span><span class="type-signature"> &rarr; {Promise.&lt;Array>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Check if a container is locked</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="gitHubServer_baseObjects.js.html">gitHubServer/baseObjects.js</a>, <a href="gitHubServer_baseObjects.js.html#line747">line 747</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Lock status</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;Array></span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="checkForUpdates"><span class="type-signature type-signature-async">(async) </span>checkForUpdates<span class="signature">(lastKnownCommitSha, branchName, repo)</span><span class="type-signature"> &rarr; {Promise.&lt;Array>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Check if the branch has been updated since a specific commit</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="gitHubServer_baseObjects.js.html">gitHubServer/baseObjects.js</a>, <a href="gitHubServer_baseObjects.js.html#line862">line 862</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>lastKnownCommitSha</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The last known commit SHA</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>branchName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>main</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>Name of the branch to check (default: 'main')</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>repo</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>MegaRoast_discovery</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>Name of the repository (default: 'MegaRoast_discovery')</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Status indicating if an update is needed</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;Array></span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="getBranchStatus"><span class="type-signature type-signature-async">(async) </span>getBranchStatus<span class="signature">(branchName, repo)</span><span class="type-signature"> &rarr; {Promise.&lt;Array>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Get the latest commit status for a branch</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="gitHubServer_baseObjects.js.html">gitHubServer/baseObjects.js</a>, <a href="gitHubServer_baseObjects.js.html#line759">line 759</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>branchName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>main</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>Name of branch to check (default: 'main')</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>repo</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    <code>MegaRoast_discovery</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>Name of the repository (default: 'Megaroast_discovery')</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Latest commit information</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;Array></span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="search"><span class="type-signature type-signature-async">(async) </span>search<span class="signature">(filters, options)</span><span class="type-signature"> &rarr; {Promise.&lt;Array>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Enhanced search functionality with better filtering options</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="gitHubServer_baseObjects.js.html">gitHubServer/baseObjects.js</a>, <a href="gitHubServer_baseObjects.js.html#line244">line 244</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>filters</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Filter criteria</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Search options (limit, sort, etc)</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5 class="h5-returns">Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Search results</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;Array></span>
+
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>

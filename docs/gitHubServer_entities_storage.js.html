@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>gitHubServer/entities/storage.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Actions_Actions.html">Actions</a></li><li><a href="BillingManager.html">BillingManager</a><ul class='methods'><li data-type='method'><a href="BillingManager.html#getActionsBillings">getActionsBillings</a></li><li data-type='method'><a href="BillingManager.html#getAllBillings">getAllBillings</a></li><li data-type='method'><a href="BillingManager.html#getPackagesBillings">getPackagesBillings</a></li><li data-type='method'><a href="BillingManager.html#getStorageBillings">getStorageBillings</a></li></ul></li><li><a href="BranchManager.html">BranchManager</a><ul class='methods'><li data-type='method'><a href="BranchManager.html#createBranchFromMain">createBranchFromMain</a></li><li data-type='method'><a href="BranchManager.html#mergeBranchToMain">mergeBranchToMain</a></li></ul></li><li><a href="CacheManager.html">CacheManager</a><ul class='methods'><li data-type='method'><a href="CacheManager.html#clear">clear</a></li><li data-type='method'><a href="CacheManager.html#getOrFetch">getOrFetch</a></li><li data-type='method'><a href="CacheManager.html#invalidate">invalidate</a></li></ul></li><li><a href="ContainerOperations.html">ContainerOperations</a><ul class='methods'><li data-type='method'><a href="ContainerOperations.html#catchContainers">catchContainers</a></li><li data-type='method'><a href="ContainerOperations.html#checkForLock">checkForLock</a></li><li data-type='method'><a href="ContainerOperations.html#lockContainer">lockContainer</a></li><li data-type='method'><a href="ContainerOperations.html#releaseContainers">releaseContainers</a></li><li data-type='method'><a href="ContainerOperations.html#unlockContainer">unlockContainer</a></li></ul></li><li><a href="GitHubFunctions.GitHubFunctions.html">GitHubFunctions</a></li><li><a href="RepositoryManager.html">RepositoryManager</a><ul class='methods'><li data-type='method'><a href="RepositoryManager.html#createOrUpdateFile">createOrUpdateFile</a></li><li data-type='method'><a href="RepositoryManager.html#createRepository">createRepository</a></li><li data-type='method'><a href="RepositoryManager.html#deleteFile">deleteFile</a></li><li data-type='method'><a href="RepositoryManager.html#getActionsBilling">getActionsBilling</a></li><li data-type='method'><a href="RepositoryManager.html#getCollaborators">getCollaborators</a></li><li data-type='method'><a href="RepositoryManager.html#getContent">getContent</a></li><li data-type='method'><a href="RepositoryManager.html#getOrganization">getOrganization</a></li><li data-type='method'><a href="RepositoryManager.html#getStorageBilling">getStorageBilling</a></li><li data-type='method'><a href="RepositoryManager.html#getUser">getUser</a></li></ul></li><li><a href="ResponseFactory.html">ResponseFactory</a><ul class='methods'><li data-type='method'><a href="ResponseFactory.html#.error">error</a></li><li data-type='method'><a href="ResponseFactory.html#.success">success</a></li></ul></li><li><a href="Storage_Storage.html">Storage</a></li><li><a href="Studies_Studies.html">Studies</a></li><li><a href="UserManager.html">UserManager</a><ul class='methods'><li data-type='method'><a href="UserManager.html#addUserToRepository">addUserToRepository</a></li><li data-type='method'><a href="UserManager.html#getAllUsers">getAllUsers</a></li><li data-type='method'><a href="UserManager.html#getCurrentUser">getCurrentUser</a></li><li data-type='method'><a href="UserManager.html#removeUserFromRepository">removeUserFromRepository</a></li></ul></li><li><a href="Users_Users.html">Users</a></li><li><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html">BaseObjects</a><ul class='methods'><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_createError">_createError</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_createSuccess">_createSuccess</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_executeTransaction">_executeTransaction</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_invalidateCache">_invalidateCache</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_validateParams">_validateParams</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#batchUpdate">batchUpdate</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#checkForLock">checkForLock</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#checkForUpdates">checkForUpdates</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#getBranchStatus">getBranchStatus</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#search">search</a></li></ul></li><li><a href="module-GitHubAuth-GitHubAuth.html">GitHubAuth</a><ul class='methods'><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#checkTokenExpiration">checkTokenExpiration</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#getAccessTokenDeviceFlow">getAccessTokenDeviceFlow</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#getAccessTokenFromConfig">getAccessTokenFromConfig</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#getAuthTypeFromConfig">getAuthTypeFromConfig</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#getFromConfig">getFromConfig</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#verifyAccessToken">verifyAccessToken</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#verifyGitHubSection">verifyGitHubSection</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="api_gitHubServer.module_js.html">api/gitHubServer.js</a></li><li><a href="api_gitHubServer_baseObjects.module_js.html">api/gitHubServer/baseObjects.js</a><ul class='methods'><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~createObj">createObj</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~deleteObj">deleteObj</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~findById">findById</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~findByName">findByName</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~findByX">findByX</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~getAll">getAll</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~linkObj">linkObj</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~updateObj">updateObj</a></li></ul></li><li><a href="api_gitHubServer_deprecate.module_js.html">api/gitHubServer_deprecate.js</a><ul class='methods'><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~createObj">createObj</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~deleteObj">deleteObj</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~findById">findById</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~findByName">findByName</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~findByX">findByX</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~getAll">getAll</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~linkObj">linkObj</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~updateObj">updateObj</a></li></ul></li><li><a href="module-GitHubAuth.html">GitHubAuth</a></li><li><a href="module-GitHubFunctions.html">GitHubFunctions</a><ul class='methods'><li data-type='method'><a href="module-GitHubFunctions.html#~catchContainer">catchContainer</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~checkForLock">checkForLock</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~createBranchFromMain">createBranchFromMain</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~createContainers">createContainers</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~createRepository">createRepository</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~deleteObject">deleteObject</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getActionsBillings">getActionsBillings</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getAllUsers">getAllUsers</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getGitHubOrg">getGitHubOrg</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getRepoSize">getRepoSize</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getStorageBillings">getStorageBillings</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getUser">getUser</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getWorkflowRuns">getWorkflowRuns</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~lockContainer">lockContainer</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~mergeBranchToMain">mergeBranchToMain</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~readObjects">readObjects</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~releaseContainer">releaseContainer</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~unlockContainer">unlockContainer</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~updateObject">updateObject</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~writeObject">writeObject</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#customEncodeURIComponent">customEncodeURIComponent</a></li><li><a href="global.html#decodeContent">decodeContent</a></li><li><a href="global.html#decodeJsonContent">decodeJsonContent</a></li><li><a href="global.html#encodeContent">encodeContent</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">gitHubServer/entities/storage.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* eslint-disable no-console */
+/**
+ * Storage entity class for GitHub repository storage operations
+ * @file storage.js
+ * @license Apache-2.0
+ * @version 3.0.0
+ * 
+ * @author Michael Hay &lt;michael.hay@mediumroast.io>
+ * @copyright 2024 Mediumroast, Inc. All rights reserved.
+ */
+
+import { BaseObjects } from '../baseObjects.js';
+import { logger } from '../logger.js';
+
+export class Storage extends BaseObjects {
+  /**
+   * @constructor
+   * @param {string} token - GitHub API token
+   * @param {string} org - GitHub organization name
+   * @param {string} processName - Process name for locking
+   */
+  constructor(token, org, processName) {
+    super(token, org, processName, 'Storage');
+    
+    // Add storage-specific cache keys
+    this._cacheKeys.storageBilling = 'storage_billing';
+    this._cacheKeys.byContainer = 'storage_by_container';
+    this._cacheKeys.quota = 'storage_quota';
+    this._cacheKeys.trends = 'storage_trends';
+    
+    // Set specific cache timeouts
+    this.cacheTimeouts.storageBilling = 3600000; // 1 hour for billing info
+    this.cacheTimeouts.byContainer = 3600000;    // 1 hour for container info
+    this.cacheTimeouts.quota = 86400000;         // 24 hours for quota info
+    this.cacheTimeouts.trends = 86400000;        // 24 hours for trends
+    
+    // Define object file names for containers
+    this.objectFiles = {
+      Studies: 'studies.json',
+      Companies: 'companies.json',
+      Interactions: 'interactions.json'
+    };
+  }
+
+  /**
+   * Get repository size information
+   * @returns {Promise&lt;Array>} Size information
+   */
+  async getRepoSize() {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'getRepoSize') : 
+      { end: () => {} };
+    
+    try {
+      return await this.cache.getOrFetch(
+        this._cacheKeys.repoSize,
+        async () => {
+          try {
+            // Try to use getRepository method first
+            if (typeof this.serverCtl.getRepository === 'function') {
+              const repoResponse = await this.serverCtl.getRepository();
+              
+              if (!repoResponse[0]) {
+                return repoResponse;
+              }
+              
+              // Extract just the size from the response
+              return this._createSuccess(
+                'Retrieved repository size successfully',
+                repoResponse[2].size || 0
+              );
+            } 
+            // Try to use getRepoSize (older method name) as fallback
+            else if (typeof this.serverCtl.getRepoSize === 'function') {
+              logger.info('Using legacy getRepoSize method');
+              return await this.serverCtl.getRepoSize();
+            }
+            // If neither method exists, provide a fallback response
+            else {
+              logger.warn('Repository size methods not implemented in github.js, using fallback');
+              
+              return this._createSuccess(
+                'Repository size functionality not fully implemented',
+                {
+                  size: 0,
+                  message: 'This is a placeholder. The getRepository method needs to be implemented in the github.js file.'
+                }
+              );
+            }
+          } catch (error) {
+            // Handle any unexpected errors
+            logger.error('Failed to retrieve repository size', error);
+            throw error; // Re-throw to be caught by outer try-catch
+          }
+        },
+        this.cacheTimeouts.repoSize || 3600000,
+        [] // No dependencies
+      );
+    } catch (error) {
+      return this._createError(
+        `Failed to retrieve repository size: ${error.message}`,
+        error,
+        500
+      );
+    } finally {
+      tracking.end();
+    }
+  }
+
+  /**
+   * Get storage billing information
+   * @returns {Promise&lt;Array>} Storage billing info
+   */
+  async getStorageBilling() {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'getStorageBilling') : 
+      { end: () => {} };
+    
+    try {
+      return await this.cache.getOrFetch(
+        this._cacheKeys.storageBilling,
+        async () => {
+          try {
+            // Check if the method exists first
+            if (typeof this.serverCtl.getStorageBillings === 'function') {
+              return await this.serverCtl.getStorageBillings();
+            } else {
+              // Provide fallback mock data
+              logger.warn('getStorageBillings not implemented in github.js, using fallback');
+              return this._createSuccess(
+                'Storage billing functionality not fully implemented',
+                {
+                  days_left_in_billing_cycle: 15,
+                  estimated_paid_storage_for_month: 0,
+                  estimated_storage_for_month: 5,
+                  message: 'This is a placeholder. The getStorageBillings method needs to be implemented.'
+                }
+              );
+            }
+          } catch (error) {
+            logger.error('Failed to retrieve storage billing', error);
+            throw error;
+          }
+        },
+        this.cacheTimeouts.storageBilling,
+        []
+      );
+    } catch (error) {
+      return this._createError(
+        `Failed to retrieve storage billing: ${error.message}`,
+        error,
+        500
+      );
+    } finally {
+      tracking.end();
+    }
+  }
+    
+  /**
+   * Get storage usage by container
+   * @returns {Promise&lt;Array>} Storage usage by container
+   */
+  async getStorageByContainer() {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'getStorageByContainer') : 
+      { end: () => {} };
+    
+    try {
+      return await this.cache.getOrFetch(
+        this._cacheKeys.byContainer,
+        async () => {
+          try {
+            // Get all container names
+            const containers = ['Studies', 'Companies', 'Interactions'];
+            const stats = {
+              totalSize: 0,
+              containers: {}
+            };
+            
+            for (const container of containers) {
+              // Skip if no object file for this container
+              if (!this.objectFiles[container]) {
+                logger.debug(`Skipping container ${container} - no object file defined`);
+                continue;
+              }
+                
+              // Initialize container statistics
+              stats.containers[container] = {
+                size: 0,
+                objectCount: 0,
+                lastUpdated: null
+              };
+                
+              // Get container objects
+              const containerClass = new BaseObjects(
+                this.serverCtl.token,
+                this.serverCtl.orgName,
+                'storage-analyzer',
+                container
+              );
+                
+              const objectsResp = await containerClass.getAll();
+              if (!objectsResp[0]) {
+                logger.warn(`Failed to get objects for ${container}: ${objectsResp[1]?.status_msg}`);
+                continue;
+              }
+                
+              const objects = objectsResp[2].mrJson;
+              stats.containers[container].objectCount = objects.length;
+                
+              // Get latest modification date
+              for (const obj of objects) {
+                if (obj.modification_date &amp;&amp; 
+                      (!stats.containers[container].lastUpdated || 
+                       new Date(obj.modification_date) > new Date(stats.containers[container].lastUpdated))) {
+                  stats.containers[container].lastUpdated = obj.modification_date;
+                }
+              }
+                
+              // For Interactions, also calculate total file size
+              if (container === 'Interactions') {
+                let totalInteractionSize = 0;
+                for (const obj of objects) {
+                  if (obj.file_size) {
+                    totalInteractionSize += obj.file_size;
+                  }
+                }
+                stats.containers[container].fileSize = totalInteractionSize;
+              }
+                
+              // Get container file size from SHA
+              try {
+                if (typeof this.serverCtl.getSha === 'function') {
+                  const shaResp = await this.serverCtl.getSha(
+                    container, 
+                    this.objectFiles[container], 
+                    'main'
+                  );
+                      
+                  if (shaResp[0] &amp;&amp; shaResp[2] &amp;&amp; typeof this.serverCtl.getContent === 'function') {
+                    const contentResp = await this.serverCtl.getContent(
+                      `${container}/${this.objectFiles[container]}`, 
+                      'main'
+                    );
+                          
+                    if (contentResp[0] &amp;&amp; contentResp[2] &amp;&amp; contentResp[2].size) {
+                      stats.containers[container].size = contentResp[2].size;
+                      stats.totalSize += contentResp[2].size;
+                    }
+                  }
+                }
+              } catch (err) {
+                logger.error(`Error getting size for ${container}:`, err);
+              }
+            }
+            
+            return this._createSuccess(
+              'Retrieved storage usage by container',
+              stats
+            );
+          } catch (err) {
+            return this._createError(
+              `Failed to retrieve storage usage: ${err.message}`,
+              err,
+              500
+            );
+          }
+        },
+        this.cacheTimeouts.byContainer,
+        []
+      );
+    } finally {
+      tracking.end();
+    }
+  }
+    
+  /**
+   * Get storage usage trends over time
+   * @param {number} days - Number of days to analyze
+   * @returns {Promise&lt;Array>} Storage usage trends
+   */
+  async getStorageTrends(days = 30) {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'getStorageTrends') : 
+      { end: () => {} };
+    
+    // Validate parameters
+    const validationError = this._validateParams(
+      { days },
+      { days: 'number' }
+    );
+        
+    if (validationError) return validationError;
+    
+    try {
+      // Use cache with key that includes days parameter
+      const trendsCacheKey = `${this._cacheKeys.trends}_${days}`;
+      
+      return await this.cache.getOrFetch(
+        trendsCacheKey,
+        async () => {
+          try {
+            const commitHistory = await this.serverCtl.getCommitHistory(days);
+            if (!commitHistory[0]) {
+              return commitHistory;
+            }
+            
+            // Extract size information from commits
+            const sizeByDate = {};
+            const commits = commitHistory[2];
+            
+            for (const commit of commits) {
+              const date = commit.commit.author.date.substring(0, 10); // YYYY-MM-DD
+                
+              // Get the repo size at this commit
+              try {
+                const sizeResp = await this.serverCtl.getRepoSizeAtCommit(commit.sha);
+                if (sizeResp[0] &amp;&amp; sizeResp[2]) {
+                  sizeByDate[date] = sizeResp[2];
+                }
+              } catch (err) {
+                logger.error(`Error getting size at commit ${commit.sha}:`, err);
+              }
+            }
+            
+            // Convert to array and sort by date
+            const trends = Object.entries(sizeByDate).map(([date, size]) => ({
+              date,
+              size
+            })).sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            return this._createSuccess(
+              `Retrieved storage trends for the past ${days} days`,
+              trends
+            );
+          } catch (err) {
+            return this._createError(
+              `Failed to retrieve storage trends: ${err.message}`,
+              err,
+              500
+            );
+          }
+        },
+        this.cacheTimeouts.trends
+      );
+    } finally {
+      tracking.end();
+    }
+  }
+    
+  /**
+   * Get storage quota and usage
+   * @returns {Promise&lt;Array>} Storage quota and usage information
+   */
+  async getQuota() {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'getQuota') : 
+      { end: () => {} };
+    
+    try {
+      return await this.cache.getOrFetch(
+        this._cacheKeys.quota,
+        async () => {
+          try {
+            if (typeof this.serverCtl.getGitHubOrg === 'function') {
+              const orgResp = await this.serverCtl.getGitHubOrg();
+              if (!orgResp[0]) {
+                return orgResp;
+              }
+              
+              // Provide basic quota information
+              const quota = {
+                organization: this.org,
+                plan: orgResp[2]?.plan || {
+                  name: 'unknown',
+                  space: 'unknown'
+                }
+              };
+              
+              return this._createSuccess(
+                'Retrieved storage quota information',
+                quota
+              );
+            } else {
+              // Provide fallback mock data
+              return this._createSuccess(
+                'Storage quota functionality not fully implemented',
+                {
+                  organization: this.org,
+                  plan: {
+                    name: 'team',
+                    space: 'unlimited',
+                    message: 'This is a placeholder. The getGitHubOrg method needs to be implemented.'
+                  }
+                }
+              );
+            }
+          } catch (err) {
+            return this._createError(
+              `Failed to retrieve storage quota: ${err.message}`,
+              err,
+              500
+            );
+          }
+        },
+        this.cacheTimeouts.quota,
+        []
+      );
+    } finally {
+      tracking.end();
+    }
+  }
+  
+  /**
+   * Get disk usage analytics
+   * @returns {Promise&lt;Array>} Disk usage analytics
+   */
+  async getDiskUsageAnalytics() {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'getDiskUsageAnalytics') : 
+      { end: () => {} };
+    
+    try {
+      // Use cache with dependencies on container and repo size
+      const analyticsCacheKey = 'storage_analytics';
+      
+      return await this.cache.getOrFetch(
+        analyticsCacheKey,
+        async () => {
+          try {
+            // Get storage by container
+            const containerResp = await this.getStorageByContainer();
+            if (!containerResp[0]) {
+              return containerResp;
+            }
+            
+            const storage = containerResp[2];
+            
+            // Calculate analytics
+            const analytics = {
+              totalSize: storage.totalSize,
+              repoSize: storage.repoSize || 0,
+              containers: {},
+              percentages: {},
+              largestContainer: {
+                name: '',
+                size: 0
+              },
+              mostObjects: {
+                name: '',
+                count: 0
+              },
+              mostRecentActivity: {
+                name: '',
+                date: null
+              }
+            };
+            
+            // Calculate container analytics
+            for (const [name, container] of Object.entries(storage.containers)) {
+              // Copy container data
+              analytics.containers[name] = container;
+              
+              // Calculate percentage of total
+              analytics.percentages[name] = storage.totalSize > 0 ? 
+                (container.size / storage.totalSize) * 100 : 0;
+              
+              // Track largest container
+              if (container.size > analytics.largestContainer.size) {
+                analytics.largestContainer = {
+                  name,
+                  size: container.size
+                };
+              }
+              
+              // Track container with most objects
+              if (container.objectCount > analytics.mostObjects.count) {
+                analytics.mostObjects = {
+                  name,
+                  count: container.objectCount
+                };
+              }
+              
+              // Track most recent activity
+              if (container.lastUpdated &amp;&amp; 
+                 (!analytics.mostRecentActivity.date || 
+                   new Date(container.lastUpdated) > new Date(analytics.mostRecentActivity.date))) {
+                analytics.mostRecentActivity = {
+                  name,
+                  date: container.lastUpdated
+                };
+              }
+            }
+            
+            // Add projected growth based on trends
+            try {
+              const trendsResp = await this.getStorageTrends(30);
+              if (trendsResp[0] &amp;&amp; trendsResp[2] &amp;&amp; trendsResp[2].length > 1) {
+                const trends = trendsResp[2];
+                const firstSize = trends[0].size;
+                const lastSize = trends[trends.length - 1].size;
+                const growthRate = (lastSize - firstSize) / firstSize;
+                
+                analytics.growth = {
+                  rate: growthRate,
+                  period: '30 days',
+                  projectedSize: {
+                    '30days': Math.round(lastSize * (1 + growthRate)),
+                    '90days': Math.round(lastSize * Math.pow(1 + growthRate, 3)) 
+                  }
+                };
+              }
+            } catch (err) {
+              logger.warn('Failed to calculate growth projections', err);
+            }
+            
+            return this._createSuccess(
+              'Generated storage analytics',
+              analytics
+            );
+          } catch (err) {
+            return this._createError(
+              `Failed to generate disk usage analytics: ${err.message}`,
+              err,
+              500
+            );
+          }
+        },
+        300000, // 5 minutes cache
+        [
+          this._cacheKeys.byContainer,   // Depends on container data
+          this._cacheKeys.trends,        // Depends on trends data
+          this._cacheKeys.repoSize       // Depends on repo size
+        ]
+      );
+    } finally {
+      tracking.end();
+    }
+  }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>

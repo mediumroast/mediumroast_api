@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>Storage - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Actions_Actions.html">Actions</a></li><li><a href="BillingManager.html">BillingManager</a><ul class='methods'><li data-type='method'><a href="BillingManager.html#getActionsBillings">getActionsBillings</a></li><li data-type='method'><a href="BillingManager.html#getAllBillings">getAllBillings</a></li><li data-type='method'><a href="BillingManager.html#getPackagesBillings">getPackagesBillings</a></li><li data-type='method'><a href="BillingManager.html#getStorageBillings">getStorageBillings</a></li></ul></li><li><a href="BranchManager.html">BranchManager</a><ul class='methods'><li data-type='method'><a href="BranchManager.html#createBranchFromMain">createBranchFromMain</a></li><li data-type='method'><a href="BranchManager.html#mergeBranchToMain">mergeBranchToMain</a></li></ul></li><li><a href="CacheManager.html">CacheManager</a><ul class='methods'><li data-type='method'><a href="CacheManager.html#clear">clear</a></li><li data-type='method'><a href="CacheManager.html#getOrFetch">getOrFetch</a></li><li data-type='method'><a href="CacheManager.html#invalidate">invalidate</a></li></ul></li><li><a href="ContainerOperations.html">ContainerOperations</a><ul class='methods'><li data-type='method'><a href="ContainerOperations.html#catchContainers">catchContainers</a></li><li data-type='method'><a href="ContainerOperations.html#checkForLock">checkForLock</a></li><li data-type='method'><a href="ContainerOperations.html#lockContainer">lockContainer</a></li><li data-type='method'><a href="ContainerOperations.html#releaseContainers">releaseContainers</a></li><li data-type='method'><a href="ContainerOperations.html#unlockContainer">unlockContainer</a></li></ul></li><li><a href="GitHubFunctions.GitHubFunctions.html">GitHubFunctions</a></li><li><a href="RepositoryManager.html">RepositoryManager</a><ul class='methods'><li data-type='method'><a href="RepositoryManager.html#createOrUpdateFile">createOrUpdateFile</a></li><li data-type='method'><a href="RepositoryManager.html#createRepository">createRepository</a></li><li data-type='method'><a href="RepositoryManager.html#deleteFile">deleteFile</a></li><li data-type='method'><a href="RepositoryManager.html#getActionsBilling">getActionsBilling</a></li><li data-type='method'><a href="RepositoryManager.html#getCollaborators">getCollaborators</a></li><li data-type='method'><a href="RepositoryManager.html#getContent">getContent</a></li><li data-type='method'><a href="RepositoryManager.html#getOrganization">getOrganization</a></li><li data-type='method'><a href="RepositoryManager.html#getStorageBilling">getStorageBilling</a></li><li data-type='method'><a href="RepositoryManager.html#getUser">getUser</a></li></ul></li><li><a href="ResponseFactory.html">ResponseFactory</a><ul class='methods'><li data-type='method'><a href="ResponseFactory.html#.error">error</a></li><li data-type='method'><a href="ResponseFactory.html#.success">success</a></li></ul></li><li><a href="Storage_Storage.html">Storage</a></li><li><a href="Studies_Studies.html">Studies</a></li><li><a href="UserManager.html">UserManager</a><ul class='methods'><li data-type='method'><a href="UserManager.html#addUserToRepository">addUserToRepository</a></li><li data-type='method'><a href="UserManager.html#getAllUsers">getAllUsers</a></li><li data-type='method'><a href="UserManager.html#getCurrentUser">getCurrentUser</a></li><li data-type='method'><a href="UserManager.html#removeUserFromRepository">removeUserFromRepository</a></li></ul></li><li><a href="Users_Users.html">Users</a></li><li><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html">BaseObjects</a><ul class='methods'><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_createError">_createError</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_createSuccess">_createSuccess</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_executeTransaction">_executeTransaction</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_invalidateCache">_invalidateCache</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_validateParams">_validateParams</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#batchUpdate">batchUpdate</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#checkForLock">checkForLock</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#checkForUpdates">checkForUpdates</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#getBranchStatus">getBranchStatus</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#search">search</a></li></ul></li><li><a href="module-GitHubAuth-GitHubAuth.html">GitHubAuth</a><ul class='methods'><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#checkTokenExpiration">checkTokenExpiration</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#getAccessTokenDeviceFlow">getAccessTokenDeviceFlow</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#getAccessTokenFromConfig">getAccessTokenFromConfig</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#getAuthTypeFromConfig">getAuthTypeFromConfig</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#getFromConfig">getFromConfig</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#verifyAccessToken">verifyAccessToken</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#verifyGitHubSection">verifyGitHubSection</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="api_gitHubServer.module_js.html">api/gitHubServer.js</a></li><li><a href="api_gitHubServer_baseObjects.module_js.html">api/gitHubServer/baseObjects.js</a><ul class='methods'><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~createObj">createObj</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~deleteObj">deleteObj</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~findById">findById</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~findByName">findByName</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~findByX">findByX</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~getAll">getAll</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~linkObj">linkObj</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~updateObj">updateObj</a></li></ul></li><li><a href="api_gitHubServer_deprecate.module_js.html">api/gitHubServer_deprecate.js</a><ul class='methods'><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~createObj">createObj</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~deleteObj">deleteObj</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~findById">findById</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~findByName">findByName</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~findByX">findByX</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~getAll">getAll</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~linkObj">linkObj</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~updateObj">updateObj</a></li></ul></li><li><a href="module-GitHubAuth.html">GitHubAuth</a></li><li><a href="module-GitHubFunctions.html">GitHubFunctions</a><ul class='methods'><li data-type='method'><a href="module-GitHubFunctions.html#~catchContainer">catchContainer</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~checkForLock">checkForLock</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~createBranchFromMain">createBranchFromMain</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~createContainers">createContainers</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~createRepository">createRepository</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~deleteObject">deleteObject</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getActionsBillings">getActionsBillings</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getAllUsers">getAllUsers</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getGitHubOrg">getGitHubOrg</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getRepoSize">getRepoSize</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getStorageBillings">getStorageBillings</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getUser">getUser</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getWorkflowRuns">getWorkflowRuns</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~lockContainer">lockContainer</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~mergeBranchToMain">mergeBranchToMain</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~readObjects">readObjects</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~releaseContainer">releaseContainer</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~unlockContainer">unlockContainer</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~updateObject">updateObject</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~writeObject">writeObject</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#customEncodeURIComponent">customEncodeURIComponent</a></li><li><a href="global.html#decodeContent">decodeContent</a></li><li><a href="global.html#decodeJsonContent">decodeJsonContent</a></li><li><a href="global.html#encodeContent">encodeContent</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Storage</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        
+            Storage
+        
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+    
+
+    <h4 class="name" id="Storage"><span class="type-signature"></span>new Storage<span class="signature">(token, org, processName)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="gitHubServer_entities_storage.js.html">gitHubServer/entities/storage.js</a>, <a href="gitHubServer_entities_storage.js.html#line22">line 22</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>token</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>GitHub API token</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>org</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>GitHub organization name</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>processName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Process name for locking</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>

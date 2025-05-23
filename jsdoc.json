@@ -1,0 +1,48 @@
+{
+  "plugins": ["plugins/markdown", "node_modules/better-docs/category"],
+  "source": {
+    "include": ["src"],
+    "includePattern": ".+\\.js(doc|x)?$",
+    "excludePattern": "(node_modules/|docs)"
+  },
+  "sourceType": "module",
+  "tags": {
+    "allowUnknownTags": true,
+    "dictionaries": ["jsdoc", "closure"]
+  },
+  "templates": {
+    "cleverLinks": false,
+    "monospaceLinks": false,
+    "default": {
+      "outputSourceFiles": true,
+      "includeDate": false
+    },
+    "better-docs": {
+      "name": "Mediumroast API Documentation",
+      "title": "Mediumroast API Documentation",
+      "hideGenerator": false,
+      "navigation": [
+        {
+          "label": "GitHub",
+          "href": "https://github.com/mediumroast/mediumroast_api"
+        },
+        {
+          "label": "Examples",
+          "href": "https://github.com/mediumroast/mediumroast_api/tree/main/examples"
+        }
+      ]
+    }
+  },
+  "markdown": {
+    "hardwrap": false,
+    "idInHeadings": true
+  },
+  "opts": {
+    "destination": "./docs",
+    "encoding": "utf8",
+    "private": true,
+    "recurse": true,
+    "template": "node_modules/docdash",
+    "readme": "./README.md"
+  }
+}

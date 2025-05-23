@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>gitHubServer/entities/actions.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Actions_Actions.html">Actions</a></li><li><a href="BillingManager.html">BillingManager</a><ul class='methods'><li data-type='method'><a href="BillingManager.html#getActionsBillings">getActionsBillings</a></li><li data-type='method'><a href="BillingManager.html#getAllBillings">getAllBillings</a></li><li data-type='method'><a href="BillingManager.html#getPackagesBillings">getPackagesBillings</a></li><li data-type='method'><a href="BillingManager.html#getStorageBillings">getStorageBillings</a></li></ul></li><li><a href="BranchManager.html">BranchManager</a><ul class='methods'><li data-type='method'><a href="BranchManager.html#createBranchFromMain">createBranchFromMain</a></li><li data-type='method'><a href="BranchManager.html#mergeBranchToMain">mergeBranchToMain</a></li></ul></li><li><a href="CacheManager.html">CacheManager</a><ul class='methods'><li data-type='method'><a href="CacheManager.html#clear">clear</a></li><li data-type='method'><a href="CacheManager.html#getOrFetch">getOrFetch</a></li><li data-type='method'><a href="CacheManager.html#invalidate">invalidate</a></li></ul></li><li><a href="ContainerOperations.html">ContainerOperations</a><ul class='methods'><li data-type='method'><a href="ContainerOperations.html#catchContainers">catchContainers</a></li><li data-type='method'><a href="ContainerOperations.html#checkForLock">checkForLock</a></li><li data-type='method'><a href="ContainerOperations.html#lockContainer">lockContainer</a></li><li data-type='method'><a href="ContainerOperations.html#releaseContainers">releaseContainers</a></li><li data-type='method'><a href="ContainerOperations.html#unlockContainer">unlockContainer</a></li></ul></li><li><a href="GitHubFunctions.GitHubFunctions.html">GitHubFunctions</a></li><li><a href="RepositoryManager.html">RepositoryManager</a><ul class='methods'><li data-type='method'><a href="RepositoryManager.html#createOrUpdateFile">createOrUpdateFile</a></li><li data-type='method'><a href="RepositoryManager.html#createRepository">createRepository</a></li><li data-type='method'><a href="RepositoryManager.html#deleteFile">deleteFile</a></li><li data-type='method'><a href="RepositoryManager.html#getActionsBilling">getActionsBilling</a></li><li data-type='method'><a href="RepositoryManager.html#getCollaborators">getCollaborators</a></li><li data-type='method'><a href="RepositoryManager.html#getContent">getContent</a></li><li data-type='method'><a href="RepositoryManager.html#getOrganization">getOrganization</a></li><li data-type='method'><a href="RepositoryManager.html#getStorageBilling">getStorageBilling</a></li><li data-type='method'><a href="RepositoryManager.html#getUser">getUser</a></li></ul></li><li><a href="ResponseFactory.html">ResponseFactory</a><ul class='methods'><li data-type='method'><a href="ResponseFactory.html#.error">error</a></li><li data-type='method'><a href="ResponseFactory.html#.success">success</a></li></ul></li><li><a href="Storage_Storage.html">Storage</a></li><li><a href="Studies_Studies.html">Studies</a></li><li><a href="UserManager.html">UserManager</a><ul class='methods'><li data-type='method'><a href="UserManager.html#addUserToRepository">addUserToRepository</a></li><li data-type='method'><a href="UserManager.html#getAllUsers">getAllUsers</a></li><li data-type='method'><a href="UserManager.html#getCurrentUser">getCurrentUser</a></li><li data-type='method'><a href="UserManager.html#removeUserFromRepository">removeUserFromRepository</a></li></ul></li><li><a href="Users_Users.html">Users</a></li><li><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html">BaseObjects</a><ul class='methods'><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_createError">_createError</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_createSuccess">_createSuccess</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_executeTransaction">_executeTransaction</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_invalidateCache">_invalidateCache</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#_validateParams">_validateParams</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#batchUpdate">batchUpdate</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#checkForLock">checkForLock</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#checkForUpdates">checkForUpdates</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#getBranchStatus">getBranchStatus</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html#search">search</a></li></ul></li><li><a href="module-GitHubAuth-GitHubAuth.html">GitHubAuth</a><ul class='methods'><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#checkTokenExpiration">checkTokenExpiration</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#getAccessTokenDeviceFlow">getAccessTokenDeviceFlow</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#getAccessTokenFromConfig">getAccessTokenFromConfig</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#getAuthTypeFromConfig">getAuthTypeFromConfig</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#getFromConfig">getFromConfig</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#verifyAccessToken">verifyAccessToken</a></li><li data-type='method'><a href="module-GitHubAuth-GitHubAuth.html#verifyGitHubSection">verifyGitHubSection</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="api_gitHubServer.module_js.html">api/gitHubServer.js</a></li><li><a href="api_gitHubServer_baseObjects.module_js.html">api/gitHubServer/baseObjects.js</a><ul class='methods'><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~createObj">createObj</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~deleteObj">deleteObj</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~findById">findById</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~findByName">findByName</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~findByX">findByX</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~getAll">getAll</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~linkObj">linkObj</a></li><li data-type='method'><a href="api_gitHubServer_baseObjects.module_js.html#~updateObj">updateObj</a></li></ul></li><li><a href="api_gitHubServer_deprecate.module_js.html">api/gitHubServer_deprecate.js</a><ul class='methods'><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~createObj">createObj</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~deleteObj">deleteObj</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~findById">findById</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~findByName">findByName</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~findByX">findByX</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~getAll">getAll</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~linkObj">linkObj</a></li><li data-type='method'><a href="api_gitHubServer_deprecate.module_js.html#~updateObj">updateObj</a></li></ul></li><li><a href="module-GitHubAuth.html">GitHubAuth</a></li><li><a href="module-GitHubFunctions.html">GitHubFunctions</a><ul class='methods'><li data-type='method'><a href="module-GitHubFunctions.html#~catchContainer">catchContainer</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~checkForLock">checkForLock</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~createBranchFromMain">createBranchFromMain</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~createContainers">createContainers</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~createRepository">createRepository</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~deleteObject">deleteObject</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getActionsBillings">getActionsBillings</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getAllUsers">getAllUsers</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getGitHubOrg">getGitHubOrg</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getRepoSize">getRepoSize</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getStorageBillings">getStorageBillings</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getUser">getUser</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~getWorkflowRuns">getWorkflowRuns</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~lockContainer">lockContainer</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~mergeBranchToMain">mergeBranchToMain</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~readObjects">readObjects</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~releaseContainer">releaseContainer</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~unlockContainer">unlockContainer</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~updateObject">updateObject</a></li><li data-type='method'><a href="module-GitHubFunctions.html#~writeObject">writeObject</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#customEncodeURIComponent">customEncodeURIComponent</a></li><li><a href="global.html#decodeContent">decodeContent</a></li><li><a href="global.html#decodeJsonContent">decodeJsonContent</a></li><li><a href="global.html#encodeContent">encodeContent</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">gitHubServer/entities/actions.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Actions entity class for GitHub workflow operations
+ * @file actions.js
+ * @license Apache-2.0
+ * @version 3.0.0
+ * 
+ * @author Michael Hay &lt;michael.hay@mediumroast.io>
+ * @copyright 2024 Mediumroast, Inc. All rights reserved.
+ */
+
+import { BaseObjects } from '../baseObjects.js';
+import { logger } from '../logger.js';
+
+export class Actions extends BaseObjects {
+  /**
+   * @constructor
+   * @param {string} token - GitHub API token
+   * @param {string} org - GitHub organization name
+   * @param {string} processName - Process name for locking
+   */
+  constructor(token, org, processName) {
+    super(token, org, processName, 'Actions');
+    
+    // Add actions-specific cache keys
+    this._cacheKeys.workflowRuns = 'workflow_runs';
+    this._cacheKeys.actionsBilling = 'actions_billing';
+    
+    // Set specific cache timeouts
+    this.cacheTimeouts.workflowRuns = 60000;    // 1 minute for workflow runs (dynamic data)
+    this.cacheTimeouts.actionsBilling = 3600000; // 1 hour for billing info
+  }
+
+  /**
+   * Update GitHub Actions workflow files
+   * @returns {Promise&lt;Array>} Operation result
+   */
+  async updateActions() {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'updateActions') : 
+      { end: () => {} };
+    
+    try {
+      return await this._executeTransaction([
+        // Step 1: Get action manifest
+        async () => {
+          try {
+            const manifestResp = await this.serverCtl.getActionsManifest();
+            if (!manifestResp[0]) {
+              return manifestResp;
+            }
+
+            // Store for next step
+            this._tempManifest = manifestResp[2];
+            return this._createSuccess('Retrieved actions manifest');
+          } catch (err) {
+            logger.error('Failed to retrieve actions manifest', err);
+            return this._createError(
+              `Failed to retrieve actions manifest: ${err.message}`,
+              err,
+              500
+            );
+          }
+        },
+
+        // Step 2: Install or update each action
+        async () => {
+          const installStatus = [];
+
+          for (const action of this._tempManifest) {
+            try {
+              // Check if action exists
+              const actionExists = await this.serverCtl.actionExists(action.name);
+
+              let result;
+              if (actionExists[0] &amp;&amp; actionExists[2]) {
+                // Update existing action
+                result = await this.serverCtl.updateAction(
+                  action.name,
+                  action.content,
+                  actionExists[2] // SHA
+                );
+              } else {
+                // Create new action
+                result = await this.serverCtl.createAction(
+                  action.name,
+                  action.content
+                );
+              }
+
+              // Add to status with operation type
+              installStatus.push({
+                name: action.name,
+                operation: actionExists[0] &amp;&amp; actionExists[2] ? 'updated' : 'created',
+                success: result[0],
+                message: result[1],
+                timestamp: new Date().toISOString()
+              });
+
+            } catch (err) {
+              logger.error(`Failed to install action [${action.name}]`, err);
+              installStatus.push({
+                name: action.name,
+                operation: 'failed',
+                success: false,
+                message: err.message,
+                timestamp: new Date().toISOString()
+              });
+            }
+          }
+
+          // If all installations failed, return error
+          if (installStatus.every(status => !status.success)) {
+            return this._createError(
+              'All action installations failed',
+              installStatus,
+              500
+            );
+          }
+
+          return this._createSuccess(
+            `Actions installation completed: ${installStatus.filter(s => s.success).length} succeeded, ${installStatus.filter(s => !s.success).length} failed`,
+            installStatus
+          );
+        }
+      ], 'update-actions');
+    } finally {
+      tracking.end();
+    }
+  }
+
+  /**
+   * Get actions billing information
+   * @returns {Promise&lt;Array>} Billing information
+   */
+  async getActionsBilling() {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'getActionsBilling') : 
+      { end: () => {} };
+    
+    try {
+      // Use the standardized cache key structure
+      return await this.cache.getOrFetch(
+        this._cacheKeys.actionsBilling,
+        async () => this.serverCtl.getActionsBillings(),
+        this.cacheTimeouts.actionsBilling || 60000,
+        [] // No dependencies
+      );
+    } catch (error) {
+      return this._createError(
+        `Failed to retrieve Actions billing: ${error.message}`,
+        error,
+        500
+      );
+    } finally {
+      tracking.end();
+    }
+  }
+
+  /**
+   * Get all workflow runs
+   * @returns {Promise&lt;Array>} List of workflow runs
+   */
+  async getAll() {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'getAll') : 
+      { end: () => {} };
+    
+    try {
+      return await this.cache.getOrFetch(
+        this._cacheKeys.workflowRuns,
+        async () => {
+          try {
+            // Try the original implementation first
+            return await this.serverCtl.getWorkflowRuns();
+          } catch (error) {
+            // If the error is specifically about missing the method, use a fallback
+            if (error.message &amp;&amp; error.message.includes('getWorkflowRuns is not a function')) {
+              logger.warn('getWorkflowRuns not implemented in github.js, using fallback implementation');
+              
+              // Fallback implementation - returns an empty successful response
+              return [
+                true, 
+                'Workflow runs functionality not fully implemented', 
+                { 
+                  workflow_runs: [],
+                  total_count: 0,
+                  message: 'This is a placeholder. The getWorkflowRuns method needs to be implemented in the github.js file.'
+                }
+              ];
+            }
+            // If it's another error, rethrow it
+            throw error;
+          }
+        },
+        this.cacheTimeouts.workflowRuns || 60000,
+        [] // No dependencies
+      );
+    } catch (error) {
+      return this._createError(
+        `Failed to retrieve workflow runs: ${error.message}`,
+        error,
+        500
+      );
+    } finally {
+      tracking.end();
+    }
+  }
+
+  /**
+   * Get details for a specific workflow run
+   * @param {string} runId - Workflow run ID
+   * @returns {Promise&lt;Array>} Workflow run details
+   */
+  async getWorkflowRun(runId) {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'getWorkflowRun') : 
+      { end: () => {} };
+    
+    try {
+      // Use standardized parameter validation
+      const validationError = this._validateParams(
+        { runId },
+        { runId: 'string' }
+      );
+        
+      if (validationError) return validationError;
+      
+      // Use cache for individual runs with dependency on all runs
+      const runCacheKey = `${this._cacheKeys.workflowRuns}_${runId}`;
+      
+      return await this.cache.getOrFetch(
+        runCacheKey,
+        async () => this.serverCtl.getWorkflowRun(runId),
+        this.cacheTimeouts.workflowRuns || 60000,
+        [this._cacheKeys.workflowRuns] // Depends on all workflow runs
+      );
+    } catch (error) {
+      return this._createError(
+        `Failed to retrieve workflow run: ${error.message}`,
+        error,
+        500
+      );
+    } finally {
+      tracking.end();
+    }
+  }
+
+  /**
+   * Cancel a workflow run
+   * @param {string} runId - Workflow run ID to cancel
+   * @returns {Promise&lt;Array>} Result of operation
+   */
+  async cancelWorkflowRun(runId) {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'cancelWorkflowRun') : 
+      { end: () => {} };
+    
+    try {
+      // Use standardized parameter validation
+      const validationError = this._validateParams(
+        { runId },
+        { runId: 'string' }
+      );
+        
+      if (validationError) return validationError;
+      
+      const result = await this.serverCtl.cancelWorkflowRun(runId);
+
+      // Invalidate cache on successful cancellation
+      if (result[0]) {
+        // Invalidate both the specific run and the list of all runs
+        this.cache.invalidate(this._cacheKeys.workflowRuns);
+        this.cache.invalidate(`${this._cacheKeys.workflowRuns}_${runId}`);
+      }
+
+      return result;
+    } catch (error) {
+      return this._createError(
+        `Failed to cancel workflow run: ${error.message}`,
+        error,
+        500
+      );
+    } finally {
+      tracking.end();
+    }
+  }
+
+  /**
+   * Trigger a specific workflow
+   * @param {string} workflowId - Workflow file name (e.g., "main.yml")
+   * @param {Object} inputs - Workflow inputs
+   * @returns {Promise&lt;Array>} Result of operation
+   */
+  async triggerWorkflow(workflowId, inputs = {}) {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'triggerWorkflow') : 
+      { end: () => {} };
+    
+    try {
+      // Use standardized parameter validation
+      const validationError = this._validateParams(
+        { workflowId, inputs },
+        { workflowId: 'string', inputs: 'object' }
+      );
+        
+      if (validationError) return validationError;
+      
+      const result = await this.serverCtl.dispatchWorkflow(workflowId, inputs);
+
+      // Invalidate cache on successful trigger
+      if (result[0]) {
+        this.cache.invalidate(this._cacheKeys.workflowRuns);
+      }
+
+      return result;
+    } catch (error) {
+      return this._createError(
+        `Failed to trigger workflow: ${error.message}`,
+        error,
+        500
+      );
+    } finally {
+      tracking.end();
+    }
+  }
+
+  /**
+   * Get usage metrics for GitHub Actions
+   * @returns {Promise&lt;Array>} Actions usage metrics
+   */
+  async getUsageMetrics() {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'getUsageMetrics') : 
+      { end: () => {} };
+    
+    try {
+      // Use the standardized cache key structure for metrics
+      return await this.cache.getOrFetch(
+        this._cacheKeys.metrics,
+        async () => {
+          // Get billing information
+          const billingResp = await this.getActionsBilling();
+          if (!billingResp[0]) {
+            return billingResp;
+          }
+
+          // Get recent workflow runs
+          const runsResp = await this.getAll();
+          if (!runsResp[0]) {
+            return runsResp;
+          }
+
+          // Calculate metrics from the data
+          const billing = billingResp[2];
+          const runs = runsResp[2];
+
+          // Count runs by status
+          const statusCounts = {};
+          const workflowCounts = {};
+
+          runs.forEach(run => {
+            // Count by status
+            statusCounts[run.status] = (statusCounts[run.status] || 0) + 1;
+
+            // Count by workflow
+            const workflowName = run.workflow_id || 'unknown';
+            workflowCounts[workflowName] = (workflowCounts[workflowName] || 0) + 1;
+          });
+
+          // Build usage metrics
+          const metrics = {
+            billing: {
+              included_minutes: billing.included_minutes,
+              total_minutes_used: billing.total_minutes_used,
+              minutes_used_breakdown: billing.minutes_used_breakdown,
+              remaining_minutes: Math.max(0, billing.included_minutes - billing.total_minutes_used)
+            },
+            runs: {
+              total: runs.length,
+              by_status: statusCounts,
+              by_workflow: workflowCounts
+            },
+            period: {
+              start: billing.billing_period?.start_date,
+              end: billing.billing_period?.end_date
+            }
+          };
+
+          return this._createSuccess(
+            'Actions usage metrics compiled successfully',
+            metrics
+          );
+        },
+        this.cacheTimeouts.metrics || 300000,
+        [
+          this._cacheKeys.actionsBilling,  // Metrics depend on billing data
+          this._cacheKeys.workflowRuns      // Metrics depend on workflow runs data
+        ]
+      );
+    } catch (error) {
+      return this._createError(
+        `Failed to get Actions usage metrics: ${error.message}`,
+        error,
+        500
+      );
+    } finally {
+      tracking.end();
+    }
+  }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>
