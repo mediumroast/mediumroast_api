@@ -36,3 +36,6 @@ dist/build-temp/
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Files to exclude from npm package
+*_deprecate.js

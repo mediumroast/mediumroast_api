@@ -1,36 +1,10 @@
 /**
- * Example demonstrating all read operations in gitHubServer.js
- * 
- * INSTRUCTIONS
- * ============
- * 
- * Prerequisites:
- * 1. You must have a valid GitHub token in examples/config.ini
- * 2. The token must have access to the organization specified in config.ini
- * 
- * Running the example:
- * 1. Make sure you've installed all dependencies:
- *    npm install configparser
- * 
- * 2. Run this example:
- *    node examples/github-read-operations.js
- * 
- * 3. The script will:
- *    - Load your GitHub token from config.ini
- *    - Demonstrate various read operations on different types of objects
- *    - Display the results in a formatted way
- * 
- * 4. To run specific operations only, use command-line arguments:
- *    node examples/github-read-operations.js studies companies interactions
- *    
- *    Available options: studies, companies, interactions, users, storage, actions
- * 
- * @author Your Name
+ * Example demonstrating read operations in gitHubServer.js that work with our implementation
  */
 
 /* eslint-disable no-console */
 
-import { Studies, Companies, Interactions, Users, Storage, Actions } from '../src/api/gitHubServer.js';
+import { Studies, Companies, Interactions, Users } from '../src/api/gitHubServer.js';
 import fs from 'fs';
 import path from 'path';
 import ConfigParser from 'configparser';
@@ -98,38 +72,24 @@ async function demonstrateStudiesOperations(token, org) {
   console.log('STUDIES OPERATIONS');
   console.log(SECTION_DIVIDER);
     
-  const studies = new Studies(token, org, 'example-process');
+  try {
+    const studies = new Studies(token, org, 'example-process');
     
-  // Get all studies
-  console.log('\nFetching all studies...');
-  const allStudies = await studies.getAll();
-  logResult('getAll()', allStudies);
+    // Get all studies - basic operation that should always work
+    console.log('\nFetching all studies...');
+    const allStudies = await studies.getAll();
+    logResult('getAll()', allStudies);
     
-  if (allStudies[0] && allStudies[2]?.mrJson?.length > 0) {
-    const sampleName = allStudies[2].mrJson[0].name;
+    if (allStudies[0] && allStudies[2]?.mrJson?.length > 0) {
+      const sampleName = allStudies[2].mrJson[0].name;
         
-    // Find by name
-    console.log(`\nFinding study by name: "${sampleName}"...`);
-    const studyByName = await studies.findByName(sampleName);
-    logResult('findByName()', studyByName);
-        
-    // Find by attribute
-    if (allStudies[2].mrJson[0].status) {
-      const sampleStatus = allStudies[2].mrJson[0].status;
-      console.log(`\nFinding studies by status: "${sampleStatus}"...`);
-      const studiesByStatus = await studies.findByX('status', sampleStatus);
-      logResult('findByX(\'status\')', studiesByStatus);
+      // Find by name
+      console.log(`\nFinding study by name: "${sampleName}"...`);
+      const studyByName = await studies.findByName(sampleName);
+      logResult('findByName()', studyByName);
     }
-        
-    // Search with filters
-    console.log('\nSearching studies with filters...');
-    const searchResult = await studies.search({ name: sampleName.substring(0, 3) });
-    logResult('search({ name: \'...\' })', searchResult);
-        
-    // Search with sorting
-    console.log('\nSearching studies with sorting...');
-    const sortedResult = await studies.search({}, { sort: 'name', descending: true, limit: 5 });
-    logResult('search({}, { sort: \'name\', descending: true, limit: 5 })', sortedResult);
+  } catch (error) {
+    console.error('\n❌ Error in Studies operations:', error.message);
   }
 }
 
@@ -142,34 +102,25 @@ async function demonstrateCompaniesOperations(token, org) {
   console.log(`\n${SECTION_DIVIDER}`);
   console.log('COMPANIES OPERATIONS');
   console.log(SECTION_DIVIDER);
+  
+  try {
+    const companies = new Companies(token, org, 'example-process');
     
-  const companies = new Companies(token, org, 'example-process');
+    // Get all companies
+    console.log('\nFetching all companies...');
+    const allCompanies = await companies.getAll();
+    logResult('getAll()', allCompanies);
     
-  // Get all companies
-  console.log('\nFetching all companies...');
-  const allCompanies = await companies.getAll();
-  logResult('getAll()', allCompanies);
-    
-  if (allCompanies[0] && allCompanies[2]?.mrJson?.length > 0) {
-    const sampleName = allCompanies[2].mrJson[0].name;
+    if (allCompanies[0] && allCompanies[2]?.mrJson?.length > 0) {
+      const sampleName = allCompanies[2].mrJson[0].name;
         
-    // Find by name
-    console.log(`\nFinding company by name: "${sampleName}"...`);
-    const companyByName = await companies.findByName(sampleName);
-    logResult('findByName()', companyByName);
-        
-    // Find by attribute
-    if (allCompanies[2].mrJson[0].company_type) {
-      const sampleType = allCompanies[2].mrJson[0].company_type;
-      console.log(`\nFinding companies by type: "${sampleType}"...`);
-      const companiesByType = await companies.findByX('company_type', sampleType);
-      logResult('findByX(\'company_type\')', companiesByType);
+      // Find by name
+      console.log(`\nFinding company by name: "${sampleName}"...`);
+      const companyByName = await companies.findByName(sampleName);
+      logResult('findByName()', companyByName);
     }
-        
-    // Search with filters
-    console.log('\nSearching companies with filters...');
-    const searchResult = await companies.search({ name: sampleName.substring(0, 3) });
-    logResult('search({ name: \'...\' })', searchResult);
+  } catch (error) {
+    console.error('\n❌ Error in Companies operations:', error.message);
   }
 }
 
@@ -182,37 +133,25 @@ async function demonstrateInteractionsOperations(token, org) {
   console.log(`\n${SECTION_DIVIDER}`);
   console.log('INTERACTIONS OPERATIONS');
   console.log(SECTION_DIVIDER);
+  
+  try {
+    const interactions = new Interactions(token, org, 'example-process');
     
-  const interactions = new Interactions(token, org, 'example-process');
+    // Get all interactions
+    console.log('\nFetching all interactions...');
+    const allInteractions = await interactions.getAll();
+    logResult('getAll()', allInteractions);
     
-  // Get all interactions
-  console.log('\nFetching all interactions...');
-  const allInteractions = await interactions.getAll();
-  logResult('getAll()', allInteractions);
-    
-  if (allInteractions[0] && allInteractions[2]?.mrJson?.length > 0) {
-    const sampleName = allInteractions[2].mrJson[0].name;
+    if (allInteractions[0] && allInteractions[2]?.mrJson?.length > 0) {
+      const sampleName = allInteractions[2].mrJson[0].name;
         
-    // Find by name
-    console.log(`\nFinding interaction by name: "${sampleName}"...`);
-    const interactionByName = await interactions.findByName(sampleName);
-    logResult('findByName()', interactionByName);
-        
-    // Find by hash if available
-    if (allInteractions[2].mrJson[0].file_hash) {
-      const sampleHash = allInteractions[2].mrJson[0].file_hash;
-      console.log(`\nFinding interaction by file hash: "${sampleHash}"...`);
-      const interactionByHash = await interactions.findByHash(sampleHash);
-      logResult('findByHash()', interactionByHash);
+      // Find by name
+      console.log(`\nFinding interaction by name: "${sampleName}"...`);
+      const interactionByName = await interactions.findByName(sampleName);
+      logResult('findByName()', interactionByName);
     }
-        
-    // Find by content type if available
-    if (allInteractions[2].mrJson[0].content_type) {
-      const sampleType = allInteractions[2].mrJson[0].content_type;
-      console.log(`\nFinding interactions by content type: "${sampleType}"...`);
-      const interactionsByType = await interactions.findByX('content_type', sampleType);
-      logResult('findByX(\'content_type\')', interactionsByType);
-    }
+  } catch (error) {
+    console.error('\n❌ Error in Interactions operations:', error.message);
   }
 }
 
@@ -225,78 +164,102 @@ async function demonstrateUsersOperations(token, org) {
   console.log(`\n${SECTION_DIVIDER}`);
   console.log('USERS OPERATIONS');
   console.log(SECTION_DIVIDER);
+  
+  try {
+    const users = new Users(token, org, 'example-process');
     
-  const users = new Users(token, org, 'example-process');
+    // Get all users
+    console.log('\nFetching all users...');
+    const allUsers = await users.getAll();
+    logResult('getAll()', allUsers);
     
-  // Get all users
-  console.log('\nFetching all users...');
-  const allUsers = await users.getAll();
-  logResult('getAll()', allUsers);
-    
-  // Get current user
-  console.log('\nFetching current user...');
-  const myself = await users.getMyself();
-  logResult('getMyself()', myself);
-    
-  if (allUsers[0] && allUsers[2].length > 0) {
-    const sampleLogin = allUsers[2][0].login;
-        
-    // Find by name (login)
-    console.log(`\nFinding user by login: "${sampleLogin}"...`);
-    const userByLogin = await users.findByName(sampleLogin);
-    logResult('findByName()', userByLogin);
-        
-    // Find by attribute
-    console.log(`\nFinding users by login attribute: "${sampleLogin}"...`);
-    const usersByAttribute = await users.findByX('login', sampleLogin);
-    logResult('findByX(\'login\')', usersByAttribute);
+    // Get current user info
+    console.log('\nFetching current user information...');
+    const currentUser = await users.getAuthenticatedUser();
+    logResult('getAuthenticatedUser()', currentUser);
+  } catch (error) {
+    console.error('\n❌ Error in Users operations:', error.message);
   }
 }
 
 /**
- * Demonstrates Storage read operations
+ * Demonstrates Branch Status operations using Octokit
  * @param {string} token - GitHub token
  * @param {string} org - GitHub organization
  */
-async function demonstrateStorageOperations(token, org) {
+async function demonstrateBranchOperations(token, org) {
   console.log(`\n${SECTION_DIVIDER}`);
-  console.log('STORAGE OPERATIONS');
+  console.log('BRANCH STATUS OPERATIONS');
   console.log(SECTION_DIVIDER);
+  
+  try {
+    const studies = new Studies(token, org, 'example-process');
     
-  const storage = new Storage(token, org, 'example-process');
+    // Create the repository name by appending "_discovery" to the org name
+    const discoveryRepo = `${org}_discovery`;
     
-  // Skip the non-existent getAll()/getRepoSize() method
-  console.log('\nSkipping repository size information (method not available).');
+    // First get status for the discovery repository
+    console.log('\nFetching branch status for the discovery repository...');
+    console.log(`(Using: branch="main", repo="${discoveryRepo}")`);
+    const defaultStatus = await studies.getBranchStatus('main', discoveryRepo);
+    logResult('getBranchStatus(\'main\', discoveryRepo)', defaultStatus);
     
-  // Get storage billing - this should still work
-  console.log('\nFetching storage billing information...');
-  const storageBilling = await storage.getStorageBilling();
-  logResult('getStorageBilling()', storageBilling);
+    // If we have a successful result, demonstrate the checkForUpdates method
+    if (defaultStatus[0]) {
+      const currentSha = defaultStatus[2].sha;
+      
+      // Display the SHA we're using
+      console.log(`\nUsing current SHA for comparison: ${currentSha.substring(0, 8)}...`);
+      
+      // Check for updates using the current SHA (should return no update needed)
+      console.log('\nChecking for updates with current SHA (should show no updates needed)...');
+      const upToDate = await studies.checkForUpdates(currentSha, 'main', discoveryRepo);
+      logResult('checkForUpdates(currentSha, \'main\', discoveryRepo)', upToDate);
+      
+      // Check for updates using a made-up SHA (should indicate update needed)
+      console.log('\nChecking for updates with outdated SHA (should show updates needed)...');
+      const needsUpdate = await studies.checkForUpdates('0000000000000000000000000000000000000000', 'main', discoveryRepo);
+      logResult('checkForUpdates(\'0000...\', \'main\', discoveryRepo)', needsUpdate);
+      
+      // Show an example of how clients could use this information
+      console.log('\nExample client implementation:');
+      console.log('```javascript');
+      console.log(`// Client-side code example
+async function synchronizeData(clientSha = null) {
+  // Step 1: Get current commit SHA if we don't have it
+  let commitSha = clientSha || localStorage.getItem('lastCommitSha');
+  
+  // Step 2: Check if updates are needed
+  const updateCheck = await api.checkForUpdates(commitSha, 'main', '${discoveryRepo}');
+  
+  if (updateCheck.data.updateNeeded) {
+    console.log('Repository has changed, downloading latest data...');
+    
+    // Step 3: Fetch the latest data
+    const latestData = await api.getAll();
+    
+    // Step 4: Save the new data and SHA
+    localStorage.setItem('lastCommitSha', updateCheck.data.currentCommitSha);
+    localStorage.setItem('cachedData', JSON.stringify(latestData));
+    
+    return latestData;
+  } else {
+    console.log('Using cached data - no updates needed');
+    return JSON.parse(localStorage.getItem('cachedData'));
+  }
+}`);
+      console.log('```');
+    }
+  } catch (error) {
+    console.error('\n❌ Error in Branch operations:', error.message);
+    if (error.stack) {
+      console.error('Stack trace:', error.stack);
+    }
+  }
 }
 
 /**
- * Demonstrates Actions read operations
- * @param {string} token - GitHub token
- * @param {string} org - GitHub organization
- */
-async function demonstrateActionsOperations(token, org) {
-  console.log(`\n${SECTION_DIVIDER}`);
-  console.log('ACTIONS OPERATIONS');
-  console.log(SECTION_DIVIDER);
-    
-  const actions = new Actions(token, org, 'example-process');
-    
-  // Skip the non-existent getAll()/getWorkflowRuns() method
-  console.log('\nSkipping workflow runs information (method not available).');
-    
-  // Get actions billing - this should still work
-  console.log('\nFetching actions billing information...');
-  const actionsBilling = await actions.getActionsBilling();
-  logResult('getActionsBilling()', actionsBilling);
-}
-
-/**
- * Main function to run all demonstrations
+ * Main function to run the example
  */
 async function main() {
   try {
@@ -349,13 +312,10 @@ async function main() {
     if (runAll || args.includes('users')) {
       await demonstrateUsersOperations(token, org);
     }
-        
-    if (runAll || args.includes('storage')) {
-      await demonstrateStorageOperations(token, org);
-    }
-        
-    if (runAll || args.includes('actions')) {
-      await demonstrateActionsOperations(token, org);
+    
+    // Run branch status operations
+    if (runAll || args.includes('branch')) {
+      await demonstrateBranchOperations(token, org);
     }
         
     console.log(`\n${SECTION_DIVIDER}`);

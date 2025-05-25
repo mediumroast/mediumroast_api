@@ -1,112 +1,50 @@
 /**
- * Simple logger for GitHubServer
+ * Logger module for the GitHubServer API
+ * @file logger.js
+ * @version 3.0.0
  */
-export class Logger {
-  constructor(options = {}) {
-    this.options = {
-      level: 'info', // debug, info, warn, error
-      includeTimestamp: true,
-      logToConsole: true,
-      ...options
-    };
-        
-    this.metrics = {
-      operationCount: 0,
-      errorCount: 0,
-      transactionCount: 0,
-      apiCallCount: 0,
-      startTime: Date.now(),
-      entityCounts: {}
-    };
-  }
-    
-  log(level, message, data = null) {
-    if (this._shouldLog(level)) {
-      const entry = this._formatLogEntry(level, message, data);
-            
-      if (this.options.logToConsole) {
-        // eslint-disable-next-line no-console
-        console[level === 'error' ? 'error' : level === 'warn' ? 'warn' : 'log'](entry);
-      }
-            
-      return entry;
+
+/* eslint-disable no-console */
+
+// Create a logger with sensible defaults
+export const logger = {
+  debug: (...args) => console.debug(`[${new Date().toISOString()}] [DEBUG]`, ...args),
+  info: (...args) => console.info(`[${new Date().toISOString()}] [INFO]`, ...args),
+  warn: (...args) => console.warn(`[${new Date().toISOString()}] [WARN]`, ...args),
+  error: (...args) => console.error(`[${new Date().toISOString()}] [ERROR]`, ...args),
+  
+  // Always return a tracker object with an end method
+  trackOperation: (objType, operation) => {
+    const startTime = Date.now();
+    // Only log in debug mode to avoid cluttering the console
+    if (process.env.DEBUG) {
+      console.debug(`[${new Date().toISOString()}] Starting operation: ${objType}.${operation}`);
     }
-  }
     
-  debug(message, data = null) {
-    return this.log('debug', message, data);
-  }
-    
-  info(message, data = null) {
-    return this.log('info', message, data);
-  }
-    
-  warn(message, data = null) {
-    return this.log('warn', message, data);
-  }
-    
-  error(message, data = null) {
-    this.metrics.errorCount++;
-    return this.log('error', message, data);
-  }
-    
-  trackOperation(entityType, operation) {
-    this.metrics.operationCount++;
-    this.metrics.entityCounts[entityType] = (this.metrics.entityCounts[entityType] || 0) + 1;
-    this.debug(`Operation: ${operation} on ${entityType}`);
-  }
-    
-  trackTransaction(name) {
-    this.metrics.transactionCount++;
-    this.info(`Transaction: ${name}`);
-  }
-    
-  trackApiCall() {
-    this.metrics.apiCallCount++;
-  }
-    
-  getMetrics() {
     return {
-      ...this.metrics,
-      uptime: Date.now() - this.metrics.startTime
-    };
-  }
-    
-  _shouldLog(level) {
-    const levels = {
-      debug: 0,
-      info: 1,
-      warn: 2,
-      error: 3
-    };
-        
-    return levels[level] >= levels[this.options.level];
-  }
-    
-  _formatLogEntry(level, message, data) {
-    let entry = '';
-        
-    if (this.options.includeTimestamp) {
-      entry += `[${new Date().toISOString()}] `;
-    }
-        
-    entry += `[${level.toUpperCase()}] ${message}`;
-        
-    if (data) {
-      if (typeof data === 'string') {
-        entry += ` - ${data}`;
-      } else {
-        try {
-          entry += ` - ${JSON.stringify(data)}`;
-        } catch (e) {
-          entry += ' - [Complex Object]';
+      end: () => {
+        if (process.env.DEBUG) {
+          const duration = Date.now() - startTime;
+          console.debug(`[${new Date().toISOString()}] Completed operation: ${objType}.${operation} (${duration}ms)`);
         }
       }
+    };
+  },
+  
+  // Similar for transaction tracking
+  trackTransaction: (transactionName) => {
+    const startTime = Date.now();
+    if (process.env.DEBUG) {
+      console.debug(`[${new Date().toISOString()}] Starting transaction: ${transactionName}`);
     }
-        
-    return entry;
+    
+    return {
+      end: () => {
+        if (process.env.DEBUG) {
+          const duration = Date.now() - startTime;
+          console.debug(`[${new Date().toISOString()}] Completed transaction: ${transactionName} (${duration}ms)`);
+        }
+      }
+    };
   }
-}
-
-// Create singleton logger instance
-export const logger = new Logger();
+};
