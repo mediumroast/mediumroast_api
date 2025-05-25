@@ -117,7 +117,7 @@ The module provides a standardized response format that includes a status code, 
 The API documentation is available in two formats:
 
 - **[API Reference (GitHub Pages)](https://mediumroast.github.io/mediumroast_api/)**: Complete documentation hosted on GitHub Pages
-- **[API Reference (Markdown)](https://github.com/mediumroast/mediumroast_api/blob/gh-pages/markdown/api-docs.md)**: Documentation in Markdown format for in-repository viewing
+- **[API Reference (Markdown)](api-docs.md)**: Documentation in Markdown format for in-repository viewing
 
 ## Testing
 This project uses Vitest as its testing framework, to run the tests for the module, use: 

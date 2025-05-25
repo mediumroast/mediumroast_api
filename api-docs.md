@@ -7,9 +7,6 @@
 <dt><a href="#module_GitHubFunctions">GitHubFunctions</a></dt>
 <dd><p>github.js</p>
 </dd>
-<dt><a href="#api/gitHubServer_deprecate.module_js">api/gitHubServer_deprecate.js</a></dt>
-<dd><p>gitHubServer.js</p>
-</dd>
 <dt><a href="#api/gitHubServer.module_js">api/gitHubServer.js</a></dt>
 <dd><p>gitHubServer.js</p>
 </dd>
@@ -363,77 +360,6 @@ Releases a container by unlocking it and merging the branch
 | --- | --- | --- |
 | repoMetadata | <code>Object</code> | The metadata object |
 
-<a name="api/gitHubServer_deprecate.module_js"></a>
-
-## api/gitHubServer\_deprecate.js
-gitHubServer.js
-
-**Version**: 3.0.0  
-**Author**: Michael Hay <michael.hay@mediumroast.io>  
-**License**: Apache-2.0  
-**Copyright**: 2024 Mediumroast, Inc. All rights reserved.  
-
-* [api/gitHubServer_deprecate.js](#api/gitHubServer_deprecate.module_js)
-    * [~getAll()](#api/gitHubServer_deprecate.module_js..getAll) ⇒ <code>Array</code>
-    * [~findByName()](#api/gitHubServer_deprecate.module_js..findByName)
-    * ~~[~findById()](#api/gitHubServer_deprecate.module_js..findById)~~
-    * [~findByX()](#api/gitHubServer_deprecate.module_js..findByX)
-    * [~createObj()](#api/gitHubServer_deprecate.module_js..createObj)
-    * [~updateObj()](#api/gitHubServer_deprecate.module_js..updateObj)
-    * [~deleteObj()](#api/gitHubServer_deprecate.module_js..deleteObj)
-    * [~linkObj()](#api/gitHubServer_deprecate.module_js..linkObj)
-
-<a name="api/gitHubServer_deprecate.module_js..getAll"></a>
-
-### api/gitHubServer_deprecate.js~getAll() ⇒ <code>Array</code>
-Get all objects from the mediumroast.io application
-
-**Kind**: inner method of [<code>api/gitHubServer\_deprecate.js</code>](#api/gitHubServer_deprecate.module_js)  
-**Returns**: <code>Array</code> - the results from the called function mrRest class  
-<a name="api/gitHubServer_deprecate.module_js..findByName"></a>
-
-### api/gitHubServer_deprecate.js~findByName()
-Find all objects by name from the mediumroast.io application
-
-**Kind**: inner method of [<code>api/gitHubServer\_deprecate.js</code>](#api/gitHubServer_deprecate.module_js)  
-<a name="api/gitHubServer_deprecate.module_js..findById"></a>
-
-### ~~api/gitHubServer_deprecate.js~findById()~~
-***Deprecated***
-
-Find all objects by id from the mediumroast.io application
-
-**Kind**: inner method of [<code>api/gitHubServer\_deprecate.js</code>](#api/gitHubServer_deprecate.module_js)  
-<a name="api/gitHubServer_deprecate.module_js..findByX"></a>
-
-### api/gitHubServer_deprecate.js~findByX()
-Find all objects by attribute and value pair
-
-**Kind**: inner method of [<code>api/gitHubServer\_deprecate.js</code>](#api/gitHubServer_deprecate.module_js)  
-<a name="api/gitHubServer_deprecate.module_js..createObj"></a>
-
-### api/gitHubServer_deprecate.js~createObj()
-Create objects in the mediumroast.io application
-
-**Kind**: inner method of [<code>api/gitHubServer\_deprecate.js</code>](#api/gitHubServer_deprecate.module_js)  
-<a name="api/gitHubServer_deprecate.module_js..updateObj"></a>
-
-### api/gitHubServer_deprecate.js~updateObj()
-Update an object in the mediumroast.io application
-
-**Kind**: inner method of [<code>api/gitHubServer\_deprecate.js</code>](#api/gitHubServer_deprecate.module_js)  
-<a name="api/gitHubServer_deprecate.module_js..deleteObj"></a>
-
-### api/gitHubServer_deprecate.js~deleteObj()
-Delete an object in the mediumroast.io application
-
-**Kind**: inner method of [<code>api/gitHubServer\_deprecate.js</code>](#api/gitHubServer_deprecate.module_js)  
-<a name="api/gitHubServer_deprecate.module_js..linkObj"></a>
-
-### api/gitHubServer_deprecate.js~linkObj()
-Link objects in the mediumroast.io application
-
-**Kind**: inner method of [<code>api/gitHubServer\_deprecate.js</code>](#api/gitHubServer_deprecate.module_js)  
 <a name="api/gitHubServer.module_js"></a>
 
 ## api/gitHubServer.js
