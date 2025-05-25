@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Mediumroast for GitHub SDK and CLI Tutorial: github-auth-tutorial</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.cyborg.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html"><img class="branding-logo" src="img/logo.png"
+		alt="logo"/>Mediumroast for GitHub SDK and CLI</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="api_gitHubServer.module_js.html">api/gitHubServer.js</a></li><li><a href="api_gitHubServer_baseObjects.module_js.html">api/gitHubServer/baseObjects.js</a></li><li><a href="module-GitHubAuth.html">GitHubAuth</a></li><li><a href="module-GitHubFunctions.html">GitHubFunctions</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="Actions_Actions.html">Actions#Actions</a></li><li><a href="BillingManager.html">BillingManager</a></li><li><a href="BranchManager.html">BranchManager</a></li><li><a href="CacheManager.html">CacheManager</a></li><li><a href="ContainerOperations.html">ContainerOperations</a></li><li><a href="GitHubFunctions.GitHubFunctions.html">GitHubFunctions.GitHubFunctions</a></li><li><a href="RepositoryManager.html">RepositoryManager</a></li><li><a href="ResponseFactory.html">ResponseFactory</a></li><li><a href="Storage_Storage.html">Storage#Storage</a></li><li><a href="Studies_Studies.html">Studies#Studies</a></li><li><a href="UserManager.html">UserManager</a></li><li><a href="Users_Users.html">Users#Users</a></li><li><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html">api/gitHubServer/baseObjects.js.BaseObjects</a></li><li><a href="module-GitHubAuth-GitHubAuth.html">GitHubAuth~GitHubAuth</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="tutorials.list.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="tutorial-github-auth-tutorial.html">github-auth-tutorial</a></li><li><a href="tutorial-github-read-operations-tutorial.html">github-read-operations-tutorial</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="global.html#customEncodeURIComponent">customEncodeURIComponent</a></li><li><a href="global.html#decodeContent">decodeContent</a></li><li><a href="global.html#decodeJsonContent">decodeJsonContent</a></li><li><a href="global.html#encodeContent">encodeContent</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			<section class="tutorial-section">
+
+<header>
+    
+
+    <h2>github-auth-tutorial</h2>
+</header>
+
+<article>
+    <h1 id="github-device-authentication-tutorial">GitHub Device Authentication Tutorial</h1>
+<p>This tutorial explains how to use the GitHub device flow authentication with the Mediumroast API.</p>
+<h2 id="overview">Overview</h2>
+<p>GitHub's device flow authentication is ideal for:</p>
+<ul>
+<li>CLI applications</li>
+<li>Environments without direct browser access</li>
+<li>Applications that need to interact with GitHub APIs</li>
+</ul>
+<p>The Mediumroast API provides built-in support for this authentication method.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Before using this authentication method, you'll need:</p>
+<ol>
+<li>A GitHub account</li>
+<li>A GitHub OAuth App:
+<ul>
+<li>Create one at <a href="https://github.com/settings/developers">GitHub Developer Settings</a></li>
+<li>Note your Client ID (no secret needed for device flow)</li>
+<li>Set callback URL to <code>http://localhost</code> (required but not used in device flow)</li>
+</ul>
+</li>
+</ol>
+<h2 id="authentication-process">Authentication Process</h2>
+<p>The device flow follows these steps:</p>
+<ol>
+<li>Your application requests a device code from GitHub</li>
+<li>GitHub returns a user code and verification URL</li>
+<li>Your application displays these to the user and opens a browser</li>
+<li>User enters the code on GitHub's website</li>
+<li>Meanwhile, your application polls GitHub until authentication completes</li>
+<li>Upon success, GitHub provides an access token</li>
+</ol>
+<h2 id="implementation">Implementation</h2>
+<p>The <a href="./github-device-auth.js">github-device-auth.js</a> example demonstrates a complete implementation:</p>
+<pre class="prettyprint source lang-javascript"><code>// Create GitHub Auth instance
+const github = new GitHubAuth(env, environ, configFile, configExists);
+
+// Start device flow authentication
+const tokenData = await github.getAccessTokenDeviceFlow();
+
+// Save the token for future use
+const config = environ.readConfig(userConfigFile);
+let result = environ.updateConfigSetting(config, 'GitHub', 'token', tokenData.token);
+await result[1].write(userConfigFile);
+</code></pre>
+<h2 id="configuration-management">Configuration Management</h2>
+<p>The example shows how to manage configuration:</p>
+<ol>
+<li>Read from existing config or use defaults</li>
+<li>Update configuration with new authentication data</li>
+<li>Save token securely for future sessions</li>
+</ol>
+<h2 id="using-the-token">Using the Token</h2>
+<p>After authentication, you can use the token with the Mediumroast API:</p>
+<pre class="prettyprint source lang-javascript"><code>import { Companies, Studies } from 'mediumroast_api';
+
+// Use the saved token
+const config = new ConfigParser();
+config.read('./config.ini');
+const token = config.get('GitHub', 'token');
+const org = config.get('GitHub', 'org');
+
+// Create API instances
+const companies = new Companies(token, org, 'my-process');
+const studies = new Studies(token, org, 'my-process');
+
+// Make API calls
+const allCompanies = await companies.getAll();
+</code></pre>
+<h2 id="security-considerations">Security Considerations</h2>
+<p>When implementing authentication:</p>
+<ul>
+<li>Never commit tokens to source control</li>
+<li>Consider environment variables for sensitive values</li>
+<li>Implement token refresh logic for long-running applications</li>
+<li>Revoke tokens when no longer needed</li>
+</ul>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<p>Common issues:</p>
+<ul>
+<li><strong>Invalid Client ID</strong>: Verify your GitHub OAuth App configuration</li>
+<li><strong>Authorization Timeout</strong>: Users have limited time to complete authorization</li>
+<li><strong>Rate Limiting</strong>: GitHub API has request limits that may affect authentication</li>
+<li><strong>Scope Issues</strong>: Permission errors may indicate insufficient OAuth scopes</li>
+</ul>
+<h2 id="complete-example">Complete Example</h2>
+<p>For the full implementation, refer to the <a href="./github-device-auth.js">github-device-auth.js</a> example in this directory.</p>
+</article>
+
+</section>
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	© 2023-2024 Mediumroast, Inc. All rights reserved.
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a>
+	
+		on Sun May 25th 2025
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>

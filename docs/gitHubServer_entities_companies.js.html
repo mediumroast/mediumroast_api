@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Mediumroast for GitHub SDK and CLI Source: gitHubServer/entities/companies.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.cyborg.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html"><img class="branding-logo" src="img/logo.png"
+		alt="logo"/>Mediumroast for GitHub SDK and CLI</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="api_gitHubServer.module_js.html">api/gitHubServer.js</a></li><li><a href="api_gitHubServer_baseObjects.module_js.html">api/gitHubServer/baseObjects.js</a></li><li><a href="module-GitHubAuth.html">GitHubAuth</a></li><li><a href="module-GitHubFunctions.html">GitHubFunctions</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="Actions_Actions.html">Actions#Actions</a></li><li><a href="BillingManager.html">BillingManager</a></li><li><a href="BranchManager.html">BranchManager</a></li><li><a href="CacheManager.html">CacheManager</a></li><li><a href="ContainerOperations.html">ContainerOperations</a></li><li><a href="GitHubFunctions.GitHubFunctions.html">GitHubFunctions.GitHubFunctions</a></li><li><a href="RepositoryManager.html">RepositoryManager</a></li><li><a href="ResponseFactory.html">ResponseFactory</a></li><li><a href="Storage_Storage.html">Storage#Storage</a></li><li><a href="Studies_Studies.html">Studies#Studies</a></li><li><a href="UserManager.html">UserManager</a></li><li><a href="Users_Users.html">Users#Users</a></li><li><a href="api_gitHubServer_baseObjects.module_js.BaseObjects.html">api/gitHubServer/baseObjects.js.BaseObjects</a></li><li><a href="module-GitHubAuth-GitHubAuth.html">GitHubAuth~GitHubAuth</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="tutorials.list.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="tutorial-github-auth-tutorial.html">github-auth-tutorial</a></li><li><a href="tutorial-github-read-operations-tutorial.html">github-read-operations-tutorial</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="global.html#customEncodeURIComponent">customEncodeURIComponent</a></li><li><a href="global.html#decodeContent">decodeContent</a></li><li><a href="global.html#decodeJsonContent">decodeJsonContent</a></li><li><a href="global.html#encodeContent">encodeContent</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: gitHubServer/entities/companies.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">import { BaseObjects } from '../baseObjects.js';
+import { Interactions } from './interactions.js';
+import { logger } from '../logger.js';
+
+export class Companies extends BaseObjects {
+  constructor(token, org, processName) {
+    super(token, org, processName, 'Companies');
+    
+    // Add profile-specific cache settings
+    this._cacheKeys.profile = `${this.objType}_profile`;
+    this.cacheTimeouts.profile = 600000; // 10 minutes for profiles
+  }
+
+  /**
+   * Generates company profile with analytics
+   * @param {string} name - Company name
+   * @returns {Promise&lt;Array>} Company profile
+   */
+  async generateCompanyProfile(name) {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'generateCompanyProfile') : 
+      { end: () => {} };
+    
+    // Validate parameter
+    const validationError = this._validateParams(
+      { name },
+      { name: 'string' }
+    );
+        
+    if (validationError) return validationError;
+    
+    try {
+      // Use cache with dependency on both company and interactions data
+      const profileCacheKey = `${this._cacheKeys.profile}_${name}`;
+      
+      return await this.cache.getOrFetch(
+        profileCacheKey,
+        async () => {
+          // Find the company
+          const companyResp = await this.findByName(name);
+          if (!companyResp[0]) {
+            return companyResp;
+          }
+          
+          const company = companyResp[2][0];
+          
+          // Get linked interactions
+          let linkedInteractionDetails = [];
+          if (company.linked_interactions &amp;&amp; Object.keys(company.linked_interactions).length > 0) {
+            // Instantiate Interactions class to get details
+            const interactionsClass = new Interactions(
+              this.serverCtl.token,
+              this.serverCtl.orgName,
+              'profile-generator'
+            );
+                
+            // Get details for each interaction
+            for (const interactionName of Object.keys(company.linked_interactions)) {
+              const interactionResp = await interactionsClass.findByName(interactionName);
+              if (interactionResp[0]) {
+                linkedInteractionDetails.push(interactionResp[2][0]);
+              }
+            }
+          }
+          
+          // Analyze the interactions
+          const analytics = {
+            interactionCount: linkedInteractionDetails.length,
+            contentTypes: {},
+            totalFileSize: 0,
+            avgReadingTime: 0,
+            totalWordCount: 0,
+            avgPageCount: 0,
+            lastModified: null,
+            oldestInteraction: null
+          };
+          
+          // Process each interaction
+          linkedInteractionDetails.forEach(interaction => {
+            // Track content types
+            analytics.contentTypes[interaction.content_type] = 
+              (analytics.contentTypes[interaction.content_type] || 0) + 1;
+                    
+            // Track file sizes
+            if (interaction.file_size) {
+              analytics.totalFileSize += interaction.file_size;
+            }
+                
+            // Track reading time
+            if (interaction.reading_time) {
+              analytics.avgReadingTime += interaction.reading_time;
+            }
+                
+            // Track word count
+            if (interaction.word_count) {
+              analytics.totalWordCount += interaction.word_count;
+            }
+                
+            // Track page count
+            if (interaction.page_count) {
+              analytics.avgPageCount += interaction.page_count;
+            }
+                
+            // Track modification dates
+            const modDate = new Date(interaction.modification_date);
+            if (!analytics.lastModified || modDate > new Date(analytics.lastModified)) {
+              analytics.lastModified = interaction.modification_date;
+            }
+                
+            if (!analytics.oldestInteraction || modDate &lt; new Date(analytics.oldestInteraction)) {
+              analytics.oldestInteraction = interaction.modification_date;
+            }
+          });
+          
+          // Calculate averages
+          if (linkedInteractionDetails.length > 0) {
+            analytics.avgReadingTime /= linkedInteractionDetails.length;
+            analytics.avgPageCount /= linkedInteractionDetails.length;
+          }
+          
+          // Create company profile
+          const profile = {
+            ...company,
+            analytics,
+            interactionSummary: linkedInteractionDetails.map(i => ({
+              name: i.name,
+              content_type: i.content_type,
+              file_size: i.file_size,
+              modification_date: i.modification_date,
+              description: i.description
+            }))
+          };
+          
+          return this._createSuccess(
+            `Generated profile for company [${name}]`,
+            profile
+          );
+        },
+        this.cacheTimeouts.profile,
+        [
+          this._cacheKeys.container,                // Depends on company data
+          'container_Interactions'                 // Depends on interaction data
+        ]
+      );
+    } catch (error) {
+      return this._createError(
+        `Error generating company profile: ${error.message}`,
+        error,
+        500
+      );
+    } finally {
+      tracking.end();
+    }
+  }
+  
+  /**
+   * Link interactions to a company
+   * @param {string} companyName - Name of the company
+   * @param {Array&lt;Object>} interactions - Interactions to link
+   * @returns {Promise&lt;Array>} Result of the operation
+   */
+  async linkInteractions(companyName, interactions) {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'linkInteractions') : 
+      { end: () => {} };
+    
+    try {
+      // Validate parameters
+      const validationError = this._validateParams(
+        { companyName, interactions },
+        { companyName: 'string', interactions: 'array' }
+      );
+          
+      if (validationError) return validationError;
+      
+      // Create linked objects hash
+      const linkedInteractions = this.linkObj(interactions);
+      
+      // Update the company with linked interactions
+      return await this.updateObj({
+        name: companyName,
+        key: 'linked_interactions',
+        value: linkedInteractions
+      });
+      
+    } catch (error) {
+      return this._createError(
+        `Error linking interactions to company: ${error.message}`,
+        error,
+        500
+      );
+    } finally {
+      tracking.end();
+    }
+  }
+}</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	© 2023-2024 Mediumroast, Inc. All rights reserved.
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a>
+	
+		on Sun May 25th 2025
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>
