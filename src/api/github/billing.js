@@ -20,6 +20,7 @@ class BillingManager {
   constructor(octokit, orgName) {
     this.octokit = octokit;
     this.orgName = orgName;
+    this.repoName = `${orgName}_discovery`; // Default repo name, can be overridden
   }
 
   /**

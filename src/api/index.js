@@ -8,7 +8,7 @@ import {
 
 import {
   GitHubAuth
-} from './gitHubAuth.js';
+} from './authorize.js';
 
 export {
   Interactions,
