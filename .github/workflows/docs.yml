@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -29,8 +29,6 @@ jobs:
         run: |
           npm run docs
           npm run docs:md
-          mkdir -p docs/markdown
-          cp api-docs.md docs/markdown/
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4

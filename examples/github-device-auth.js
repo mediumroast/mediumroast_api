@@ -1,8 +1,11 @@
 /**
  * Example demonstrating GitHub device flow authentication
+ * @author Michael Hay <michael.hay@mediumroast.io>
+ * @file github-device-auth.js
+ * @license Apache-2.0
+ * @version 3.0.0
+ * @copyright 2025 Mediumroast, Inc. All rights reserved.
  * 
- * INSTRUCTIONS
- * ============
  * 
  * Prerequisites:
  * 1. Create a GitHub OAuth App (https://github.com/settings/developers)
@@ -29,7 +32,12 @@
  * contains placeholder values. It's recommended to create your own 
  * GitHub OAuth app and update the clientId appropriately.
  * 
- * @author Your Name
+ * 
+ * @requires configparser
+ * @requires fs
+ * @requires path
+ * @requires url
+ * @requires ../src/api/authorize.js
  */
 
 /* eslint-disable no-console */

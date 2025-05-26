@@ -2,6 +2,8 @@
  * @fileoverview User management operations for GitHub
  * @license Apache-2.0
  * @version 3.0.0
+ * @author Michael Hay <michael.hay@mediumroast.io>
+ * @copyright 2025 Mediumroast, Inc. All rights reserved.
  */
 
 import ResponseFactory from './response.js';
@@ -30,7 +32,7 @@ class UserManager {
     try {
       const response = await this.octokit.rest.users.getAuthenticated();
       return ResponseFactory.success(
-        `Successfully retrieved authenticated user information`,
+        'Successfully retrieved authenticated user information',
         response.data
       );
     } catch (err) {
@@ -53,7 +55,7 @@ class UserManager {
         affiliation: 'all'
       });
       return ResponseFactory.success(
-        `Successfully retrieved all repository collaborators`,
+        'Successfully retrieved all repository collaborators',
         response.data
       );
     } catch (err) {

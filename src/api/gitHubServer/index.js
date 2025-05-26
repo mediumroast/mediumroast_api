@@ -2,7 +2,7 @@
  * Central export point for the GitHubServer API
  * @author Michael Hay <michael.hay@mediumroast.io>
  * @file index.js
- * @copyright 2024 Mediumroast, Inc. All rights reserved.
+ * @copyright 2025 Mediumroast, Inc. All rights reserved.
  * @license Apache-2.0
  * @version 3.0.0
  */

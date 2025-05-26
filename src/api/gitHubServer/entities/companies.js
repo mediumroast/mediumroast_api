@@ -1,3 +1,14 @@
+/**
+ * Actions entity class for GitHub workflow operations
+ * @file companies.js
+ * @license Apache-2.0
+ * @version 3.0.0
+ * 
+ * @author Michael Hay <michael.hay@mediumroast.io>
+ * @copyright 2025 Mediumroast, Inc. All rights reserved.
+ */
+
+
 import { BaseObjects } from '../baseObjects.js';
 import { Interactions } from './interactions.js';
 import { logger } from '../logger.js';
