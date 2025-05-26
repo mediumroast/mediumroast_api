@@ -373,14 +373,18 @@ class GitHubFunctions {
      * @async
      * @function getWorkflowRuns
      * @description Gets all of the workflow runs for the repository
+     * @param {string} [repoName] - Optional repository name (defaults to this.repoName)
      * @returns {Array} An array with position 0 being boolean to signify success/failure and position 1 being the response or error message.
      */
-  async getWorkflowRuns() {
-    // Workflow runs change more frequently - shorter cache
+  async getWorkflowRuns(repoName) {
+    // Use default repo name if not provided
+    const repo = repoName || this.repoName;
+    
+    // Workflow runs change frequently - short cache time
     return this._getCachedOrFetch(
-      'workflow_runs',
-      () => this.repositoryManager.getWorkflowRuns(),
-      30000 // 30 seconds
+      `workflow_runs_${repo}`, // Use repo-specific cache key
+      () => this.billingManager.getWorkflowRuns(repo),
+      30000 // 30 seconds cache
     );
   }
 

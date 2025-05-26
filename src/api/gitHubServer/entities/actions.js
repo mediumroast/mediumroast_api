@@ -359,13 +359,16 @@ export class Actions extends BaseObjects {
 
           // Calculate metrics from the data
           const billing = billingResp[2];
-          const runs = runsResp[2];
+          
+          // Get the workflow_runs array from the response
+          // Fix: access the workflow_runs property instead of treating runsResp[2] as an array
+          const workflowRuns = runsResp[2].workflow_runs || [];
 
           // Count runs by status
           const statusCounts = {};
           const workflowCounts = {};
 
-          runs.forEach(run => {
+          workflowRuns.forEach(run => {
             // Count by status
             statusCounts[run.status] = (statusCounts[run.status] || 0) + 1;
 
@@ -383,7 +386,7 @@ export class Actions extends BaseObjects {
               remaining_minutes: Math.max(0, billing.included_minutes - billing.total_minutes_used)
             },
             runs: {
-              total: runs.length,
+              total: workflowRuns.length,
               by_status: statusCounts,
               by_workflow: workflowCounts
             },
@@ -401,7 +404,7 @@ export class Actions extends BaseObjects {
         this.cacheTimeouts.metrics || 300000,
         [
           this._cacheKeys.actionsBilling,  // Metrics depend on billing data
-          this._cacheKeys.workflowRuns      // Metrics depend on workflow runs data
+          this._cacheKeys.workflowRuns     // Metrics depend on workflow runs data
         ]
       );
     } catch (error) {
