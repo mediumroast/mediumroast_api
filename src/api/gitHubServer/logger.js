@@ -2,6 +2,8 @@
  * Logger module for the GitHubServer API
  * @file logger.js
  * @version 3.0.0
+ * @author Michael Hay <michael.hay@mediumroast.io>
+ * @copyright 2025 Mediumroast, Inc. All rights reserved.
  */
 
 /* eslint-disable no-console */

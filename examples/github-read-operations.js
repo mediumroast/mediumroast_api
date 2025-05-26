@@ -1,5 +1,41 @@
 /**
  * Example demonstrating read operations in gitHubServer.js that work with our implementation
+ * @author Michael Hay <michael.hay@mediumroast.io>
+ * @file github-read-operations.js
+ * @license Apache-2.0
+ * @version 3.0.0
+ * @copyright 2025 Mediumroast, Inc. All rights reserved.
+ * 
+ * This example shows how to use the Studies, Companies, Interactions, and Users classes
+ * to perform read operations against a GitHub organization.
+ * 
+ * It includes:
+ * - Fetching all studies, companies, interactions, and users
+ * - Finding specific items by name
+ * - Demonstrating branch status checks
+ * 
+ * To run this example, create a config.ini file with your GitHub token and organization.
+ * The file should look like this:
+ * 
+ * [GitHub]
+ * token = YOUR_GITHUB_TOKEN
+ * org = YOUR_ORGANIZATION_NAME
+ * 
+ * You can run the example with:
+ * node examples/github-read-operations.js
+ * 
+ * You can also specify which operations to run:
+ * node examples/github-read-operations.js studies companies interactions users branch
+ * 
+ * This will run all operations by default, or you can specify individual ones.
+ * 
+ * Note: Make sure you have the necessary permissions for the token to access the organization data.
+ * 
+ * @requires configparser
+ * @requires fs
+ * @requires path
+ * @requires url
+ * @requires ../src/api/gitHubServer.js
  */
 
 /* eslint-disable no-console */
