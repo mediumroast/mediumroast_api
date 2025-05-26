@@ -1,10 +1,11 @@
 /**
  * @fileoverview Studies entity for GitHubServer
+ * @file studies.js
  * @license Apache-2.0
  * @version 3.0.0
  * 
  * @author Michael Hay <michael.hay@mediumroast.io>
- * @copyright 2024 Mediumroast, Inc. All rights reserved.
+ * @copyright 2025 Mediumroast, Inc. All rights reserved.
  */
 
 import { BaseObjects } from '../baseObjects.js';

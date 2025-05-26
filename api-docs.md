@@ -368,4 +368,4 @@ gitHubServer.js
 **Version**: 3.0.0  
 **Author**: Michael Hay <michael.hay@mediumroast.io>  
 **License**: Apache-2.0  
-**Copyright**: 2024 Mediumroast, Inc. All rights reserved.  
+**Copyright**: 2025 Mediumroast, Inc. All rights reserved.  
