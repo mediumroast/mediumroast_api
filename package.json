@@ -1,6 +1,6 @@
 {
   "name": "mediumroast_api",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "Mediumroast for Git(Hub) SDK covering all categories of function.",
   "main": "src/index.js",
   "type": "module",
