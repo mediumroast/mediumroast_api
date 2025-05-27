@@ -241,11 +241,6 @@ async function demonstrateActionsOperations(token, org) {
     const billingInfo = await actions.getActionsBilling();
     logResult('getActionsBilling()', billingInfo);
     
-    // Get usage metrics
-    console.log('\nFetching GitHub Actions usage metrics...');
-    const usageMetrics = await actions.getUsageMetrics();
-    logResult('getUsageMetrics()', usageMetrics);
-    
     // If workflow runs exist, demonstrate getting a specific run
     if (allWorkflows[0] && allWorkflows[2] && Array.isArray(allWorkflows[2]) && allWorkflows[2].length > 0) {
       const sampleRunId = allWorkflows[2][0].id;

@@ -32,10 +32,6 @@ class BillingManager {
       const response = await this.octokit.rest.billing.getGithubActionsBillingOrg({
         org: this.orgName,
       });
-
-      // const response = await this.octCtl.rest.billing.getGithubActionsBillingOrg({
-      //           org: this.orgName,
-      //       })
       
       return ResponseFactory.success(
         `Successfully retrieved Actions billing information for organization ${this.orgName}`,

@@ -130,35 +130,6 @@ export class Actions extends BaseObjects {
   }
 
   /**
-   * Get actions billing information
-   * @returns {Promise<Array>} Billing information
-   */
-  async getActionsBilling() {
-    // Track this operation
-    const tracking = logger.trackOperation ? 
-      logger.trackOperation(this.objType, 'getActionsBilling') : 
-      { end: () => {} };
-    
-    try {
-      // Use the standardized cache key structure
-      return await this.cache.getOrFetch(
-        this._cacheKeys.actionsBilling,
-        async () => this.serverCtl.getActionsBillings(),
-        this.cacheTimeouts.actionsBilling || 60000,
-        [] // No dependencies
-      );
-    } catch (error) {
-      return this._createError(
-        `Failed to retrieve Actions billing: ${error.message}`,
-        error,
-        500
-      );
-    } finally {
-      tracking.end();
-    }
-  }
-
-  /**
    * Get all workflow runs
    * @returns {Promise<Array>} List of workflow runs
    */
@@ -334,7 +305,7 @@ export class Actions extends BaseObjects {
    * Get usage metrics for GitHub Actions
    * @returns {Promise<Array>} Actions usage metrics
    */
-  async getUsageMetrics() {
+  async getActionsBilling() {
     // Track this operation
     const tracking = logger.trackOperation ? 
       logger.trackOperation(this.objType, 'getUsageMetrics') : 
@@ -346,7 +317,7 @@ export class Actions extends BaseObjects {
         this._cacheKeys.metrics,
         async () => {
           // Get billing information
-          const billingResp = await this.getActionsBilling();
+          const billingResp = await this.serverCtl.getActionsBillings();
           if (!billingResp[0]) {
             return billingResp;
           }
@@ -360,39 +331,76 @@ export class Actions extends BaseObjects {
           // Calculate metrics from the data
           const billing = billingResp[2];
           
-          // Get the workflow_runs array from the response
-          // Fix: access the workflow_runs property instead of treating runsResp[2] as an array
-          const workflowRuns = runsResp[2].workflow_runs || [];
+          // Get workflow data
+          const workflowRuns = runsResp[2].workflowList || [];
+          const totalRunTimeThisMonth = runsResp[2].totalRunTimeThisMonth || 0;
+          const repository = runsResp[2].repository || 'unknown';
 
-          // Count runs by status
+          // Count runs by various dimensions
           const statusCounts = {};
-          const workflowCounts = {};
+          const conclusionCounts = {};
+          const eventCounts = {};
+          const workflowMetrics = {};
 
           workflowRuns.forEach(run => {
             // Count by status
             statusCounts[run.status] = (statusCounts[run.status] || 0) + 1;
+            
+            // Count by conclusion (success/failure)
+            conclusionCounts[run.conclusion] = (conclusionCounts[run.conclusion] || 0) + 1;
+            
+            // Count by event type
+            eventCounts[run.event] = (eventCounts[run.event] || 0) + 1;
 
-            // Count by workflow
-            const workflowName = run.workflow_id || 'unknown';
-            workflowCounts[workflowName] = (workflowCounts[workflowName] || 0) + 1;
+            // Track metrics by workflow
+            if (!workflowMetrics[run.workflowId]) {
+              workflowMetrics[run.workflowId] = {
+                name: run.name,
+                title: run.title,
+                path: run.path,
+                count: 0,
+                totalRuntime: 0,
+                avgRuntime: 0,
+                success: 0,
+                failure: 0
+              };
+            }
+            
+            const wf = workflowMetrics[run.workflowId];
+            wf.count++;
+            wf.totalRuntime += run.runTimeMinutes || 0;
+            
+            // Track success/failure counts
+            if (run.conclusion === 'success') {
+              wf.success++;
+            } else if (run.conclusion === 'failure') {
+              wf.failure++;
+            }
+          });
+          
+          // Calculate average runtimes
+          Object.values(workflowMetrics).forEach(wf => {
+            wf.avgRuntime = wf.count > 0 ? (wf.totalRuntime / wf.count).toFixed(1) : 0;
           });
 
-          // Build usage metrics
+          // Build usage metrics with simplified billing data
           const metrics = {
-            billing: {
-              included_minutes: billing.included_minutes,
-              total_minutes_used: billing.total_minutes_used,
-              minutes_used_breakdown: billing.minutes_used_breakdown,
-              remaining_minutes: Math.max(0, billing.included_minutes - billing.total_minutes_used)
-            },
             runs: {
               total: workflowRuns.length,
               by_status: statusCounts,
-              by_workflow: workflowCounts
+              by_conclusion: conclusionCounts,
+              by_event: eventCounts,
+              by_workflow: workflowMetrics,
+              total_runtime_minutes: totalRunTimeThisMonth
             },
+            billing: {
+              included_minutes: billing.included_minutes,
+              total_paid_minutes_used: billing.total_paid_minutes_used || 0,
+              total_minutes_used: billing.included_minutes - totalRunTimeThisMonth - billing.total_paid_minutes_used || 0,
+            },
+            repository: repository,
             period: {
-              start: billing.billing_period?.start_date,
-              end: billing.billing_period?.end_date
+              current_month: new Date().toLocaleString('default', { month: 'long', year: 'numeric' })
             }
           };
 
@@ -403,8 +411,8 @@ export class Actions extends BaseObjects {
         },
         this.cacheTimeouts.metrics || 300000,
         [
-          this._cacheKeys.actionsBilling,  // Metrics depend on billing data
-          this._cacheKeys.workflowRuns     // Metrics depend on workflow runs data
+          this._cacheKeys.actionsBilling,
+          this._cacheKeys.workflowRuns
         ]
       );
     } catch (error) {
