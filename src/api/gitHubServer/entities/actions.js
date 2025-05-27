@@ -396,7 +396,8 @@ export class Actions extends BaseObjects {
             billing: {
               included_minutes: billing.included_minutes,
               total_paid_minutes_used: billing.total_paid_minutes_used || 0,
-              total_minutes_used: billing.included_minutes - totalRunTimeThisMonth - billing.total_paid_minutes_used || 0,
+              total_minutes_remaining: billing.included_minutes - totalRunTimeThisMonth - billing.total_paid_minutes_used || 0,
+              total_minutes_used: totalRunTimeThisMonth
             },
             repository: repository,
             period: {
