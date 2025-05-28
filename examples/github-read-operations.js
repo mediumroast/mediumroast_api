@@ -356,6 +356,11 @@ async function demonstrateStorageOperations(token, org) {
   try {
     const storage = new Storage(token, org, 'example-process');
     
+    // Get all storage information (comprehensive view)
+    console.log('\nFetching comprehensive storage information...');
+    const allStorageInfo = await storage.getAll();
+    logResult('getAll()', allStorageInfo);
+    
     // Get repository size
     console.log('\nFetching repository size...');
     const repoSize = await storage.getRepoSize();

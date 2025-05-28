@@ -258,9 +258,6 @@ export class Storage extends BaseObjects {
                   );
                 }
                 
-                // Debug log the response structure
-                // logger.debug(`Content response structure: ${JSON.stringify(contentResp[2])}`);
-                
                 // Extract size from response
                 let fileSize = 0;
                 if (contentResp[0] && contentResp[2]) {
@@ -418,6 +415,11 @@ export class Storage extends BaseObjects {
                 }
               };
               
+              // Add human-readable space if available
+              if (quota.plan && typeof quota.plan.space === 'number') {
+                quota.plan.space_readable = this._formatFileSize(quota.plan.space);
+              }
+              
               return this._createSuccess(
                 'Retrieved storage quota information',
                 quota
@@ -431,6 +433,7 @@ export class Storage extends BaseObjects {
                   plan: {
                     name: 'team',
                     space: 'unlimited',
+                    space_readable: 'unlimited',
                     message: 'This is a placeholder. The getGitHubOrg method needs to be implemented.'
                   }
                 }
@@ -593,5 +596,122 @@ export class Storage extends BaseObjects {
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     
     return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+  
+  /**
+   * Get all storage information
+   * @returns {Promise<Array>} Combined storage information
+   */
+  async getAll() {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'getAll') : 
+      { end: () => {} };
+  
+    try {
+      return await this.cache.getOrFetch(
+        'storage_all',
+        async () => {
+          try {
+            // Get billing information
+            const billingResp = await this.getStorageBilling();
+            if (!billingResp[0]) {
+              return billingResp;
+            }
+            
+            // Get quota information
+            const quotaResp = await this.getQuota();
+            if (!quotaResp[0]) {
+              return quotaResp;
+            }
+            
+            // Get repository size
+            const repoSizeResp = await this.getRepoSize();
+            if (!repoSizeResp[0]) {
+              return repoSizeResp;
+            }
+            
+            // Get detailed container information
+            const containerResp = await this.getStorageByContainer();
+            if (!containerResp[0]) {
+              return containerResp;
+            }
+            
+            // Extract relevant data from each response
+            const billing = billingResp[2];
+            const quota = quotaResp[2];
+            const repoSize = repoSizeResp[2];
+            const containerStorage = containerResp[2];
+            
+            // Calculate remaining space (handle unlimited quota case)
+            let remainingSpace = null;
+            let remainingPercentage = null;
+            
+            if (typeof quota.plan.space === 'number' && quota.plan.space > 0) {
+              remainingSpace = quota.plan.space - repoSize.size_kb * 1024; // Convert KB to bytes
+              remainingPercentage = (remainingSpace / quota.plan.space) * 100;
+            }
+            
+            // Build combined response
+            const storageInfo = {
+              // Organization info
+              organization: quota.organization,
+              plan: quota.plan.name,
+              
+              // Total storage metrics
+              repository: repoSize.repository,
+              total_space: quota.plan.space,
+              total_space_readable: quota.plan.space_readable,
+              consumed_space: repoSize.size_kb * 1024, // Convert to bytes
+              consumed_space_readable: repoSize.size_mb + ' MB',
+              
+              // Remaining space
+              remaining_space: remainingSpace,
+              remaining_space_readable: remainingSpace !== null ? this._formatFileSize(remainingSpace) : 'unlimited',
+              remaining_percentage: remainingPercentage !== null ? remainingPercentage.toFixed(2) + '%' : 'unlimited',
+              
+              // Billing information
+              billing_cycle_days_left: billing.days_left_in_billing_cycle || 0,
+              estimated_paid_storage: billing.estimated_paid_storage_for_month || 0,
+              estimated_storage: billing.estimated_storage_for_month || 0,
+              
+              // Container breakdown
+              containers: containerStorage.containers,
+              container_count: Object.keys(containerStorage.containers).length,
+              total_objects: Object.values(containerStorage.containers).reduce((sum, container) => sum + container.objectCount, 0),
+              
+              // Additional metadata
+              last_updated: new Date().toISOString()
+            };
+            
+            return this._createSuccess(
+              'Retrieved all storage information successfully',
+              storageInfo
+            );
+          } catch (err) {
+            return this._createError(
+              `Failed to retrieve all storage information: ${err.message}`,
+              err,
+              500
+            );
+          }
+        },
+        300000, // 5 minutes cache
+        [
+          this._cacheKeys.storageBilling,
+          this._cacheKeys.quota,
+          this._cacheKeys.repoSize,
+          this._cacheKeys.byContainer
+        ]
+      );
+    } catch (error) {
+      return this._createError(
+        `Failed to retrieve all storage information: ${error.message}`,
+        error,
+        500
+      );
+    } finally {
+      tracking.end();
+    }
   }
 }
