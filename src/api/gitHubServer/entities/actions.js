@@ -2,8 +2,6 @@
  * Actions entity class for GitHub workflow operations
  * @file actions.js
  * @license Apache-2.0
- * @version 3.0.0
- * 
  * @author Michael Hay <michael.hay@mediumroast.io>
  * @copyright 2025 Mediumroast, Inc. All rights reserved.
  */
@@ -172,127 +170,6 @@ export class Actions extends BaseObjects {
     } catch (error) {
       return this._createError(
         `Failed to retrieve workflow runs: ${error.message}`,
-        error,
-        500
-      );
-    } finally {
-      tracking.end();
-    }
-  }
-
-  /**
-   * Get details for a specific workflow run
-   * @param {string} runId - Workflow run ID
-   * @returns {Promise<Array>} Workflow run details
-   */
-  async getWorkflowRun(runId) {
-    // Track this operation
-    const tracking = logger.trackOperation ? 
-      logger.trackOperation(this.objType, 'getWorkflowRun') : 
-      { end: () => {} };
-    
-    try {
-      // Use standardized parameter validation
-      const validationError = this._validateParams(
-        { runId },
-        { runId: 'string' }
-      );
-        
-      if (validationError) return validationError;
-      
-      // Use cache for individual runs with dependency on all runs
-      const runCacheKey = `${this._cacheKeys.workflowRuns}_${runId}`;
-      
-      return await this.cache.getOrFetch(
-        runCacheKey,
-        async () => this.serverCtl.getWorkflowRun(runId),
-        this.cacheTimeouts.workflowRuns || 60000,
-        [this._cacheKeys.workflowRuns] // Depends on all workflow runs
-      );
-    } catch (error) {
-      return this._createError(
-        `Failed to retrieve workflow run: ${error.message}`,
-        error,
-        500
-      );
-    } finally {
-      tracking.end();
-    }
-  }
-
-  /**
-   * Cancel a workflow run
-   * @param {string} runId - Workflow run ID to cancel
-   * @returns {Promise<Array>} Result of operation
-   */
-  async cancelWorkflowRun(runId) {
-    // Track this operation
-    const tracking = logger.trackOperation ? 
-      logger.trackOperation(this.objType, 'cancelWorkflowRun') : 
-      { end: () => {} };
-    
-    try {
-      // Use standardized parameter validation
-      const validationError = this._validateParams(
-        { runId },
-        { runId: 'string' }
-      );
-        
-      if (validationError) return validationError;
-      
-      const result = await this.serverCtl.cancelWorkflowRun(runId);
-
-      // Invalidate cache on successful cancellation
-      if (result[0]) {
-        // Invalidate both the specific run and the list of all runs
-        this.cache.invalidate(this._cacheKeys.workflowRuns);
-        this.cache.invalidate(`${this._cacheKeys.workflowRuns}_${runId}`);
-      }
-
-      return result;
-    } catch (error) {
-      return this._createError(
-        `Failed to cancel workflow run: ${error.message}`,
-        error,
-        500
-      );
-    } finally {
-      tracking.end();
-    }
-  }
-
-  /**
-   * Trigger a specific workflow
-   * @param {string} workflowId - Workflow file name (e.g., "main.yml")
-   * @param {Object} inputs - Workflow inputs
-   * @returns {Promise<Array>} Result of operation
-   */
-  async triggerWorkflow(workflowId, inputs = {}) {
-    // Track this operation
-    const tracking = logger.trackOperation ? 
-      logger.trackOperation(this.objType, 'triggerWorkflow') : 
-      { end: () => {} };
-    
-    try {
-      // Use standardized parameter validation
-      const validationError = this._validateParams(
-        { workflowId, inputs },
-        { workflowId: 'string', inputs: 'object' }
-      );
-        
-      if (validationError) return validationError;
-      
-      const result = await this.serverCtl.dispatchWorkflow(workflowId, inputs);
-
-      // Invalidate cache on successful trigger
-      if (result[0]) {
-        this.cache.invalidate(this._cacheKeys.workflowRuns);
-      }
-
-      return result;
-    } catch (error) {
-      return this._createError(
-        `Failed to trigger workflow: ${error.message}`,
         error,
         500
       );

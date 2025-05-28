@@ -36,9 +36,9 @@ export class Storage extends BaseObjects {
     
     // Define object file names for containers
     this.objectFiles = {
-      Studies: 'studies.json',
-      Companies: 'companies.json',
-      Interactions: 'interactions.json'
+      Studies: 'Studies.json',
+      Companies: 'Companies.json',
+      Interactions: 'Interactions.json'
     };
   }
 
@@ -57,45 +57,24 @@ export class Storage extends BaseObjects {
         this._cacheKeys.repoSize,
         async () => {
           try {
-            // Try to use getRepository method first
-            if (typeof this.serverCtl.getRepository === 'function') {
-              const repoResponse = await this.serverCtl.getRepository();
-              
-              if (!repoResponse[0]) {
-                return repoResponse;
-              }
-              
-              // Extract just the size from the response
-              return this._createSuccess(
-                'Retrieved repository size successfully',
-                repoResponse[2].size || 0
-              );
-            } 
-            // Try to use getRepoSize (older method name) as fallback
-            else if (typeof this.serverCtl.getRepoSize === 'function') {
-              logger.info('Using legacy getRepoSize method');
-              return await this.serverCtl.getRepoSize();
+            // Direct call to repositoryManager's getRepositorySize method
+            const repoResponse = await this.serverCtl.getRepoSize();
+            
+            if (!repoResponse[0]) {
+              return repoResponse;
             }
-            // If neither method exists, provide a fallback response
-            else {
-              logger.warn('Repository size methods not implemented in github.js, using fallback');
-              
-              return this._createSuccess(
-                'Repository size functionality not fully implemented',
-                {
-                  size: 0,
-                  message: 'This is a placeholder. The getRepository method needs to be implemented in the github.js file.'
-                }
-              );
-            }
+            
+            return this._createSuccess(
+              'Retrieved repository size successfully',
+              repoResponse[2]
+            );
           } catch (error) {
-            // Handle any unexpected errors
             logger.error('Failed to retrieve repository size', error);
-            throw error; // Re-throw to be caught by outer try-catch
+            throw error;
           }
         },
         this.cacheTimeouts.repoSize || 3600000,
-        [] // No dependencies
+        []
       );
     } catch (error) {
       return this._createError(
@@ -167,33 +146,33 @@ export class Storage extends BaseObjects {
     const tracking = logger.trackOperation ? 
       logger.trackOperation(this.objType, 'getStorageByContainer') : 
       { end: () => {} };
-    
+
     try {
       return await this.cache.getOrFetch(
         this._cacheKeys.byContainer,
         async () => {
           try {
-            // Get all container names
+          // Get all container names
             const containers = ['Studies', 'Companies', 'Interactions'];
             const stats = {
               totalSize: 0,
               containers: {}
             };
-            
+          
             for (const container of containers) {
-              // Skip if no object file for this container
+            // Skip if no object file for this container
               if (!this.objectFiles[container]) {
                 logger.debug(`Skipping container ${container} - no object file defined`);
                 continue;
               }
-                
+              
               // Initialize container statistics
               stats.containers[container] = {
-                size: 0,
+                metadataSize: 0, // Size of the container's JSON file
                 objectCount: 0,
                 lastUpdated: null
               };
-                
+              
               // Get container objects
               const containerClass = new BaseObjects(
                 this.serverCtl.token,
@@ -201,62 +180,118 @@ export class Storage extends BaseObjects {
                 'storage-analyzer',
                 container
               );
-                
+              
               const objectsResp = await containerClass.getAll();
               if (!objectsResp[0]) {
                 logger.warn(`Failed to get objects for ${container}: ${objectsResp[1]?.status_msg}`);
                 continue;
               }
-                
+              
               const objects = objectsResp[2].mrJson;
               stats.containers[container].objectCount = objects.length;
-                
+              
               // Get latest modification date
               for (const obj of objects) {
                 if (obj.modification_date && 
-                      (!stats.containers[container].lastUpdated || 
-                       new Date(obj.modification_date) > new Date(stats.containers[container].lastUpdated))) {
+                    (!stats.containers[container].lastUpdated || 
+                     new Date(obj.modification_date) > new Date(stats.containers[container].lastUpdated))) {
                   stats.containers[container].lastUpdated = obj.modification_date;
                 }
               }
-                
-              // For Interactions, also calculate total file size
+              
+              // Calculate total content size
+              let totalContentSize = 0;
+            
+              // For Interactions, calculate from file_size attributes in objects
               if (container === 'Interactions') {
-                let totalInteractionSize = 0;
                 for (const obj of objects) {
                   if (obj.file_size) {
-                    totalInteractionSize += obj.file_size;
-                  }
-                }
-                stats.containers[container].fileSize = totalInteractionSize;
-              }
-                
-              // Get container file size from SHA
-              try {
-                if (typeof this.serverCtl.getSha === 'function') {
-                  const shaResp = await this.serverCtl.getSha(
-                    container, 
-                    this.objectFiles[container], 
-                    'main'
-                  );
-                      
-                  if (shaResp[0] && shaResp[2] && typeof this.serverCtl.getContent === 'function') {
-                    const contentResp = await this.serverCtl.getContent(
-                      `${container}/${this.objectFiles[container]}`, 
-                      'main'
-                    );
-                          
-                    if (contentResp[0] && contentResp[2] && contentResp[2].size) {
-                      stats.containers[container].size = contentResp[2].size;
-                      stats.totalSize += contentResp[2].size;
+                    const sizeStr = String(obj.file_size);
+                  
+                    // Parse size values with units
+                    let sizeValue = 0;
+                    if (sizeStr.includes('KB')) {
+                      sizeValue = parseFloat(sizeStr) * 1024;
+                    } else if (sizeStr.includes('MB')) {
+                      sizeValue = parseFloat(sizeStr) * 1024 * 1024;
+                    } else if (sizeStr.includes('GB')) {
+                      sizeValue = parseFloat(sizeStr) * 1024 * 1024 * 1024;
+                    } else {
+                    // Try to parse as raw number
+                      sizeValue = parseFloat(sizeStr);
+                    }
+                  
+                    if (!isNaN(sizeValue)) {
+                      totalContentSize += sizeValue;
                     }
                   }
                 }
-              } catch (err) {
-                logger.error(`Error getting size for ${container}:`, err);
               }
-            }
             
+              // For other containers, estimate based on object count and average size
+              else {
+              // Estimate avg size per object (rough approximation)
+                const avgObjSize = 5 * 1024; // 5KB per object as estimate
+                totalContentSize = objects.length * avgObjSize;
+              }
+            
+              // Get metadata file size
+              try {
+                // Direct API call to ensure we get fresh data
+                // Add debug log to see what path we're using
+                const filePath = `${container}/${this.objectFiles[container]}`;
+                logger.debug(`Attempting to get metadata size for ${filePath}`);
+                
+                // Try both case formats to handle potential mismatch
+                let contentResp = await this.serverCtl.getContent(
+                  filePath,
+                  'main'
+                );
+                
+                // If that fails, try alternative case
+                if (!contentResp[0]) {
+                  const altFilePath = `${container}/${this.objectFiles[container].charAt(0).toUpperCase() + this.objectFiles[container].slice(1)}`;
+                  logger.debug(`First attempt failed, trying alternate path: ${altFilePath}`);
+                  contentResp = await this.serverCtl.getContent(
+                    altFilePath,
+                    'main'
+                  );
+                }
+                
+                // Debug log the response structure
+                // logger.debug(`Content response structure: ${JSON.stringify(contentResp[2])}`);
+                
+                // Extract size from response
+                let fileSize = 0;
+                if (contentResp[0] && contentResp[2]) {
+                  if (typeof contentResp[2].size === 'number') {
+                    fileSize = contentResp[2].size;
+                  } else if (contentResp[2].content) {
+                    // If no size directly, calculate from content length
+                    // GitHub returns base64 content which is ~4/3 the size of the actual data
+                    fileSize = Math.ceil((contentResp[2].content.length * 3) / 4);
+                  }
+                  
+                  logger.debug(`Extracted file size for ${container}: ${fileSize}`);
+                  stats.containers[container].metadataSize = fileSize;
+                  // Add human-readable version of the metadata size
+                  stats.containers[container].metadataSize_readable = this._formatFileSize(fileSize);
+                }
+              } catch (err) {
+                logger.error(`Error getting metadata size for ${container}:`, err);
+              }
+            
+              // Set the total size for this container (metadata + content)
+              stats.containers[container].size = totalContentSize + stats.containers[container].metadataSize;
+              stats.containers[container].size_readable = this._formatFileSize(stats.containers[container].size);
+            
+              // Add to total size
+              stats.totalSize += stats.containers[container].size;
+            }
+          
+            // Add readable total size
+            stats.totalSize_readable = this._formatFileSize(stats.totalSize);
+          
             return this._createSuccess(
               'Retrieved storage usage by container',
               stats
@@ -314,7 +349,8 @@ export class Storage extends BaseObjects {
             const commits = commitHistory[2];
             
             for (const commit of commits) {
-              const date = commit.commit.author.date.substring(0, 10); // YYYY-MM-DD
+              // FIX: Use the top-level date property instead of commit.author.date
+              const date = commit.date.substring(0, 10); // YYYY-MM-DD
                 
               // Get the repo size at this commit
               try {
@@ -542,5 +578,20 @@ export class Storage extends BaseObjects {
     } finally {
       tracking.end();
     }
+  }
+  
+  /**
+   * Format file size in bytes to human-readable string
+   * @private
+   * @param {number} bytes - Size in bytes
+   * @returns {string} Human-readable size
+   */
+  _formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    
+    return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
   }
 }

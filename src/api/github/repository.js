@@ -129,36 +129,6 @@ class RepositoryManager {
   }
 
   /**
-   * Gets billing information for GitHub Actions
-   * @returns {Promise<Array>} ResponseFactory result
-   */
-  async getActionsBilling() {
-    try {
-      const response = await this.octokit.rest.billing.getGithubActionsBillingOrg({
-        org: this.orgName,
-      });
-      return ResponseFactory.success('Successfully retrieved actions billing', response.data);
-    } catch (err) {
-      return ResponseFactory.error(`Failed to get actions billing: ${err.message}`, err.message, 404);
-    }
-  }
-
-  /**
-   * Gets billing information for GitHub Storage
-   * @returns {Promise<Array>} ResponseFactory result
-   */
-  async getStorageBilling() {
-    try {
-      const response = await this.octokit.rest.billing.getSharedStorageBillingOrg({
-        org: this.orgName,
-      });
-      return ResponseFactory.success('Successfully retrieved storage billing', response.data);
-    } catch (err) {
-      return ResponseFactory.error(`Failed to get storage billing: ${err.message}`, err.message, 404);
-    }
-  }
-
-  /**
    * Creates a repository in the organization
    * @param {String} description - Repository description
    * @returns {Promise<Array>} ResponseFactory result
@@ -189,6 +159,164 @@ class RepositoryManager {
       return ResponseFactory.success(`Retrieved organization ${this.orgName}`, response.data);
     } catch (err) {
       return ResponseFactory.error(`Failed to get organization: ${err.message}`, err.message);
+    }
+  }
+
+  /**
+   * Gets repository size information
+   * @returns {Promise<Array>} ResponseFactory result with repository size in KB
+   */
+  async getRepoSize() {
+    try {
+      const response = await this.octokit.rest.repos.get({
+        owner: this.orgName,
+        repo: this.repoName
+      });
+
+      // The size property is in KB
+      const sizeInKB = response.data.size;
+      
+      return ResponseFactory.success(
+        `Repository ${this.repoName} size retrieved successfully`, 
+        {
+          repository: this.repoName,
+          size_kb: sizeInKB,
+          size_mb: (sizeInKB / 1024).toFixed(2),
+          size_gb: (sizeInKB / 1024 / 1024).toFixed(2)
+        }
+      );
+    } catch (err) {
+      return ResponseFactory.error(
+        `Failed to get repository size: ${err.message}`, 
+        err
+      );
+    }
+  }
+
+  /**
+   * Gets the SHA of a file in the repository
+   * @param {String} path - Path to the file
+   * @param {String} ref - Branch or commit reference
+   * @returns {Promise<Array>} ResponseFactory result with SHA
+   */
+  async getSha(path, ref) {
+    try {
+      const response = await this.octokit.rest.repos.getContent({
+        owner: this.orgName,
+        repo: this.repoName,
+        path,
+        ref
+      });
+      
+      // Handle case where response is an array (directory listing)
+      if (Array.isArray(response.data)) {
+        return ResponseFactory.error(
+          `Cannot get SHA for directory: ${path}`, 
+          null, 
+          400
+        );
+      }
+      
+      return ResponseFactory.success(
+        `Retrieved SHA for ${path}`, 
+        response.data.sha
+      );
+    } catch (err) {
+      if (err.status === 404) {
+        return ResponseFactory.error(
+          `File not found at ${path}`,
+          err,
+          404
+        );
+      }
+      return ResponseFactory.error(
+        `Failed to get SHA for ${path}: ${err.message}`,
+        err,
+        err.status || 500
+      );
+    }
+  }
+
+  /**
+   * Gets commit history for a repository
+   * @param {number} days - Number of days to look back
+   * @param {string} [branch=null] - Branch to get history for
+   * @returns {Promise<Array>} ResponseFactory result with commit history
+   */
+  async getCommitHistory(days = 7, branch = null) {
+    try {
+      // Calculate the date range
+      const since = new Date();
+      since.setDate(since.getDate() - days);
+      since.setHours(0, 0, 0, 0); // Start of day
+
+      // Get commits using the Octokit API
+      const response = await this.octokit.rest.repos.listCommits({
+        owner: this.orgName,
+        repo: this.repoName,
+        sha: branch || undefined,
+        since: since.toISOString(),
+        per_page: 100 // Max results per page
+      });
+
+      const commits = response.data.map(commit => ({
+        sha: commit.sha,
+        date: commit.commit.author.date,
+        message: commit.commit.message,
+        author: {
+          name: commit.commit.author.name,
+          email: commit.commit.author.email
+        },
+        stats: commit.stats || { additions: 0, deletions: 0, total: 0 }
+      }));
+
+      return ResponseFactory.success(
+        `Retrieved ${commits.length} commits from the last ${days} days`,
+        commits
+      );
+    } catch (err) {
+      return ResponseFactory.error(
+        `Failed to get commit history: ${err.message}`,
+        err,
+        err.status || 500
+      );
+    }
+  }
+
+  /**
+   * Gets repository size at a specific commit
+   * @param {string} commitSha - Commit SHA
+   * @returns {Promise<Array>} ResponseFactory result with repository size in KB
+   */
+  async getRepoSizeAtCommit(commitSha) {
+    try {
+      // Unfortunately, GitHub API doesn't provide direct size at commit
+      // We'll use the repository data at that point in time
+      const response = await this.octokit.rest.repos.get({
+        owner: this.orgName,
+        repo: this.repoName,
+        // Note: We can't directly get size at a specific commit through the API
+        // The size will be the current size, but we can include commit info
+      });
+
+      // The size property is in KB
+      const sizeInKB = response.data.size;
+      
+      return ResponseFactory.success(
+        `Repository ${this.repoName} size at commit ${commitSha.substring(0, 7)} retrieved`, 
+        {
+          repository: this.repoName,
+          commit: commitSha,
+          size_kb: sizeInKB,
+          size_mb: (sizeInKB / 1024).toFixed(2),
+          size_gb: (sizeInKB / 1024 / 1024).toFixed(2)
+        }
+      );
+    } catch (err) {
+      return ResponseFactory.error(
+        `Failed to get repository size at commit ${commitSha}: ${err.message}`, 
+        err
+      );
     }
   }
 }

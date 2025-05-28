@@ -404,6 +404,30 @@ class GitHubFunctions {
   }
 
   /**
+     * @async
+     * @function getRepoSizeAtCommit
+     * @description Gets the size of the repository at a specific commit
+     * @param {string} commitSha - Commit SHA
+     * @returns {Promise<Array>} ResponseFactory result with repository size in KB
+     */
+  async getRepoSizeAtCommit(commitSha) {
+    if (!commitSha) {
+      return ResponseFactory.error(
+        'Missing required parameter: [commitSha]',
+        null,
+        400
+      );
+    }
+
+    // Cache size at commit for longer since historical data doesn't change
+    return this._getCachedOrFetch(
+      `repo_size_at_commit_${commitSha}`,
+      () => this.repositoryManager.getRepoSizeAtCommit(commitSha),
+      3600000 // 1 hour cache for historical data
+    );
+  }
+
+  /**
      * @function createContainers
      * @description Creates the top level Study, Company and Interaction containers for all mediumroast.io assets
      * @returns {Array} An array with position 0 being boolean to signify success/failure and position 1 being the responses or error messages.
@@ -1014,6 +1038,57 @@ class GitHubFunctions {
     return this.containerOps.releaseContainers(
       repoMetadata,
       (branchName, branchSha) => this.branchManager.mergeBranchToMain(branchName, branchSha)
+    );
+  }
+
+  /**
+     * @async
+     * @function getCommitHistory
+     * @description Gets commit history for the repository
+     * @param {number} days - Number of days to look back
+     * @param {string} [branchName=this.mainBranchName] - Branch to get history for
+     * @returns {Promise<Array>} ResponseFactory result with commit history
+     */
+  async getCommitHistory(days = 7, branchName = this.mainBranchName) {
+    // Validate days parameter
+    if (typeof days !== 'number' || days < 1) {
+      return ResponseFactory.error(
+        `Invalid parameter: [days=${days}] must be a positive number`,
+        null,
+        400
+      );
+    }
+
+    // Cache commit history for a short time (1 minute)
+    return this._getCachedOrFetch(
+      `commit_history_${days}_${branchName}`,
+      () => this.repositoryManager.getCommitHistory(days, branchName),
+      60000 // 1 minute cache
+    );
+  }
+
+  /**
+     * @async
+     * @function getContent
+     * @description Gets content from a path in the repository
+     * @param {string} path - Path to the content
+     * @param {string} ref - Branch or commit reference
+     * @returns {Promise<Array>} ResponseFactory result with content
+     */
+  async getContent(path, ref = this.mainBranchName) {
+    if (isEmpty(path)) {
+      return ResponseFactory.error(
+        'Missing required parameter: [path]',
+        null,
+        400
+      );
+    }
+    
+    // Cache content for a short time
+    return this._getCachedOrFetch(
+      `content_${path}_${ref}`,
+      () => this.repositoryManager.getContent(path, ref),
+      30000 // 30 seconds cache
     );
   }
 }
