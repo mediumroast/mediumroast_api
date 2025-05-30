@@ -2,8 +2,6 @@
  * Actions entity class for GitHub workflow operations
  * @file actions.js
  * @license Apache-2.0
- * @version 3.0.0
- * 
  * @author Michael Hay <michael.hay@mediumroast.io>
  * @copyright 2025 Mediumroast, Inc. All rights reserved.
  */
@@ -130,35 +128,6 @@ export class Actions extends BaseObjects {
   }
 
   /**
-   * Get actions billing information
-   * @returns {Promise<Array>} Billing information
-   */
-  async getActionsBilling() {
-    // Track this operation
-    const tracking = logger.trackOperation ? 
-      logger.trackOperation(this.objType, 'getActionsBilling') : 
-      { end: () => {} };
-    
-    try {
-      // Use the standardized cache key structure
-      return await this.cache.getOrFetch(
-        this._cacheKeys.actionsBilling,
-        async () => this.serverCtl.getActionsBillings(),
-        this.cacheTimeouts.actionsBilling || 60000,
-        [] // No dependencies
-      );
-    } catch (error) {
-      return this._createError(
-        `Failed to retrieve Actions billing: ${error.message}`,
-        error,
-        500
-      );
-    } finally {
-      tracking.end();
-    }
-  }
-
-  /**
    * Get all workflow runs
    * @returns {Promise<Array>} List of workflow runs
    */
@@ -210,131 +179,10 @@ export class Actions extends BaseObjects {
   }
 
   /**
-   * Get details for a specific workflow run
-   * @param {string} runId - Workflow run ID
-   * @returns {Promise<Array>} Workflow run details
-   */
-  async getWorkflowRun(runId) {
-    // Track this operation
-    const tracking = logger.trackOperation ? 
-      logger.trackOperation(this.objType, 'getWorkflowRun') : 
-      { end: () => {} };
-    
-    try {
-      // Use standardized parameter validation
-      const validationError = this._validateParams(
-        { runId },
-        { runId: 'string' }
-      );
-        
-      if (validationError) return validationError;
-      
-      // Use cache for individual runs with dependency on all runs
-      const runCacheKey = `${this._cacheKeys.workflowRuns}_${runId}`;
-      
-      return await this.cache.getOrFetch(
-        runCacheKey,
-        async () => this.serverCtl.getWorkflowRun(runId),
-        this.cacheTimeouts.workflowRuns || 60000,
-        [this._cacheKeys.workflowRuns] // Depends on all workflow runs
-      );
-    } catch (error) {
-      return this._createError(
-        `Failed to retrieve workflow run: ${error.message}`,
-        error,
-        500
-      );
-    } finally {
-      tracking.end();
-    }
-  }
-
-  /**
-   * Cancel a workflow run
-   * @param {string} runId - Workflow run ID to cancel
-   * @returns {Promise<Array>} Result of operation
-   */
-  async cancelWorkflowRun(runId) {
-    // Track this operation
-    const tracking = logger.trackOperation ? 
-      logger.trackOperation(this.objType, 'cancelWorkflowRun') : 
-      { end: () => {} };
-    
-    try {
-      // Use standardized parameter validation
-      const validationError = this._validateParams(
-        { runId },
-        { runId: 'string' }
-      );
-        
-      if (validationError) return validationError;
-      
-      const result = await this.serverCtl.cancelWorkflowRun(runId);
-
-      // Invalidate cache on successful cancellation
-      if (result[0]) {
-        // Invalidate both the specific run and the list of all runs
-        this.cache.invalidate(this._cacheKeys.workflowRuns);
-        this.cache.invalidate(`${this._cacheKeys.workflowRuns}_${runId}`);
-      }
-
-      return result;
-    } catch (error) {
-      return this._createError(
-        `Failed to cancel workflow run: ${error.message}`,
-        error,
-        500
-      );
-    } finally {
-      tracking.end();
-    }
-  }
-
-  /**
-   * Trigger a specific workflow
-   * @param {string} workflowId - Workflow file name (e.g., "main.yml")
-   * @param {Object} inputs - Workflow inputs
-   * @returns {Promise<Array>} Result of operation
-   */
-  async triggerWorkflow(workflowId, inputs = {}) {
-    // Track this operation
-    const tracking = logger.trackOperation ? 
-      logger.trackOperation(this.objType, 'triggerWorkflow') : 
-      { end: () => {} };
-    
-    try {
-      // Use standardized parameter validation
-      const validationError = this._validateParams(
-        { workflowId, inputs },
-        { workflowId: 'string', inputs: 'object' }
-      );
-        
-      if (validationError) return validationError;
-      
-      const result = await this.serverCtl.dispatchWorkflow(workflowId, inputs);
-
-      // Invalidate cache on successful trigger
-      if (result[0]) {
-        this.cache.invalidate(this._cacheKeys.workflowRuns);
-      }
-
-      return result;
-    } catch (error) {
-      return this._createError(
-        `Failed to trigger workflow: ${error.message}`,
-        error,
-        500
-      );
-    } finally {
-      tracking.end();
-    }
-  }
-
-  /**
    * Get usage metrics for GitHub Actions
    * @returns {Promise<Array>} Actions usage metrics
    */
-  async getUsageMetrics() {
+  async getActionsBilling() {
     // Track this operation
     const tracking = logger.trackOperation ? 
       logger.trackOperation(this.objType, 'getUsageMetrics') : 
@@ -346,7 +194,7 @@ export class Actions extends BaseObjects {
         this._cacheKeys.metrics,
         async () => {
           // Get billing information
-          const billingResp = await this.getActionsBilling();
+          const billingResp = await this.serverCtl.getActionsBillings();
           if (!billingResp[0]) {
             return billingResp;
           }
@@ -359,37 +207,78 @@ export class Actions extends BaseObjects {
 
           // Calculate metrics from the data
           const billing = billingResp[2];
-          const runs = runsResp[2];
+          
+          // Get workflow data
+          const workflowRuns = runsResp[2].workflowList || [];
+          const totalRunTimeThisMonth = runsResp[2].totalRunTimeThisMonth || 0;
+          const repository = runsResp[2].repository || 'unknown';
 
-          // Count runs by status
+          // Count runs by various dimensions
           const statusCounts = {};
-          const workflowCounts = {};
+          const conclusionCounts = {};
+          const eventCounts = {};
+          const workflowMetrics = {};
 
-          runs.forEach(run => {
+          workflowRuns.forEach(run => {
             // Count by status
             statusCounts[run.status] = (statusCounts[run.status] || 0) + 1;
+            
+            // Count by conclusion (success/failure)
+            conclusionCounts[run.conclusion] = (conclusionCounts[run.conclusion] || 0) + 1;
+            
+            // Count by event type
+            eventCounts[run.event] = (eventCounts[run.event] || 0) + 1;
 
-            // Count by workflow
-            const workflowName = run.workflow_id || 'unknown';
-            workflowCounts[workflowName] = (workflowCounts[workflowName] || 0) + 1;
+            // Track metrics by workflow
+            if (!workflowMetrics[run.workflowId]) {
+              workflowMetrics[run.workflowId] = {
+                name: run.name,
+                title: run.title,
+                path: run.path,
+                count: 0,
+                totalRuntime: 0,
+                avgRuntime: 0,
+                success: 0,
+                failure: 0
+              };
+            }
+            
+            const wf = workflowMetrics[run.workflowId];
+            wf.count++;
+            wf.totalRuntime += run.runTimeMinutes || 0;
+            
+            // Track success/failure counts
+            if (run.conclusion === 'success') {
+              wf.success++;
+            } else if (run.conclusion === 'failure') {
+              wf.failure++;
+            }
+          });
+          
+          // Calculate average runtimes
+          Object.values(workflowMetrics).forEach(wf => {
+            wf.avgRuntime = wf.count > 0 ? (wf.totalRuntime / wf.count).toFixed(1) : 0;
           });
 
-          // Build usage metrics
+          // Build usage metrics with simplified billing data
           const metrics = {
+            runs: {
+              total: workflowRuns.length,
+              by_status: statusCounts,
+              by_conclusion: conclusionCounts,
+              by_event: eventCounts,
+              by_workflow: workflowMetrics,
+              total_runtime_minutes: totalRunTimeThisMonth
+            },
             billing: {
               included_minutes: billing.included_minutes,
-              total_minutes_used: billing.total_minutes_used,
-              minutes_used_breakdown: billing.minutes_used_breakdown,
-              remaining_minutes: Math.max(0, billing.included_minutes - billing.total_minutes_used)
+              total_paid_minutes_used: billing.total_paid_minutes_used || 0,
+              total_minutes_remaining: billing.included_minutes - totalRunTimeThisMonth - billing.total_paid_minutes_used || 0,
+              total_minutes_used: totalRunTimeThisMonth
             },
-            runs: {
-              total: runs.length,
-              by_status: statusCounts,
-              by_workflow: workflowCounts
-            },
+            repository: repository,
             period: {
-              start: billing.billing_period?.start_date,
-              end: billing.billing_period?.end_date
+              current_month: new Date().toLocaleString('default', { month: 'long', year: 'numeric' })
             }
           };
 
@@ -400,8 +289,8 @@ export class Actions extends BaseObjects {
         },
         this.cacheTimeouts.metrics || 300000,
         [
-          this._cacheKeys.actionsBilling,  // Metrics depend on billing data
-          this._cacheKeys.workflowRuns      // Metrics depend on workflow runs data
+          this._cacheKeys.actionsBilling,
+          this._cacheKeys.workflowRuns
         ]
       );
     } catch (error) {

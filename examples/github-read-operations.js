@@ -40,7 +40,8 @@
 
 /* eslint-disable no-console */
 
-import { Studies, Companies, Interactions, Users } from '../src/api/gitHubServer.js';
+// Update the import statement to include Storage
+import { Studies, Companies, Interactions, Users, Actions, Storage } from '../src/api/gitHubServer.js';
 import fs from 'fs';
 import path from 'path';
 import ConfigParser from 'configparser';
@@ -213,8 +214,76 @@ async function demonstrateUsersOperations(token, org) {
     console.log('\nFetching current user information...');
     const currentUser = await users.getAuthenticatedUser();
     logResult('getAuthenticatedUser()', currentUser);
+    
+    // Find user by login if users exist
+    if (allUsers[0] && allUsers[2] && allUsers[2].length > 0) {
+      const sampleLogin = allUsers[2][0].login;
+      
+      console.log(`\nFinding user by login: "${sampleLogin}"...`);
+      const userByLogin = await users.findByLogin(sampleLogin);
+      logResult('findByLogin()', userByLogin);
+    }
+    
+    // Find users by role - common roles are 'admin' and 'member'
+    console.log('\nFinding users with role: "admin"...');
+    const adminUsers = await users.findByRole('admin');
+    logResult('findByRole("admin")', adminUsers);
+    
+    console.log('\nNOTE: This API only supports read operations for Users.');
+    
   } catch (error) {
     console.error('\n❌ Error in Users operations:', error.message);
+    if (error.stack) {
+      console.error('Stack trace:', error.stack);
+    }
+  }
+}
+
+/**
+ * Demonstrates Actions read operations
+ * @param {string} token - GitHub token
+ * @param {string} org - GitHub organization
+ */
+async function demonstrateActionsOperations(token, org) {
+  console.log(`\n${SECTION_DIVIDER}`);
+  console.log('ACTIONS OPERATIONS');
+  console.log(SECTION_DIVIDER);
+  
+  try {
+    const actions = new Actions(token, org, 'example-process');
+    
+    // Get all workflow runs
+    console.log('\nFetching all workflow runs...');
+    const allWorkflows = await actions.getAll();
+    logResult('getAll()', allWorkflows);
+    
+    // Get actions billing information
+    console.log('\nFetching GitHub Actions billing information...');
+    const billingInfo = await actions.getActionsBilling();
+    logResult('getActionsBilling()', billingInfo);
+    
+    // If workflow runs exist, demonstrate getting a specific run
+    if (allWorkflows[0] && allWorkflows[2] && Array.isArray(allWorkflows[2]) && allWorkflows[2].length > 0) {
+      const sampleRunId = allWorkflows[2][0].id;
+      
+      console.log(`\nFetching details for workflow run ID: ${sampleRunId}...`);
+      const workflowRun = await actions.getWorkflowRun(sampleRunId);
+      logResult('getWorkflowRun()', workflowRun);
+      
+      console.log('\nNOTE: The following operations would modify data and are commented out by default:');
+      console.log('// Cancel a workflow run');
+      console.log(`// const cancelResult = await actions.cancelWorkflowRun('${sampleRunId}');`);
+      console.log('// logResult(\'cancelWorkflowRun()\', cancelResult);');
+      
+      console.log('\n// Trigger a workflow');
+      console.log('// const triggerResult = await actions.triggerWorkflow(\'main.yml\', { ref: \'main\' });');
+      console.log('// logResult(\'triggerWorkflow()\', triggerResult);');
+    }
+  } catch (error) {
+    console.error('\n❌ Error in Actions operations:', error.message);
+    if (error.stack) {
+      console.error('Stack trace:', error.stack);
+    }
   }
 }
 
@@ -295,6 +364,62 @@ async function synchronizeData(clientSha = null) {
 }
 
 /**
+ * Demonstrates Storage read operations
+ * @param {string} token - GitHub token
+ * @param {string} org - GitHub organization
+ */
+async function demonstrateStorageOperations(token, org) {
+  console.log(`\n${SECTION_DIVIDER}`);
+  console.log('STORAGE OPERATIONS');
+  console.log(SECTION_DIVIDER);
+  
+  try {
+    const storage = new Storage(token, org, 'example-process');
+    
+    // Get all storage information (comprehensive view)
+    console.log('\nFetching comprehensive storage information...');
+    const allStorageInfo = await storage.getAll();
+    logResult('getAll()', allStorageInfo);
+    
+    // Get repository size
+    console.log('\nFetching repository size...');
+    const repoSize = await storage.getRepoSize();
+    logResult('getRepoSize()', repoSize);
+    
+    // Get storage billing information
+    console.log('\nFetching storage billing information...');
+    const storageBilling = await storage.getStorageBilling();
+    logResult('getStorageBilling()', storageBilling);
+    
+    // Get storage by container
+    console.log('\nFetching storage by container...');
+    const containerStorage = await storage.getStorageByContainer();
+    logResult('getStorageByContainer()', containerStorage);
+    
+    // Get storage quota
+    console.log('\nFetching storage quota information...');
+    const quota = await storage.getQuota();
+    logResult('getQuota()', quota);
+    
+    // Get storage trends (last 7 days to keep it faster)
+    console.log('\nFetching storage trends for the last 7 days...');
+    const trends = await storage.getStorageTrends(7);
+    logResult('getStorageTrends(7)', trends);
+    
+    // Get comprehensive disk usage analytics
+    console.log('\nGenerating disk usage analytics...');
+    const analytics = await storage.getDiskUsageAnalytics();
+    logResult('getDiskUsageAnalytics()', analytics);
+    
+  } catch (error) {
+    console.error('\n❌ Error in Storage operations:', error.message);
+    if (error.stack) {
+      console.error('Stack trace:', error.stack);
+    }
+  }
+}
+
+/**
  * Main function to run the example
  */
 async function main() {
@@ -331,22 +456,32 @@ async function main() {
     // Get command-line arguments to determine which demos to run
     const args = process.argv.slice(2);
     const runAll = args.length === 0;
-        
+    
     // Run selected demonstrations
     if (runAll || args.includes('studies')) {
       await demonstrateStudiesOperations(token, org);
     }
-        
+    
     if (runAll || args.includes('companies')) {
       await demonstrateCompaniesOperations(token, org);
     }
-        
+    
     if (runAll || args.includes('interactions')) {
       await demonstrateInteractionsOperations(token, org);
     }
-        
+    
     if (runAll || args.includes('users')) {
       await demonstrateUsersOperations(token, org);
+    }
+    
+    // Run actions operations
+    if (runAll || args.includes('actions')) {
+      await demonstrateActionsOperations(token, org);
+    }
+    
+    // Run storage operations
+    if (runAll || args.includes('storage')) {
+      await demonstrateStorageOperations(token, org);
     }
     
     // Run branch status operations

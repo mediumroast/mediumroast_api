@@ -20,6 +20,7 @@ class BillingManager {
   constructor(octokit, orgName) {
     this.octokit = octokit;
     this.orgName = orgName;
+    this.repoName = `${orgName}_discovery`; // Default repo name, can be overridden
   }
 
   /**
@@ -44,6 +45,8 @@ class BillingManager {
       );
     }
   }
+
+
 
   /**
    * Gets GitHub Packages storage billing information for the organization
@@ -130,6 +133,69 @@ class BillingManager {
       return ResponseFactory.error(
         `Failed to retrieve billing information: ${err.message}`,
         err
+      );
+    }
+  }
+
+  /**
+   * Gets workflow runs for a specific repository in the organization
+   * @param {string} repoName - Repository name
+   * @returns {Promise<Array>} ResponseFactory result with workflow runs data
+   */
+  async getWorkflowRuns(repoName) {
+    try {
+      const response = await this.octokit.rest.actions.listWorkflowRunsForRepo({
+        owner: this.orgName,
+        repo: repoName
+      });
+      
+      const workflowList = [];
+      let totalRunTimeThisMonth = 0;
+      const currentMonth = new Date().getMonth();
+      
+      for (const workflow of response.data.workflow_runs) {
+        // Calculate runtime in minutes (minimum 1 minute)
+        const runTime = Math.ceil(
+          (new Date(workflow.updated_at) - new Date(workflow.created_at)) / 1000 / 60
+        ) || 1;
+        
+        // Skip workflows not from current month
+        if (new Date(workflow.updated_at).getMonth() !== currentMonth) {
+          continue;
+        }
+        
+        totalRunTimeThisMonth += runTime;
+        
+        // Add formatted workflow data to list
+        workflowList.push({
+          name: workflow.path.replace('.github/workflows/', '').replace('.yml', ''),
+          title: workflow.display_title,
+          id: workflow.id,
+          workflowId: workflow.workflow_id,
+          runTimeMinutes: runTime,
+          status: workflow.status,
+          conclusion: workflow.conclusion,
+          event: workflow.event,
+          path: workflow.path
+        });
+      }
+      
+      // Sort by updated_at (most recent first)
+      workflowList.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+      
+      return ResponseFactory.success(
+        `Discovered ${workflowList.length} workflow runs for repository ${repoName}`,
+        {
+          workflowList,
+          totalRunTimeThisMonth,
+          repository: repoName
+        }
+      );
+    } catch (err) {
+      return ResponseFactory.error(
+        `Failed to retrieve workflow runs: ${err.message}`,
+        err,
+        err.status || 500
       );
     }
   }
