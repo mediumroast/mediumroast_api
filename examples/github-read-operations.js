@@ -214,8 +214,28 @@ async function demonstrateUsersOperations(token, org) {
     console.log('\nFetching current user information...');
     const currentUser = await users.getAuthenticatedUser();
     logResult('getAuthenticatedUser()', currentUser);
+    
+    // Find user by login if users exist
+    if (allUsers[0] && allUsers[2] && allUsers[2].length > 0) {
+      const sampleLogin = allUsers[2][0].login;
+      
+      console.log(`\nFinding user by login: "${sampleLogin}"...`);
+      const userByLogin = await users.findByLogin(sampleLogin);
+      logResult('findByLogin()', userByLogin);
+    }
+    
+    // Find users by role - common roles are 'admin' and 'member'
+    console.log('\nFinding users with role: "admin"...');
+    const adminUsers = await users.findByRole('admin');
+    logResult('findByRole("admin")', adminUsers);
+    
+    console.log('\nNOTE: This API only supports read operations for Users.');
+    
   } catch (error) {
     console.error('\n❌ Error in Users operations:', error.message);
+    if (error.stack) {
+      console.error('Stack trace:', error.stack);
+    }
   }
 }
 
