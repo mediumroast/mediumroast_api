@@ -141,7 +141,9 @@ class RepositoryManager {
         description: description,
         private: true
       });
-      return ResponseFactory.success(`Created repository ${this.repoName}`, response.data);
+      // Ensure size metrics are calculated before returning
+      const sizeMetrics = await this.calculateRepoSize(response.data);
+      return ResponseFactory.success(`Calculated repository size metrics for ${this.repoName}`, sizeMetrics);
     } catch (err) {
       return ResponseFactory.error(`Failed to create repository: ${err.message}`, err.message);
     }
