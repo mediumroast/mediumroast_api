@@ -231,7 +231,7 @@ export class Storage extends BaseObjects {
               // For other containers, estimate based on object count and average size
               else {
               // Estimate avg size per object (rough approximation)
-                const avgObjSize = 5 * 1024; // 5KB per object as estimate
+                const avgObjSize = AVG_OBJECT_SIZE_BYTES; // 5KB per object as estimate
                 totalContentSize = objects.length * avgObjSize;
               }
             
