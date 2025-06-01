@@ -40,6 +40,9 @@ export class Storage extends BaseObjects {
       Companies: 'Companies.json',
       Interactions: 'Interactions.json'
     };
+    
+    // Define constants for size estimation
+    this.AVG_OBJECT_SIZE_BYTES = 5 * 1024; // 5KB per object as estimate
   }
 
   /**
@@ -231,7 +234,7 @@ export class Storage extends BaseObjects {
               // For other containers, estimate based on object count and average size
               else {
               // Estimate avg size per object (rough approximation)
-                const avgObjSize = AVG_OBJECT_SIZE_BYTES; // 5KB per object as estimate
+                const avgObjSize = this.AVG_OBJECT_SIZE_BYTES; // 5KB per object as estimate
                 totalContentSize = objects.length * avgObjSize;
               }
             
@@ -310,7 +313,7 @@ export class Storage extends BaseObjects {
   }
     
   /**
-   * Get storage usage trends over time
+   * Get storage trends over time
    * @param {number} days - Number of days to analyze
    * @returns {Promise<Array>} Storage usage trends
    */
