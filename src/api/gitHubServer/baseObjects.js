@@ -139,6 +139,19 @@ export class BaseObjects {
   }
     
   /**
+   * Creates a standardized warning response
+   * @private
+   * @param {String} message - Warning message
+   * @param {Object} data - Response data
+   * @param {Number} statusCode - HTTP status code
+   * @returns {Array} Standardized warning response
+   */
+  _createWarning(message, data = null, statusCode = 200) {
+    logger.warn(message, { data });
+    return [true, { status_code: statusCode, status_msg: message }, data];
+  }
+    
+  /**
    * Validates parameters against expected types
    * @private
    * @param {Object} params - Parameters to validate
