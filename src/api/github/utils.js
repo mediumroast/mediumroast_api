@@ -70,7 +70,7 @@ const customEncodeURIComponent = (str) => {
  */
 const extractWorkflowsFromZip = async (zipBuffer, options = {}) => {
   const { debug = false, tempDir = null } = options;
-  // Replace custom log function with logger.debug
+  // Use debug parameter to control detailed logging, but respect global log level
   const log = debug ? msg => logger.debug(msg) : () => {};
   
   try {

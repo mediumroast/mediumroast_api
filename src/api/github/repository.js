@@ -9,6 +9,7 @@
 import ResponseFactory from './response.js';
 import { encodeContent } from './utils.js';
 import { default as fetch } from 'node-fetch';
+import { logger } from '../logger.js';
 
 /**
  * Manages low-level GitHub repository operations
@@ -391,7 +392,7 @@ class RepositoryManager {
    */
   async downloadAssetDirect(assetUrl) {
     try {
-      console.log(`DEBUG: Directly downloading asset from: ${assetUrl}`);
+      logger.debug(`Directly downloading asset from: ${assetUrl}`);
       const response = await fetch(assetUrl);
       
       if (!response.ok) {
@@ -403,7 +404,7 @@ class RepositoryManager {
       }
       
       const buffer = await response.buffer();
-      console.log(`DEBUG: Successfully downloaded asset (${buffer.length} bytes)`);
+      logger.debug(`Successfully downloaded asset (${buffer.length} bytes)`);
       
       return ResponseFactory.success(
         `Successfully downloaded asset (${buffer.length} bytes)`,
