@@ -9,7 +9,7 @@
 import ResponseFactory from './response.js';
 import { encodeContent } from './utils.js';
 import { default as fetch } from 'node-fetch';
-import { logger } from '../logger.js';
+import { logger } from '../gitHubServer/logger.js';
 
 /**
  * Manages low-level GitHub repository operations
