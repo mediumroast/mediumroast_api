@@ -451,11 +451,14 @@ async function demonstrateRepositorySetup(token, org, operations) {
   console.log(SECTION_DIVIDER);
   
   try {
+    const github = new GitHubFunctions(token, org, 'write-operations-example');
+    
     // First, check if the GitHub App is properly installed
     console.log('\n📋 Pre-flight checks...');
-    const appCheck = await checkGitHubAppInstallation(token, org);
+    const appCheckResult = await github.checkGitHubAppInstallation();
     
-    if (!appCheck.installed) {
+    if (!appCheckResult[0]) {
+      const appCheck = appCheckResult[2];
       console.log(`\n${ERROR_PREFIX} GitHub App Installation Issue:`);
       console.log(`Message: ${appCheck.error}`);
       
@@ -490,12 +493,11 @@ async function demonstrateRepositorySetup(token, org, operations) {
     }
     
     // Display successful app installation info
+    const appCheck = appCheckResult[2];
     console.log(`\n${SUCCESS_PREFIX} GitHub App Installation Check:`);
     console.log('✅ Mediumroast for GitHub app is properly installed');
     console.log(`✅ Repository access: ${appCheck.repositorySelection === 'all' ? 'All repositories' : `${appCheck.repositoryAccess} repositories`}`);
     console.log('✅ App has required permissions');
-    
-    const github = new GitHubFunctions(token, org, 'write-operations-example');
     
     // Check for existing installations
     console.log(`\n${SECTION_DIVIDER}`);
@@ -648,78 +650,6 @@ async function demonstrateRepositorySetup(token, org, operations) {
  * @param {string} org - GitHub organization
  * @returns {Promise<Object>} Installation status and details
  */
-async function checkGitHubAppInstallation(token, org) {
-  try {
-    const github = new GitHubFunctions(token, org, 'app-check');
-    
-    console.log('\n🔍 Checking GitHub App installation...');
-    
-    // Check if we can access the organization
-    const orgResult = await github.getGitHubOrg();
-    if (!orgResult[0]) {
-      return {
-        installed: false,
-        canAccessOrg: false,
-        error: `Cannot access organization: ${orgResult[1].status_msg || orgResult[1]}`
-      };
-    }
-    
-    console.log('✅ Can access organization');
-    
-    // Try to check app installations (this requires the GitHub App to be installed)
-    try {
-      const response = await github.octCtl.rest.apps.listInstallationsForAuthenticatedUser();
-      
-      // Look for installations in our target organization
-      const orgInstallation = response.data.installations.find(installation => 
-        installation.account.login === org
-      );
-      
-      if (!orgInstallation) {
-        return {
-          installed: false,
-          canAccessOrg: true,
-          error: `Mediumroast for GitHub app is not installed in organization "${org}"`
-        };
-      }
-      
-      console.log('✅ GitHub App is installed in organization');
-      
-      // Check what repositories the app has access to
-      const repoAccess = await github.octCtl.rest.apps.listInstallationReposForAuthenticatedUser({
-        installation_id: orgInstallation.id
-      });
-      
-      return {
-        installed: true,
-        canAccessOrg: true,
-        installation: orgInstallation,
-        repositoryAccess: repoAccess.data.repositories.length,
-        repositorySelection: orgInstallation.repository_selection,
-        permissions: orgInstallation.permissions
-      };
-      
-    } catch (err) {
-      // If we can't list installations, the app might not be installed or have wrong permissions
-      if (err.status === 403 || err.status === 404) {
-        return {
-          installed: false,
-          canAccessOrg: true,
-          error: 'Mediumroast for GitHub app is not installed or lacks proper permissions'
-        };
-      }
-      throw err;
-    }
-    
-  } catch (error) {
-    return {
-      installed: false,
-      canAccessOrg: false,
-      error: `Error checking GitHub App installation: ${error.message}`
-    };
-  }
-}
-
 /**
  * Checks for existing repository, containers, and actions installations
  * @param {GitHubFunctions} github - GitHubFunctions instance

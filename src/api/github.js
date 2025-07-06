@@ -1091,6 +1091,102 @@ class GitHubFunctions {
       30000 // 30 seconds cache
     );
   }
+
+  /**
+   * @async
+   * @function checkGitHubAppInstallation
+   * @description Checks if the Mediumroast for GitHub app is properly installed and has required permissions
+   * @returns {Promise<Array>} ResponseFactory result with installation status and details
+   */
+  async checkGitHubAppInstallation() {
+    try {
+      // First check if we can access the organization
+      const orgResult = await this.getGitHubOrg();
+      if (!orgResult[0]) {
+        return ResponseFactory.error(
+          `Cannot access organization: ${orgResult[1].status_msg || orgResult[1]}`,
+          {
+            installed: false,
+            canAccessOrg: false,
+            error: `Cannot access organization: ${orgResult[1].status_msg || orgResult[1]}`
+          },
+          403
+        );
+      }
+
+      // Try to check app installations
+      try {
+        const response = await this.octCtl.rest.apps.listInstallationsForAuthenticatedUser();
+        
+        // Look for installations in our target organization
+        const orgInstallation = response.data.installations.find(installation => 
+          installation.account.login === this.orgName
+        );
+
+        if (!orgInstallation) {
+          return ResponseFactory.error(
+            `Mediumroast for GitHub app is not installed in organization "${this.orgName}"`,
+            {
+              installed: false,
+              canAccessOrg: true,
+              error: `Mediumroast for GitHub app is not installed in organization "${this.orgName}"`
+            },
+            404
+          );
+        }
+
+        // Check what repositories the app has access to
+        const repoAccess = await this.octCtl.rest.apps.listInstallationReposForAuthenticatedUser({
+          installation_id: orgInstallation.id
+        });
+
+        return ResponseFactory.success(
+          'Mediumroast for GitHub app is properly installed',
+          {
+            installed: true,
+            canAccessOrg: true,
+            installation: orgInstallation,
+            repositoryAccess: repoAccess.data.repositories.length,
+            repositorySelection: orgInstallation.repository_selection,
+            permissions: orgInstallation.permissions,
+            repositoryCount: repoAccess.data.repositories.length,
+            repositories: repoAccess.data.repositories.map(repo => ({
+              name: repo.name,
+              fullName: repo.full_name,
+              private: repo.private
+            }))
+          },
+          200
+        );
+
+      } catch (err) {
+        // If we can't list installations, the app might not be installed or have wrong permissions
+        if (err.status === 403 || err.status === 404) {
+          return ResponseFactory.error(
+            'Mediumroast for GitHub app is not installed or lacks proper permissions',
+            {
+              installed: false,
+              canAccessOrg: true,
+              error: 'Mediumroast for GitHub app is not installed or lacks proper permissions'
+            },
+            err.status
+          );
+        }
+        throw err;
+      }
+
+    } catch (error) {
+      return ResponseFactory.error(
+        `Error checking GitHub App installation: ${error.message}`,
+        {
+          installed: false,
+          canAccessOrg: false,
+          error: `Error checking GitHub App installation: ${error.message}`
+        },
+        500
+      );
+    }
+  }
 }
 
 export default GitHubFunctions;
