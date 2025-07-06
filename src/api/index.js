@@ -10,9 +10,7 @@ import {
   GitHubAuth
 } from './authorize.js';
 
-import {
-  GitHubFunctions
-} from './github.js';
+import GitHubFunctions from './github.js';
 
 export {
   Interactions,
