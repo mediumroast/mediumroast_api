@@ -20,11 +20,15 @@ class RepositoryManager {
    * @param {Object} octokit - Octokit instance
    * @param {String} orgName - GitHub organization name
    * @param {String} repoName - GitHub repository name
+   * @param {String} repoDesc - GitHub repository description
+   * @param {String} mainBranchName - Main branch name
    */
-  constructor(octokit, orgName, repoName) {
+  constructor(octokit, orgName, repoName, repoDesc, mainBranchName) {
     this.octokit = octokit;
     this.orgName = orgName;
     this.repoName = repoName;
+    this.repoDesc = repoDesc;
+    this.mainBranchName = mainBranchName;
   }
 
   /**
@@ -136,20 +140,17 @@ class RepositoryManager {
 
   /**
    * Creates a repository in the organization
-   * @param {String} description - Repository description
    * @returns {Promise<Array>} ResponseFactory result
    */
-  async createRepository(description) {
+  async createRepository() {
     try {
       const response = await this.octokit.rest.repos.createInOrg({
         org: this.orgName,
         name: this.repoName,
-        description: description,
+        description: this.repoDesc,
         private: true
       });
-      // Ensure size metrics are calculated before returning
-      const sizeMetrics = await this.calculateRepoSize(response.data);
-      return ResponseFactory.success(`Calculated repository size metrics for ${this.repoName}`, sizeMetrics);
+      return ResponseFactory.success(`Successfully created repository ${this.repoName}`, response.data);
     } catch (err) {
       return ResponseFactory.error(`Failed to create repository: ${err.message}`, err.message);
     }
@@ -647,6 +648,50 @@ class RepositoryManager {
     } catch (err) {
       return ResponseFactory.error(
         `Failed to create directory ${dirPath}: ${err.message}`,
+        err,
+        err.status || 500
+      );
+    }
+  }
+
+  /**
+   * Creates multiple containers (directories) in the repository
+   * @param {Array<String>} containers - Array of container names to create
+   * @returns {Promise<Array>} ResponseFactory result with creation results
+   */
+  async createContainers(containers = ['Studies', 'Companies', 'Interactions']) {
+    try {
+      const results = [];
+      
+      for (const container of containers) {
+        try {
+          const result = await this.createDirectory(container, this.mainBranchName);
+          results.push({
+            container: container,
+            success: result[0],
+            message: result[1],
+            timestamp: new Date().toISOString()
+          });
+          
+          // Add a small delay to avoid rate limiting
+          await new Promise(resolve => setTimeout(resolve, 100));
+        } catch (err) {
+          results.push({
+            container: container,
+            success: false,
+            message: err.message,
+            timestamp: new Date().toISOString()
+          });
+        }
+      }
+      
+      return ResponseFactory.success(
+        `Container creation completed. ${results.filter(r => r.success).length}/${results.length} containers created successfully`,
+        results
+      );
+    } catch (err) {
+      return ResponseFactory.error(
+        `Failed to create containers: ${err.message}`,
         err,
         err.status || 500
       );

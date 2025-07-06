@@ -10,6 +10,7 @@
  * against a GitHub organization.
  * 
  * It currently demonstrates:
+ * - Repository: Create the discovery repository and containers (Studies, Companies, Interactions)
  * - Actions: Install, update, and delete GitHub Actions workflows
  * 
  * To run this example, create a config.ini file with your GitHub token and organization.
@@ -23,10 +24,10 @@
  * node examples/github-write-operations.js
  * 
  * You can also specify which categories to run:
- * node examples/github-write-operations.js actions
+ * node examples/github-write-operations.js repository actions
  * 
  * Or specify specific operations within a category:
- * node examples/github-write-operations.js actions:install actions:delete
+ * node examples/github-write-operations.js repository:repository repository:containers actions:install actions:delete
  * 
  * This will run all operations by default, or you can specify individual ones.
  * 
@@ -42,6 +43,7 @@
 /* eslint-disable no-console */
 
 import { Studies, Companies, Interactions, Actions } from '../src/api/gitHubServer.js';
+import GitHubFunctions from '../src/api/github.js';
 import fs from 'fs';
 import path from 'path';
 import ConfigParser from 'configparser';
@@ -438,6 +440,452 @@ async function demonstrateInteractionsOperations(token, org, operations) {
 }
 
 /**
+ * Demonstrates Repository and Container setup operations
+ * @param {string} token - GitHub token
+ * @param {string} org - GitHub organization
+ * @param {Array<string>} operations - Specific operations to run
+ */
+async function demonstrateRepositorySetup(token, org, operations) {
+  console.log(`\n${SECTION_DIVIDER}`);
+  console.log('REPOSITORY AND CONTAINER SETUP');
+  console.log(SECTION_DIVIDER);
+  
+  try {
+    // First, check if the GitHub App is properly installed
+    console.log('\n📋 Pre-flight checks...');
+    const appCheck = await checkGitHubAppInstallation(token, org);
+    
+    if (!appCheck.installed) {
+      console.log(`\n${ERROR_PREFIX} GitHub App Installation Issue:`);
+      console.log(`Message: ${appCheck.error}`);
+      
+      if (!appCheck.canAccessOrg) {
+        console.log('\n❌ Cannot proceed: Unable to access the organization.');
+        console.log('Please ensure:');
+        console.log('1. The organization name is correct');
+        console.log('2. Your token has access to the organization');
+        return;
+      }
+      
+      console.log('\n❌ Cannot proceed: Mediumroast for GitHub app is not properly installed.');
+      console.log('\nTo fix this:');
+      console.log('1. Go to https://github.com/apps/mediumroast-for-github');
+      console.log('2. Click "Install" or "Configure"');
+      console.log(`3. Select the "${org}" organization`);
+      console.log('4. Grant access to repositories (All repositories or select specific ones)');
+      console.log('5. Ensure the app has permissions for:');
+      console.log('   - Repository administration');
+      console.log('   - Contents (read/write)');
+      console.log('   - Actions (read/write)');
+      console.log('   - Metadata (read)');
+      
+      const retry = await confirmAction('Have you installed the GitHub App? Would you like to retry the check?');
+      if (retry) {
+        // Recursive call to re-check
+        return await demonstrateRepositorySetup(token, org, operations);
+      } else {
+        console.log('\nSetup cancelled. Please install the GitHub App and try again.');
+        return;
+      }
+    }
+    
+    // Display successful app installation info
+    console.log(`\n${SUCCESS_PREFIX} GitHub App Installation Check:`);
+    console.log('✅ Mediumroast for GitHub app is properly installed');
+    console.log(`✅ Repository access: ${appCheck.repositorySelection === 'all' ? 'All repositories' : `${appCheck.repositoryAccess} repositories`}`);
+    console.log('✅ App has required permissions');
+    
+    const github = new GitHubFunctions(token, org, 'write-operations-example');
+    
+    // Check for existing installations
+    console.log(`\n${SECTION_DIVIDER}`);
+    console.log('CHECKING EXISTING INSTALLATIONS');
+    console.log(SECTION_DIVIDER);
+    
+    const installationStatus = await checkExistingInstallations(github);
+    
+    // If anything exists, prompt the user
+    const hasExistingComponents = installationStatus.repository.exists || 
+                                 installationStatus.containers.exists || 
+                                 installationStatus.actions.exists;
+    
+    let userDecisions = {
+      proceedWithRepository: true,
+      proceedWithContainers: true,
+      proceedWithActions: true,
+      skipAll: false
+    };
+    
+    if (hasExistingComponents) {
+      userDecisions = await promptForExistingInstallations(installationStatus);
+      
+      if (userDecisions.skipAll) {
+        console.log('\n🚫 All operations cancelled by user.');
+        return;
+      }
+    } else {
+      console.log('\n✅ No existing installations detected. Proceeding with fresh setup...');
+    }
+    
+    const runAll = operations.length === 0;
+    
+    // Create Repository
+    if ((runAll || operations.includes('repository')) && userDecisions.proceedWithRepository) {
+      console.log(`\n${SECTION_DIVIDER}`);
+      console.log('CREATE DISCOVERY REPOSITORY');
+      console.log(SECTION_DIVIDER);
+      
+      console.log(`\nCreating repository: ${org}_discovery`);
+      console.log('This repository will store all mediumroast.io application assets.');
+      
+      // Confirm before proceeding
+      const confirmed = await confirmAction(`This will create the repository ${org}_discovery in your organization. Continue?`);
+      
+      if (!confirmed) {
+        console.log('\nRepository creation cancelled by user.');
+      } else {
+        console.log('\nCreating repository...');
+        const createRepoResult = await github.createRepository();
+        logResult('createRepository()', createRepoResult);
+        
+        if (createRepoResult[0]) {
+          console.log(`\n${SUCCESS_PREFIX} Repository ${org}_discovery created successfully!`);
+          console.log(`Repository URL: https://github.com/${org}/${org}_discovery`);
+        }
+      }
+    }
+    
+    // Create Containers
+    if ((runAll || operations.includes('containers')) && userDecisions.proceedWithContainers) {
+      console.log(`\n${SECTION_DIVIDER}`);
+      console.log('CREATE CONTAINERS (DIRECTORIES)');
+      console.log(SECTION_DIVIDER);
+      
+      console.log('\nCreating container directories for Studies, Companies, and Interactions...');
+      
+      // Confirm before proceeding
+      const confirmed = await confirmAction('This will create three directories (Studies, Companies, Interactions) in the discovery repository. Continue?');
+      
+      if (!confirmed) {
+        console.log('\nContainer creation cancelled by user.');
+      } else {
+        console.log('\nCreating containers...');
+        const createContainersResult = await github.createContainers();
+        logResult('createContainers()', createContainersResult);
+        
+        if (createContainersResult[0]) {
+          console.log(`\n${SUCCESS_PREFIX} Containers created successfully!`);
+          
+          // Show the created containers
+          const containerData = createContainersResult[2];
+          if (containerData && Array.isArray(containerData)) {
+            console.log('\nContainer creation results:');
+            containerData.forEach(result => {
+              const status = result.success ? SUCCESS_PREFIX : ERROR_PREFIX;
+              const message = typeof result.message === 'object' && result.message.status_msg 
+                ? result.message.status_msg 
+                : result.message;
+              console.log(`  ${status} ${result.container}: ${message}`);
+            });
+          }
+        }
+      }
+    }
+    
+    // Get Organization info
+    if (runAll || operations.includes('orginfo')) {
+      console.log(`\n${SECTION_DIVIDER}`);
+      console.log('ORGANIZATION INFORMATION');
+      console.log(SECTION_DIVIDER);
+      
+      console.log('\nFetching organization information...');
+      const orgResult = await github.getGitHubOrg();
+      logResult('getGitHubOrg()', orgResult, false);
+      
+      if (orgResult[0]) {
+        const orgData = orgResult[2];
+        console.log(`\n${SUCCESS_PREFIX} Organization Details:`);
+        console.log(`  Name: ${orgData.name || orgData.login}`);
+        console.log(`  Login: ${orgData.login}`);
+        console.log(`  Description: ${orgData.description || 'No description'}`);
+        console.log(`  Location: ${orgData.location || 'Not specified'}`);
+        console.log(`  Public repos: ${orgData.public_repos}`);
+        console.log(`  Private repos: ${orgData.total_private_repos || 'N/A'}`);
+        console.log(`  Members: ${orgData.collaborators || 'N/A'}`);
+        console.log(`  Created: ${new Date(orgData.created_at).toLocaleDateString()}`);
+      }
+    }
+    
+    // Get Repository size
+    if (runAll || operations.includes('reposize')) {
+      console.log(`\n${SECTION_DIVIDER}`);
+      console.log('REPOSITORY SIZE INFORMATION');
+      console.log(SECTION_DIVIDER);
+      
+      console.log('\nFetching repository size...');
+      const sizeResult = await github.getRepoSize();
+      logResult('getRepoSize()', sizeResult, false);
+      
+      if (sizeResult[0]) {
+        const sizeData = sizeResult[2];
+        console.log(`\n${SUCCESS_PREFIX} Repository Size:`);
+        console.log(`  Repository: ${sizeData.repository}`);
+        console.log(`  Size: ${sizeData.size_kb} KB (${sizeData.size_mb} MB)`);
+      }
+    }
+    
+  } catch (error) {
+    console.error('\n❌ Error in Repository setup operations:', error.message);
+    if (error.stack) {
+      console.error('Stack trace:', error.stack);
+    }
+  }
+}
+
+/**
+ * Checks if the Mediumroast for GitHub app is installed and has proper permissions
+ * @param {string} token - GitHub token
+ * @param {string} org - GitHub organization
+ * @returns {Promise<Object>} Installation status and details
+ */
+async function checkGitHubAppInstallation(token, org) {
+  try {
+    const github = new GitHubFunctions(token, org, 'app-check');
+    
+    console.log('\n🔍 Checking GitHub App installation...');
+    
+    // Check if we can access the organization
+    const orgResult = await github.getGitHubOrg();
+    if (!orgResult[0]) {
+      return {
+        installed: false,
+        canAccessOrg: false,
+        error: `Cannot access organization: ${orgResult[1].status_msg || orgResult[1]}`
+      };
+    }
+    
+    console.log('✅ Can access organization');
+    
+    // Try to check app installations (this requires the GitHub App to be installed)
+    try {
+      const response = await github.octCtl.rest.apps.listInstallationsForAuthenticatedUser();
+      
+      // Look for installations in our target organization
+      const orgInstallation = response.data.installations.find(installation => 
+        installation.account.login === org
+      );
+      
+      if (!orgInstallation) {
+        return {
+          installed: false,
+          canAccessOrg: true,
+          error: `Mediumroast for GitHub app is not installed in organization "${org}"`
+        };
+      }
+      
+      console.log('✅ GitHub App is installed in organization');
+      
+      // Check what repositories the app has access to
+      const repoAccess = await github.octCtl.rest.apps.listInstallationReposForAuthenticatedUser({
+        installation_id: orgInstallation.id
+      });
+      
+      return {
+        installed: true,
+        canAccessOrg: true,
+        installation: orgInstallation,
+        repositoryAccess: repoAccess.data.repositories.length,
+        repositorySelection: orgInstallation.repository_selection,
+        permissions: orgInstallation.permissions
+      };
+      
+    } catch (err) {
+      // If we can't list installations, the app might not be installed or have wrong permissions
+      if (err.status === 403 || err.status === 404) {
+        return {
+          installed: false,
+          canAccessOrg: true,
+          error: 'Mediumroast for GitHub app is not installed or lacks proper permissions'
+        };
+      }
+      throw err;
+    }
+    
+  } catch (error) {
+    return {
+      installed: false,
+      canAccessOrg: false,
+      error: `Error checking GitHub App installation: ${error.message}`
+    };
+  }
+}
+
+/**
+ * Checks for existing repository, containers, and actions installations
+ * @param {GitHubFunctions} github - GitHubFunctions instance
+ * @returns {Promise<Object>} Installation status details
+ */
+async function checkExistingInstallations(github) {
+  const status = {
+    repository: { exists: false, error: null },
+    containers: { exists: false, existing: [], missing: [] },
+    actions: { exists: false, version: null, error: null }
+  };
+
+  try {
+    // Check if repository exists
+    console.log('🔍 Checking if repository exists...');
+    try {
+      const repoResult = await github.getRepoSize();
+      if (repoResult[0]) {
+        status.repository.exists = true;
+        console.log('✅ Repository exists');
+      }
+    } catch (err) {
+      status.repository.error = err.message;
+      console.log('❌ Repository does not exist');
+    }
+
+    // Check if containers exist (only if repository exists)
+    if (status.repository.exists) {
+      console.log('🔍 Checking container directories...');
+      const containers = ['Studies', 'Companies', 'Interactions'];
+      
+      for (const container of containers) {
+        try {
+          const contentResult = await github.getContent(container);
+          if (contentResult[0]) {
+            status.containers.existing.push(container);
+            console.log(`✅ ${container} directory exists`);
+          } else {
+            status.containers.missing.push(container);
+            console.log(`❌ ${container} directory missing`);
+          }
+        } catch (err) {
+          status.containers.missing.push(container);
+          console.log(`❌ ${container} directory missing`);
+        }
+      }
+      
+      status.containers.exists = status.containers.existing.length > 0;
+    }
+
+    // Check if GitHub Actions are installed (only if repository exists)
+    if (status.repository.exists) {
+      console.log('🔍 Checking GitHub Actions installation...');
+      try {
+        // We'll use the Actions class to check for existing installation
+        const { Actions } = await import('../src/api/gitHubServer.js');
+        const actions = new Actions(github.token, github.orgName, 'installation-check');
+        
+        const versionResult = await actions.getCurrentVersion();
+        if (versionResult[0] && versionResult[2].installed) {
+          status.actions.exists = true;
+          status.actions.version = versionResult[2].version_file?.content?.version || 'unknown';
+          console.log(`✅ GitHub Actions installed (version: ${status.actions.version})`);
+        } else {
+          console.log('❌ GitHub Actions not installed');
+        }
+      } catch (err) {
+        status.actions.error = err.message;
+        console.log('❌ Error checking GitHub Actions installation');
+      }
+    }
+
+  } catch (error) {
+    console.error('Error during installation check:', error.message);
+  }
+
+  return status;
+}
+
+/**
+ * Prompts user about existing installations and returns what actions to take
+ * @param {Object} installationStatus - Status from checkExistingInstallations
+ * @returns {Promise<Object>} User decisions about what to proceed with
+ */
+async function promptForExistingInstallations(installationStatus) {
+  const decisions = {
+    proceedWithRepository: true,
+    proceedWithContainers: true,
+    proceedWithActions: true,
+    skipAll: false
+  };
+
+  console.log(`\n${WARNING_PREFIX} EXISTING INSTALLATION DETECTED`);
+  console.log('The following components are already installed:');
+
+  // Repository status
+  if (installationStatus.repository.exists) {
+    console.log('  📁 Repository: ✅ EXISTS');
+    const proceed = await confirmAction('Repository already exists. Do you want to proceed anyway? (This will skip repository creation)');
+    decisions.proceedWithRepository = proceed;
+    if (!proceed) {
+      console.log('Repository operations will be skipped.');
+    }
+  } else {
+    console.log('  📁 Repository: ❌ NOT FOUND (will be created)');
+  }
+
+  // Containers status
+  if (installationStatus.containers.exists) {
+    console.log(`  📂 Containers: ✅ ${installationStatus.containers.existing.length}/3 EXIST`);
+    if (installationStatus.containers.existing.length > 0) {
+      console.log(`     Existing: ${installationStatus.containers.existing.join(', ')}`);
+    }
+    if (installationStatus.containers.missing.length > 0) {
+      console.log(`     Missing: ${installationStatus.containers.missing.join(', ')}`);
+    }
+    
+    const proceed = await confirmAction('Some containers already exist. Do you want to proceed? (Existing containers will be left unchanged)');
+    decisions.proceedWithContainers = proceed;
+    if (!proceed) {
+      console.log('Container operations will be skipped.');
+    }
+  } else if (installationStatus.repository.exists) {
+    console.log('  📂 Containers: ❌ NOT FOUND (will be created)');
+  }
+
+  // Actions status
+  if (installationStatus.actions.exists) {
+    console.log(`  ⚡ GitHub Actions: ✅ INSTALLED (version: ${installationStatus.actions.version})`);
+    const proceed = await confirmAction('GitHub Actions are already installed. Do you want to proceed? (This may reinstall or update)');
+    decisions.proceedWithActions = proceed;
+    if (!proceed) {
+      console.log('GitHub Actions operations will be skipped.');
+    }
+  } else if (installationStatus.repository.exists) {
+    console.log('  ⚡ GitHub Actions: ❌ NOT INSTALLED (will be installed)');
+  }
+
+  // Final confirmation if any components exist
+  const hasExistingComponents = installationStatus.repository.exists || 
+                               installationStatus.containers.exists || 
+                               installationStatus.actions.exists;
+
+  if (hasExistingComponents) {
+    console.log('\n📋 Summary of planned actions:');
+    console.log(`  Repository: ${decisions.proceedWithRepository ? 'PROCEED' : 'SKIP'}`);
+    console.log(`  Containers: ${decisions.proceedWithContainers ? 'PROCEED' : 'SKIP'}`);
+    console.log(`  Actions: ${decisions.proceedWithActions ? 'PROCEED' : 'SKIP'}`);
+
+    const allSkipped = !decisions.proceedWithRepository && !decisions.proceedWithContainers && !decisions.proceedWithActions;
+    if (allSkipped) {
+      console.log('\n⚠️  All operations will be skipped.');
+      decisions.skipAll = true;
+    } else {
+      const finalConfirm = await confirmAction('Continue with the planned actions?');
+      if (!finalConfirm) {
+        decisions.skipAll = true;
+        console.log('All operations cancelled by user.');
+      }
+    }
+  }
+
+  return decisions;
+}
+
+/**
  * Main function to run the example
  */
 async function main() {
@@ -485,6 +933,7 @@ async function main() {
     
     // Parse arguments to determine which entity types and operations to run
     const entityOperations = {
+      repository: [],
       actions: [],
       studies: [],
       companies: [],
@@ -509,6 +958,10 @@ async function main() {
     }
     
     // Run selected demonstrations
+    if (runAllEntities || args.includes('repository') || entityOperations.repository.length > 0) {
+      await demonstrateRepositorySetup(token, org, entityOperations.repository);
+    }
+    
     if (runAllEntities || args.includes('actions') || entityOperations.actions.length > 0) {
       await demonstrateActionsOperations(token, org, entityOperations.actions);
     }
