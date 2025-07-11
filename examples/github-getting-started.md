@@ -92,6 +92,23 @@ Personal access tokens are useful for:
 - **Prototyping**: Rapid experimentation
 - **Limited scope operations**: When you don't need full app permissions
 
+### Device Flow Authentication (Recommended for CLI Apps)
+
+For CLI applications and headless environments, the Mediumroast API supports GitHub's device flow authentication:
+
+- **OAuth compliant**: Secure, standards-based authentication
+- **No client secret**: Eliminates secret management in client applications
+- **User-friendly**: Browser-based authorization flow
+- **Automatic token management**: Built-in token storage and refresh
+
+**Quick Start with Device Flow**:
+```bash
+# Run the complete authentication example
+node examples/github-device-auth.js
+```
+
+This will guide you through the complete authentication process and save your token for future use.
+
 > **Important**: Never commit your personal access token to version control. Use environment variables or secure configuration management.
 
 ## Basic API Usage
@@ -157,11 +174,31 @@ The Mediumroast API includes several safety features:
 
 Once you've completed the setup, you can proceed to specific tutorials:
 
+- **[Authentication Tutorial](./github-auth-tutorial.md)**: Complete guide to GitHub authentication methods including device flow
 - **[Repository Management](./github-repository.md)**: Learn to create and manage repositories
 - **[GitHub Actions](./github-actions.md)**: Manage GitHub Actions workflows
-- **[Authentication Tutorial](./github-auth-tutorial.md)**: Deep dive into authentication methods
 - **[Read Operations](./github-read-operations-tutorial.md)**: Learn read-only operations
 - **[Write Operations](./github-write-operations-tutorial.md)**: Learn write operations
+
+### 🚀 Quick Start Options
+
+**For CLI Development:**
+```bash
+# Start with device flow authentication
+node examples/github-device-auth.js
+```
+
+**For Production Applications:**
+```bash
+# Use GitHub App with repository management
+node examples/integrations/repository-manager-cli.js setup
+```
+
+**For Web Applications:**
+```bash
+# Explore React component examples
+open examples/integrations/repository-manager.jsx
+```
 
 ## Common Troubleshooting
 

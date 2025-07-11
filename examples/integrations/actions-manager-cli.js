@@ -16,7 +16,7 @@
  * - Detailed error handling and user feedback
  * 
  * Usage:
- *   node github-actions-manager.js
+ *   node actions-manager-cli.js
  * 
  * Prerequisites:
  *   - Complete the setup in github-getting-started.md

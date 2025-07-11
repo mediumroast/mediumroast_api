@@ -449,509 +449,146 @@ async function checkContainerStatus(github, containerName) {
 }
 ```
 
+## Production-Ready Examples
+
+For complete, production-ready implementations including CLI applications and React components, see the **[🔧 Integrations Directory](./integrations/)**:
+
+### Available Examples
+
+| Example | Type | Description |
+|---------|------|-------------|
+| **[repository-manager-cli.js](./integrations/repository-manager-cli.js)** | CLI | Complete command-line tool with interactive setup, status checking, and batch operations |
+| **[repository-manager.jsx](./integrations/repository-manager.jsx)** | React | Modern web component with real-time status, repository creation, and container management |
+
+### Quick Start with Examples
+
+```bash
+# Run the CLI tool
+cd examples/integrations
+node repository-manager-cli.js setup
+
+# View React component integration
+open repository-manager.jsx
+```
+
+For detailed usage instructions, configuration options, and customization guides, see the **[Integrations README](./integrations/README.md)**.
+
 ## Web Application Integration
 
-### React Component Example
+### React Component Integration
 
-```javascript
-import React, { useState, useEffect } from 'react';
-import GitHubFunctions from 'mediumroast_api/src/api/github.js';
+Instead of building from scratch, use our production-ready React component:
 
-const RepositoryManager = ({ token, org }) => {
-    const [github, setGithub] = useState(null);
-    const [status, setStatus] = useState('idle');
-    const [repositories, setRepositories] = useState([]);
-    const [containers, setContainers] = useState([]);
-    const [error, setError] = useState(null);
+```jsx
+import RepositoryManager from './integrations/repository-manager.jsx';
 
-    useEffect(() => {
-        if (token && org) {
-            const githubInstance = new GitHubFunctions(token, org, 'web-app');
-            setGithub(githubInstance);
-        }
-    }, [token, org]);
-
-    const handleCreateRepository = async () => {
-        if (!github) return;
-        
-        setStatus('creating');
-        setError(null);
-        
-        try {
-            // Pre-flight check
-            const appCheck = await github.checkGitHubAppInstallation();
-            if (!appCheck[0]) {
-                throw new Error('GitHub App not properly installed');
-            }
-            
-            // Create repository
-            const result = await github.createRepository();
-            if (result[0]) {
-                setRepositories(prev => [...prev, result[2]]);
-                setStatus('success');
-            } else {
-                throw new Error(result[1]);
-            }
-        } catch (err) {
-            setError(err.message);
-            setStatus('error');
-        }
-    };
-
-    const handleCreateContainers = async () => {
-        if (!github) return;
-        
-        setStatus('creating-containers');
-        setError(null);
-        
-        try {
-            const result = await github.containerOps.createContainers();
-            if (result[0]) {
-                setContainers(result[2]);
-                setStatus('success');
-            } else {
-                throw new Error(result[1]);
-            }
-        } catch (err) {
-            setError(err.message);
-            setStatus('error');
-        }
-    };
-
-    const handleCheckStatus = async () => {
-        if (!github) return;
-        
-        setStatus('checking');
-        try {
-            const existingInstallations = await checkExistingInstallations(github);
-            // Update UI with status
-            setStatus('checked');
-        } catch (err) {
-            setError(err.message);
-            setStatus('error');
-        }
-    };
-
-    return (
-        <div className="repository-manager">
-            <h2>Repository Manager</h2>
-            
-            <div className="actions">
-                <button 
-                    onClick={handleCheckStatus}
-                    disabled={status === 'checking'}
-                    className="btn btn-secondary"
-                >
-                    {status === 'checking' ? 'Checking...' : 'Check Status'}
-                </button>
-                
-                <button 
-                    onClick={handleCreateRepository}
-                    disabled={status === 'creating'}
-                    className="btn btn-primary"
-                >
-                    {status === 'creating' ? 'Creating...' : 'Create Repository'}
-                </button>
-                
-                <button 
-                    onClick={handleCreateContainers}
-                    disabled={status === 'creating-containers'}
-                    className="btn btn-success"
-                >
-                    {status === 'creating-containers' ? 'Creating...' : 'Setup Containers'}
-                </button>
-            </div>
-
-            {error && (
-                <div className="alert alert-danger">
-                    <strong>Error:</strong> {error}
-                </div>
-            )}
-
-            {repositories.length > 0 && (
-                <div className="repositories">
-                    <h3>Repositories</h3>
-                    {repositories.map(repo => (
-                        <div key={repo.id} className="repository-card">
-                            <h4>{repo.name}</h4>
-                            <p>{repo.description}</p>
-                            <a href={repo.html_url} target="_blank" rel="noopener noreferrer">
-                                View on GitHub
-                            </a>
-                        </div>
-                    ))}
-                </div>
-            )}
-
-            {containers.length > 0 && (
-                <div className="containers">
-                    <h3>Containers</h3>
-                    {containers.map(container => (
-                        <div key={container.container} className="container-card">
-                            <h4>{container.container}</h4>
-                            <span className={`status ${container.success ? 'success' : 'error'}`}>
-                                {container.success ? '✅' : '❌'}
-                            </span>
-                            <p>{container.message}</p>
-                        </div>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-};
-
-export default RepositoryManager;
+// Basic usage
+<RepositoryManager
+  token="ghp_your_token"
+  org="your-organization"
+/>
 ```
 
-### CSS Styles for React Component
+The React component provides:
+- **Repository Creation**: One-click repository setup with validation
+- **Container Management**: Automatic directory structure creation  
+- **Status Monitoring**: Real-time status updates and error handling
+- **Modern UI**: GitHub-inspired responsive design
 
-```css
-.repository-manager {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-}
+### Key Features
 
-.actions {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.btn-primary {
-    background-color: #007bff;
-    color: white;
-}
-
-.btn-secondary {
-    background-color: #6c757d;
-    color: white;
-}
-
-.btn-success {
-    background-color: #28a745;
-    color: white;
-}
-
-.alert {
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-}
-
-.alert-danger {
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    color: #721c24;
-}
-
-.repository-card, .container-card {
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 15px;
-    margin-bottom: 10px;
-}
-
-.status.success {
-    color: #28a745;
-}
-
-.status.error {
-    color: #dc3545;
-}
-```
+- **Pre-flight Checks**: Validates GitHub App installation before operations
+- **Interactive Feedback**: Real-time status updates during operations
+- **Error Recovery**: Graceful handling of API failures and permission issues
+- **Responsive Design**: Works on desktop and mobile devices
 
 ## CLI Application Integration
 
-### Command-Line Interface Example
+### Command-Line Interface
+
+For a complete CLI implementation with interactive setup, status checking, and batch operations, use our production-ready tool:
+
+```bash
+# Interactive setup wizard
+cd examples/integrations  
+node repository-manager-cli.js setup
+
+# Create repository with options
+node repository-manager-cli.js create --org my-org --token ghp_xxx
+
+# Check detailed status
+node repository-manager-cli.js status --detailed
+
+# Get organization info
+node repository-manager-cli.js info --org my-org
+```
+
+The CLI application provides:
+- **Interactive Setup**: Guided configuration wizard
+- **Command-line Options**: Flexible parameter handling
+- **Status Monitoring**: Detailed repository and container status
+- **Batch Operations**: Handle multiple repositories efficiently
+- **Rich Output**: Color-coded messages and progress indicators
+
+For complete CLI source code and advanced usage examples, see **[repository-manager-cli.js](./integrations/repository-manager-cli.js)**.
+
+## Basic Integration Patterns
+
+### Quick Repository Check
 
 ```javascript
-#!/usr/bin/env node
-
-import { Command } from 'commander';
-import GitHubFunctions from 'mediumroast_api/src/api/github.js';
-import ConfigParser from 'configparser';
-import inquirer from 'inquirer';
-import chalk from 'chalk';
-
-const program = new Command();
-
-program
-    .name('repo-manager')
-    .description('GitHub repository management CLI')
-    .version('1.0.0');
-
-program
-    .command('create')
-    .description('Create a new repository and containers')
-    .option('-o, --org <org>', 'GitHub organization')
-    .option('-t, --token <token>', 'GitHub token')
-    .option('-c, --config <config>', 'Configuration file path', './config.ini')
-    .option('--skip-checks', 'Skip pre-flight checks')
-    .action(async (options) => {
-        await createRepositoryCommand(options);
-    });
-
-program
-    .command('status')
-    .description('Check repository and container status')
-    .option('-o, --org <org>', 'GitHub organization')
-    .option('-t, --token <token>', 'GitHub token')
-    .option('-c, --config <config>', 'Configuration file path', './config.ini')
-    .action(async (options) => {
-        await statusCommand(options);
-    });
-
-program
-    .command('setup')
-    .description('Interactive setup wizard')
-    .option('-c, --config <config>', 'Configuration file path', './config.ini')
-    .action(async (options) => {
-        await setupWizard(options);
-    });
-
-async function createRepositoryCommand(options) {
+async function quickRepoCheck(github) {
     try {
-        const config = loadConfig(options);
-        const github = new GitHubFunctions(config.token, config.org, 'cli-tool');
+        // Check if repository exists
+        const repoResult = await github.getRepository();
+        console.log(`Repository: ${repoResult[0] ? '✅ EXISTS' : '❌ NOT FOUND'}`);
         
-        console.log(chalk.blue('🚀 Creating repository...'));
-        
-        if (!options.skipChecks) {
-            const appCheck = await github.checkGitHubAppInstallation();
-            if (!appCheck[0]) {
-                console.error(chalk.red('❌ GitHub App not properly installed'));
-                process.exit(1);
-            }
+        // Check container status
+        const containers = ['Studies', 'Companies', 'Interactions'];
+        for (const container of containers) {
+            const contentResult = await github.getContent(container);
+            console.log(`${container}: ${contentResult[0] ? '✅' : '❌'}`);
+        }
+    } catch (error) {
+        console.error(`Error: ${error.message}`);
+    }
+}
+```
+
+### Simple Repository Creation
+
+```javascript
+async function createRepositoryWithContainers(github) {
+    try {
+        // Pre-flight check
+        const appCheck = await github.checkGitHubAppInstallation();
+        if (!appCheck[0]) {
+            throw new Error('GitHub App not properly installed');
         }
         
-        const result = await github.createRepository();
-        if (result[0]) {
-            console.log(chalk.green(`✅ Repository created: ${result[2].html_url}`));
-            
-            // Create containers
-            const containerResult = await github.containerOps.createContainers();
-            if (containerResult[0]) {
-                console.log(chalk.green('✅ Containers created successfully'));
-                logContainerResults(containerResult[2]);
-            }
+        // Create repository
+        const repoResult = await github.createRepository();
+        if (!repoResult[0]) {
+            throw new Error(`Repository creation failed: ${repoResult[1]}`);
+        }
+        
+        console.log('✅ Repository created successfully');
+        
+        // Create containers
+        const containerResult = await github.containerOps.createContainers();
+        if (containerResult[0]) {
+            console.log('✅ Containers created successfully');
+            return containerResult[2];
         } else {
-            console.error(chalk.red(`❌ Failed to create repository: ${result[1]}`));
-            process.exit(1);
+            console.warn(`⚠️ Containers partially created: ${containerResult[1]}`);
+            return null;
         }
-        
     } catch (error) {
-        console.error(chalk.red(`❌ Error: ${error.message}`));
-        process.exit(1);
-    }
-}
-
-async function statusCommand(options) {
-    try {
-        const config = loadConfig(options);
-        const github = new GitHubFunctions(config.token, config.org, 'cli-tool');
-        
-        console.log(chalk.blue('🔍 Checking repository status...'));
-        
-        const existingInstallations = await checkExistingInstallations(github);
-        
-        console.log(chalk.blue('\n📊 Repository Status:'));
-        console.log(`   Repository: ${existingInstallations.repository.exists ? chalk.green('✅ EXISTS') : chalk.red('❌ NOT FOUND')}`);
-        
-        if (existingInstallations.containers.exists) {
-            console.log(`   Containers: ${chalk.green(`✅ ${existingInstallations.containers.existing.length}/3 EXIST`)}`);
-            console.log(`   Existing: ${existingInstallations.containers.existing.join(', ')}`);
-            if (existingInstallations.containers.missing.length > 0) {
-                console.log(`   Missing: ${existingInstallations.containers.missing.join(', ')}`);
-            }
-        } else {
-            console.log(`   Containers: ${chalk.red('❌ NOT FOUND')}`);
-        }
-        
-    } catch (error) {
-        console.error(chalk.red(`❌ Error: ${error.message}`));
-        process.exit(1);
-    }
-}
-
-async function setupWizard(options) {
-    console.log(chalk.blue('🧙 Repository Setup Wizard'));
-    
-    const answers = await inquirer.prompt([
-        {
-            type: 'input',
-            name: 'org',
-            message: 'GitHub organization name:',
-            validate: (input) => input.length > 0 || 'Organization name is required'
-        },
-        {
-            type: 'password',
-            name: 'token',
-            message: 'GitHub token:',
-            mask: '*',
-            validate: (input) => input.length > 0 || 'Token is required'
-        },
-        {
-            type: 'confirm',
-            name: 'createRepo',
-            message: 'Create repository?',
-            default: true
-        },
-        {
-            type: 'confirm',
-            name: 'createContainers',
-            message: 'Create containers?',
-            default: true,
-            when: (answers) => answers.createRepo
-        }
-    ]);
-    
-    try {
-        const github = new GitHubFunctions(answers.token, answers.org, 'cli-wizard');
-        
-        if (answers.createRepo) {
-            console.log(chalk.blue('\n📁 Creating repository...'));
-            const result = await github.createRepository();
-            if (result[0]) {
-                console.log(chalk.green(`✅ Repository created: ${result[2].html_url}`));
-                
-                if (answers.createContainers) {
-                    console.log(chalk.blue('\n📂 Creating containers...'));
-                    const containerResult = await github.containerOps.createContainers();
-                    if (containerResult[0]) {
-                        console.log(chalk.green('✅ Containers created successfully'));
-                    }
-                }
-            }
-        }
-        
-        console.log(chalk.green('\n🎉 Setup completed successfully!'));
-        
-    } catch (error) {
-        console.error(chalk.red(`❌ Error: ${error.message}`));
-        process.exit(1);
-    }
-}
-
-function loadConfig(options) {
-    const config = new ConfigParser();
-    
-    if (options.config) {
-        config.read(options.config);
-    }
-    
-    return {
-        token: options.token || config.get('GitHub', 'token'),
-        org: options.org || config.get('GitHub', 'org')
-    };
-}
-
-function logContainerResults(containerData) {
-    if (containerData && Array.isArray(containerData)) {
-        console.log(chalk.blue('\n📂 Container Results:'));
-        containerData.forEach(result => {
-            const status = result.success ? chalk.green('✅') : chalk.red('❌');
-            const message = typeof result.message === 'object' && result.message.status_msg 
-                ? result.message.status_msg 
-                : result.message;
-            console.log(`   ${status} ${result.container}: ${message}`);
-        });
-    }
-}
-
-program.parse();
-```
-
-## Error Handling and Best Practices
-
-### Comprehensive Error Handling
-
-```javascript
-class RepositoryError extends Error {
-    constructor(message, code, details = null) {
-        super(message);
-        this.name = 'RepositoryError';
-        this.code = code;
-        this.details = details;
-    }
-}
-
-async function safeRepositoryOperation(operationName, operation) {
-    try {
-        console.log(`🔄 Starting: ${operationName}`);
-        const result = await operation();
-        console.log(`✅ Completed: ${operationName}`);
-        return result;
-    } catch (error) {
-        console.error(`❌ Failed: ${operationName}`);
-        console.error(`   Error: ${error.message}`);
-        
-        // Provide specific guidance based on error type
-        if (error.message.includes('App not installed')) {
-            console.log('\n🔧 Solution: Install the Mediumroast for GitHub App');
-            console.log('   https://github.com/apps/mediumroast-for-github');
-        } else if (error.message.includes('permission')) {
-            console.log('\n🔧 Solution: Check app permissions and organization access');
-        } else if (error.message.includes('already exists')) {
-            console.log('\n🔧 Solution: Use the existence check and prompt features');
-        } else if (error.message.includes('API rate limit')) {
-            console.log('\n🔧 Solution: Wait for rate limit reset or use GitHub App authentication');
-        }
-        
-        throw new RepositoryError(error.message, 'OPERATION_FAILED', { operation: operationName });
+        console.error(`❌ Error: ${error.message}`);
+        throw error;
     }
 }
 ```
-
-### Configuration Validation
-
-```javascript
-function validateConfiguration(config) {
-    const errors = [];
-    
-    // Required fields
-    if (!config.token) {
-        errors.push('GitHub token is required');
-    }
-    
-    if (!config.org) {
-        errors.push('GitHub organization is required');
-    }
-    
-    // Validate token format
-    if (config.token && !config.token.startsWith('ghp_') && !config.token.startsWith('gho_')) {
-        errors.push('Invalid GitHub token format');
-    }
-    
-    // Validate organization name
-    if (config.org && !/^[a-zA-Z0-9_-]+$/.test(config.org)) {
-        errors.push('Invalid organization name format');
-    }
-    
-    if (errors.length > 0) {
-        throw new Error(`Configuration validation failed:\n${errors.map(e => `  • ${e}`).join('\n')}`);
-    }
-    
-    console.log('✅ Configuration validation passed');
-    return true;
-}
-```
-
-### Retry Logic for Network Operations
 
 ```javascript
 async function withRetry(operation, maxRetries = 3, delay = 1000) {

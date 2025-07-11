@@ -199,12 +199,12 @@ async function safeDeleteWorkflow(github, workflowId) {
 
 For a comprehensive implementation that demonstrates the full workflow management lifecycle, see our complete integration examples:
 
-**➡️ [GitHub Actions Manager CLI](./integrations/github-actions-manager.js)**
+**➡️ [GitHub Actions Manager CLI](./integrations/actions-manager-cli.js)**
 - Complete interactive CLI application
 - Menu-driven interface for all CRUD operations
 - Pre-flight checks and error handling
 - Configuration file support
-- Usage: `node integrations/github-actions-manager.js`
+- Usage: `node integrations/actions-manager-cli.js`
 
 This example provides a full-featured command-line interface for managing GitHub Actions workflows with the following features:
 
@@ -223,7 +223,7 @@ This example provides a full-featured command-line interface for managing GitHub
 npm install inquirer configparser
 
 # Run the CLI
-node integrations/github-actions-manager.js
+node integrations/actions-manager-cli.js
 ```
 
 The CLI will guide you through all available operations with interactive prompts and provide detailed feedback on each action.
@@ -603,7 +603,7 @@ For production-ready implementations, we provide comprehensive examples that you
 
 ### 🖥️ Command-Line Interface
 
-**➡️ [GitHub Actions Manager CLI](./integrations/github-actions-manager.js)**
+**➡️ [GitHub Actions Manager CLI](./integrations/actions-manager-cli.js)**
 
 A complete interactive CLI application for GitHub Actions management:
 
@@ -620,7 +620,7 @@ A complete interactive CLI application for GitHub Actions management:
 npm install inquirer configparser
 
 # Run the CLI
-node integrations/github-actions-manager.js
+node integrations/actions-manager-cli.js
 ```
 
 ### 🌐 Web Application Interface
@@ -1765,7 +1765,7 @@ async function setupCICDPipeline() {
 
 **🚀 Ready to jump right in?** Choose your preferred approach:
 
-- **[Interactive CLI](./integrations/github-actions-manager.js)** - Complete command-line application with menu-driven interface
+- **[Interactive CLI](./integrations/actions-manager-cli.js)** - Complete command-line application with menu-driven interface
 - **[React Component](./integrations/workflow-manager.jsx)** - Drop-in web component for workflow management
 - **[Integration Guide](./integrations/README.md)** - Complete setup and customization instructions
 

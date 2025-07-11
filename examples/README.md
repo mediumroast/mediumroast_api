@@ -25,7 +25,7 @@ Welcome to the comprehensive collection of GitHub integration examples and tutor
 
 | Tutorial | Description | Level | What You'll Learn |
 |----------|-------------|-------|------------------|
-| **[Authentication](./github-auth-tutorial.md)** | Deep dive into GitHub authentication methods | Intermediate | OAuth, GitHub Apps, token management |
+| **[Authentication](./github-auth-tutorial.md)** | Complete guide to GitHub authentication including device flow | Intermediate | OAuth device flow, PATs, GitHub Apps, token management |
 | **[Read Operations](./github-read-operations-tutorial.md)** | Safe, read-only GitHub operations | Beginner | Data retrieval, organization info, repository exploration |
 | **[Write Operations](./github-write-operations-tutorial.md)** | Secure write operations with safety checks | Advanced | File management, branch operations, content creation |
 
@@ -68,9 +68,14 @@ Production-ready implementations you can use directly or customize:
 
 | File | Type | Description | Features |
 |------|------|-------------|----------|
-| `github-actions-manager.js` | Node.js CLI | Interactive Actions management | Menu-driven, pre-flight checks, CRUD operations |
+| **GitHub Actions** | | | |
+| `actions-manager-cli.js` | Node.js CLI | Interactive Actions management | Menu-driven, pre-flight checks, CRUD operations |
 | `workflow-manager.jsx` | React Component | Web UI for workflow management | Real-time updates, responsive design, GitHub-style UI |
 | `workflow-manager.css` | CSS Styles | Component styling | Mobile-friendly, modern design patterns |
+| **Repository Management** | | | |
+| `repository-manager-cli.js` | Node.js CLI | Complete repository management tool | Interactive setup, status checking, batch operations |
+| `repository-manager.jsx` | React Component | Web UI for repository operations | Container management, real-time status, responsive design |
+| `repository-manager.css` | CSS Styles | Component styling | GitHub-inspired, modern responsive design |
 
 **Key Benefits:**
 - **Production Ready** - Comprehensive error handling and safety checks
@@ -192,7 +197,7 @@ examples/
 ├── github-device-auth.js              # Device auth example
 └── integrations/                       # 🆕 Production-ready examples
     ├── README.md                       # Integration guide
-    ├── github-actions-manager.js       # Complete CLI application
+    ├── actions-manager-cli.js       # Complete CLI application
     ├── workflow-manager.jsx            # React component
     └── workflow-manager.css            # Component styles
 ```

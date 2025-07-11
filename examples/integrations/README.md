@@ -1,24 +1,32 @@
-# GitHub Actions Integration Examples
+# GitHub Integration Examples
 
-This directory contains complete implementation examples for integrating GitHub Actions management into your applications using the Mediumroast API.
+This directory contains complete implementation examples for integrating GitHub operations into your applications using the Mediumroast API.
 
 ## 📁 Files Overview
 
-### Core Integration Examples
+### GitHub Actions Integration
 
 | File | Type | Description | Use Case |
 |------|------|-------------|----------|
-| `github-actions-manager.js` | Node.js CLI | Complete interactive CLI for Actions management | Command-line automation, DevOps tools |
+| `actions-manager-cli.js` | Node.js CLI | Complete interactive CLI for Actions management | Command-line automation, DevOps tools |
 | `workflow-manager.jsx` | React Component | Full-featured web UI for workflow management | Web applications, dashboards |
 | `workflow-manager.css` | CSS Styles | Responsive styling for the React component | Web UI styling |
+
+### GitHub Repository Integration
+
+| File | Type | Description | Use Case |
+|------|------|-------------|----------|
+| `repository-manager-cli.js` | Node.js CLI | Complete CLI for repository and container management | Repository setup, automation scripts |
+| `repository-manager.jsx` | React Component | Web UI for repository and container operations | Web applications, admin dashboards |
+| `repository-manager.css` | CSS Styles | Responsive styling for the repository component | Web UI styling |
 
 ### Integration Patterns
 
 Each example demonstrates different integration approaches:
 
-- **CLI Application**: Interactive command-line interface with menu-driven operations
-- **React Component**: Modern web UI with real-time updates and responsive design
-- **Web Dashboard**: Complete frontend solution with installation checking and error handling
+- **CLI Applications**: Interactive command-line interfaces with menu-driven operations
+- **React Components**: Modern web UI with real-time updates and responsive design
+- **Web Dashboards**: Complete frontend solutions with installation checking and error handling
 
 ## 🚀 Quick Start
 
@@ -30,34 +38,53 @@ Before using these examples, ensure you have:
 2. **API Installation**: Install the Mediumroast API package
 3. **Dependencies**: Install the required dependencies for each example
 
-### Node.js CLI Example
+### GitHub Actions CLI
 
 ```bash
 # Install dependencies
 npm install inquirer configparser
 
-# Run the CLI
-node github-actions-manager.js
+# Run the Actions CLI
+node actions-manager-cli.js
 ```
 
-### React Component Example
+### GitHub Repository CLI
+
+```bash
+# Install dependencies  
+npm install commander configparser inquirer chalk
+
+# Run the Repository CLI
+node repository-manager-cli.js setup
+node repository-manager-cli.js create --org your-org
+node repository-manager-cli.js status --detailed
+```
+
+### React Components
 
 ```bash
 # Install React dependencies
 npm install react react-dom
 
-# Import in your React app
+# Actions Manager Component
 import WorkflowManager from './integrations/workflow-manager.jsx';
 import './integrations/workflow-manager.css';
 
-// Use in your component
 <WorkflowManager token="your-token" org="your-org" repoName="your-repo" />
+
+# Repository Manager Component
+import RepositoryManager from './integrations/repository-manager.jsx';
+import './integrations/repository-manager.css';
+
+<RepositoryManager token="your-token" org="your-org" />
 ```
 
 ## 🎯 Features Comparison
 
-| Feature | CLI | React Component |
-|---------|-----|-----------------|
+### GitHub Actions Examples
+
+| Feature | Actions CLI | Actions React Component |
+|---------|-------------|-------------------------|
 | **Interactive Menu** | ✅ | ✅ |
 | **Workflow CRUD** | ✅ | ✅ |
 | **Real-time Updates** | ❌ | ✅ |
@@ -68,9 +95,23 @@ import './integrations/workflow-manager.css';
 | **Workflow Triggering** | ✅ | ✅ |
 | **Run Monitoring** | ✅ | ✅ |
 
+### GitHub Repository Examples
+
+| Feature | Repository CLI | Repository React Component |
+|---------|----------------|----------------------------|
+| **Repository Creation** | ✅ | ✅ |
+| **Container Management** | ✅ | ✅ |
+| **Status Checking** | ✅ | ✅ |
+| **Setup Wizard** | ✅ | ❌ |
+| **Real-time Updates** | ❌ | ✅ |
+| **Responsive Design** | N/A | ✅ |
+| **Pre-flight Checks** | ✅ | ✅ |
+| **Configuration Management** | ✅ | ❌ |
+| **Detailed Information** | ✅ | ✅ |
+
 ## 📖 Usage Examples
 
-### CLI Application
+### GitHub Actions CLI
 
 ```javascript
 // Basic usage
@@ -83,27 +124,47 @@ manager.config.set('GitHub', 'org', 'my-org');
 await manager.run();
 ```
 
-### React Component
+### Repository Management CLI
+
+```bash
+# Interactive setup wizard
+node repository-manager-cli.js setup
+
+# Create repository with options
+node repository-manager-cli.js create --org my-org --token ghp_xxx
+
+# Check detailed status
+node repository-manager-cli.js status --detailed
+
+# Get organization info
+node repository-manager-cli.js info --org my-org
+```
+
+### React Components
 
 ```jsx
-// Basic usage
+// Actions Manager Component
 <WorkflowManager
   token="ghp_your_token"
   org="your-organization"
   repoName="your-repository"
 />
 
+// Repository Manager Component
+<RepositoryManager
+  token="ghp_your_token"
+  org="your-organization"
+/>
+
 // With error handling
 const [token, setToken] = useState('');
 const [org, setOrg] = useState('');
-const [repo, setRepo] = useState('');
 
-{token && org && repo && (
-  <WorkflowManager
-    token={token}
-    org={org}
-    repoName={repo}
-  />
+{token && org && (
+  <div>
+    <RepositoryManager token={token} org={org} />
+    <WorkflowManager token={token} org={org} repoName="discovery" />
+  </div>
 )}
 ```
 
@@ -129,32 +190,86 @@ The React component can be customized by:
 
 ## 🔧 Configuration
 
-### Environment Variables
+### Environment Setup
 
-Both examples support environment-based configuration:
+Both CLI applications support multiple configuration methods:
 
-```bash
-# Set environment variables
-export GITHUB_TOKEN="your-token"
-export GITHUB_ORG="your-org"
-export GITHUB_REPO="your-repo"
+```javascript
+// Method 1: Configuration file (config.ini)
+[GitHub]
+org = your-organization
+token = ghp_your_personal_access_token
+discovery_repo = discovery
+
+[DEFAULT]
+env = production
+log_level = info
+
+// Method 2: Environment variables
+export GITHUB_ORG=your-organization
+export GITHUB_TOKEN=ghp_your_token
+export GITHUB_DISCOVERY_REPO=discovery
+
+// Method 3: Interactive prompts (when config missing)
+node actions-manager-cli.js  # Will prompt for missing values
+node repository-manager-cli.js setup  # Guided setup wizard
 ```
 
-### Configuration Files
+### React Configuration
 
-Use `config.ini` files for persistent configuration:
+```jsx
+// Token management best practices
+const useGitHubToken = () => {
+  const [token, setToken] = useState(
+    process.env.REACT_APP_GITHUB_TOKEN || ''
+  );
+  
+  // For production, consider secure token storage
+  const secureToken = useMemo(() => {
+    return token.startsWith('ghp_') ? token : '';
+  }, [token]);
+  
+  return { token: secureToken, setToken };
+};
 
-```ini
-[GitHub]
-# Basic configuration
-org = your-organization
-token = your-github-token
-repoName = your-repository
+// Organization context
+const GitHubProvider = ({ children }) => {
+  const { token } = useGitHubToken();
+  const [org, setOrg] = useState('mediumroast');
+  
+  return (
+    <GitHubContext.Provider value={{ token, org, setOrg }}>
+      {children}
+    </GitHubContext.Provider>
+  );
+};
+```
 
-# Actions-specific settings
-workflowName = main-workflow
-workflowDescription = Main CI/CD workflow
-workflowFile = .github/workflows/main.yml
+### Security Considerations
+
+- **Never commit tokens**: Use environment variables or secure vaults
+- **Scope permissions**: Use tokens with minimal required permissions
+- **Rotate regularly**: Implement token rotation for production use
+- **Monitor usage**: Track API calls and rate limiting
+
+```javascript
+// Token validation example
+const validateToken = async (token) => {
+  if (!token.startsWith('ghp_')) {
+    throw new Error('Invalid token format');
+  }
+  
+  // Test token with minimal API call
+  const response = await fetch('https://api.github.com/user', {
+    headers: { Authorization: `token ${token}` }
+  });
+  
+  if (!response.ok) {
+    throw new Error('Invalid or expired token');
+  }
+  
+  return true;
+};
 ```
 
 ## 🔐 Security Considerations
@@ -195,11 +310,11 @@ workflowFile = .github/workflows/main.yml
 
 ```bash
 # Run with test configuration
-node github-actions-manager.js --config ./test-config.ini
+node actions-manager-cli.js --config ./test-config.ini
 
 # Test specific operations
 node -e "
-  const manager = require('./github-actions-manager.js');
+  const manager = require('./actions-manager-cli.js');
   manager.listWorkflows().then(console.log);
 "
 ```
@@ -246,7 +361,7 @@ app.post('/api/workflows/:id/trigger', async (req, res) => {
 
 ```javascript
 // pages/api/workflows.js
-import { GitHubActionsManager } from '../../../integrations/github-actions-manager.js';
+import { GitHubActionsManager } from '../../../integrations/actions-manager-cli.js';
 
 export default async function handler(req, res) {
   const manager = new GitHubActionsManager();
