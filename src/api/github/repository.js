@@ -653,50 +653,6 @@ class RepositoryManager {
       );
     }
   }
-
-  /**
-   * Creates multiple containers (directories) in the repository
-   * @param {Array<String>} containers - Array of container names to create
-   * @returns {Promise<Array>} ResponseFactory result with creation results
-   */
-  async createContainers(containers = ['Studies', 'Companies', 'Interactions']) {
-    try {
-      const results = [];
-      
-      for (const container of containers) {
-        try {
-          const result = await this.createDirectory(container, this.mainBranchName);
-          results.push({
-            container: container,
-            success: result[0],
-            message: result[1],
-            timestamp: new Date().toISOString()
-          });
-          
-          // Add a small delay to avoid rate limiting
-          await new Promise(resolve => setTimeout(resolve, 100));
-        } catch (err) {
-          results.push({
-            container: container,
-            success: false,
-            message: err.message,
-            timestamp: new Date().toISOString()
-          });
-        }
-      }
-      
-      return ResponseFactory.success(
-        `Container creation completed. ${results.filter(r => r.success).length}/${results.length} containers created successfully`,
-        results
-      );
-    } catch (err) {
-      return ResponseFactory.error(
-        `Failed to create containers: ${err.message}`,
-        err,
-        err.status || 500
-      );
-    }
-  }
 }
 
 export default RepositoryManager;

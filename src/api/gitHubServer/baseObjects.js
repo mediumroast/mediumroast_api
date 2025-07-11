@@ -56,10 +56,10 @@ export class BaseObjects {
     
     // Define object file names for containers
     this.objectFiles = {
-      Studies: 'studies.json',
-      Companies: 'companies.json',
-      Interactions: 'interactions.json',
-      Users: 'users.json' // Add users even though GitHub API doesn't store it the same way
+      Studies: 'Studies.json',
+      Companies: 'Companies.json',
+      Interactions: 'Interactions.json',
+      Users: 'Users.json' // Add users even though GitHub API doesn't store it the same way
     };
     
     // Define field whitelists centrally

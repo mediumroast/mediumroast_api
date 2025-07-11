@@ -28,7 +28,7 @@ import RepositoryManager from './github/repository.js';
 import UserManager from './github/user.js';
 import BillingManager from './github/billing.js';
 import BranchManager from './github/branch.js';
-import { encodeContent, decodeJsonContent, customEncodeURIComponent } from './github/utils.js';
+import { decodeJsonContent, customEncodeURIComponent } from './github/utils.js';
 import { isEmpty, isArray, deepClone, mergeObjects, formatDate } from '../utils/helpers.js';
 
 class GitHubFunctions {
@@ -70,7 +70,8 @@ class GitHubFunctions {
       this.orgName,
       this.repoName,
       this.mainBranchName,
-      this.lockFileName
+      this.lockFileName,
+      this.repositoryManager
     );
         
     this.userManager = new UserManager(
@@ -441,7 +442,7 @@ class GitHubFunctions {
       );
     }
         
-    return this.repositoryManager.createContainers(containers);
+    return this.containerOps.createContainers(containers);
   }
 
   /**
@@ -573,7 +574,7 @@ class GitHubFunctions {
     }
         
     const safePath = `${containerName}/${customEncodeURIComponent(fileName)}`;
-    return this.repositoryManager.deleteBlob(safePath, branchName, sha);
+    return this.repositoryManager.deleteFile(safePath, `Delete ${fileName} from ${containerName}`, branchName, sha);
   }
 
   /**
@@ -594,14 +595,28 @@ class GitHubFunctions {
       );
     }
         
-    const encodedContent = typeof blob === 'string' ? encodeContent(blob) : blob;
+    const filePath = `${containerName}/${customEncodeURIComponent(fileName)}`;
+    const commitMessage = `Update ${fileName} in ${containerName}`;
+    
+    // If SHA is not provided, check if file exists and get its SHA
+    let fileSha = sha;
+    if (!fileSha) {
+      try {
+        const existingFile = await this.repositoryManager.getSha(filePath, branchName);
+        if (existingFile[0]) {
+          fileSha = existingFile[2];
+        }
+      } catch (error) {
+        // File doesn't exist, that's fine - we'll create it
+      }
+    }
         
-    return this.repositoryManager.writeBlob(
-      containerName, 
-      customEncodeURIComponent(fileName), 
-      encodedContent, 
+    return this.repositoryManager.createOrUpdateFile(
+      filePath, 
+      blob, 
+      commitMessage,
       branchName, 
-      sha
+      fileSha
     );
   }
 
@@ -628,12 +643,13 @@ class GitHubFunctions {
       );
     }
         
-    const content = encodeContent(obj);
+    const filePath = `${containerName}/${this.objectFiles[containerName]}`;
+    const commitMessage = `Update ${this.objectFiles[containerName]} in ${containerName}`;
         
-    return this.repositoryManager.writeBlob(
-      containerName,
-      this.objectFiles[containerName],
-      content,
+    return this.repositoryManager.createOrUpdateFile(
+      filePath,
+      obj,
+      commitMessage,
       ref,
       mySha
     );

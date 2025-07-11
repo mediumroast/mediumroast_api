@@ -11,7 +11,9 @@
  * 
  * It currently demonstrates:
  * - Repository: Create the discovery repository and containers (Studies, Companies, Interactions)
- * - Actions: Install, update, and delete GitHub Actions workflows
+ * - Companies: Create and manage company data in GitHub repositories
+ * 
+ * For GitHub Actions operations (install, update, delete), see github-update-operations.js
  * 
  * To run this example, create a config.ini file with your GitHub token and organization.
  * The file should look like this:
@@ -24,12 +26,23 @@
  * node examples/github-write-operations.js
  * 
  * You can also specify which categories to run:
- * node examples/github-write-operations.js repository actions
+ * node examples/github-write-operations.js repository companies
  * 
  * Or specify specific operations within a category:
- * node examples/github-write-operations.js repository:repository repository:containers actions:install actions:delete
+ * node examples/github-write-operations.js repository:repository repository:containers companies:create-test companies:create-all companies:list
+ * 
+ * Companies operations:
+ * - companies:create-test  - Create first 2 test companies from sample data
+ * - companies:create-all   - Create all remaining companies from sample data
+ * - companies:list         - List all existing companies with summary
  * 
  * This will run all operations by default, or you can specify individual ones.
+ * 
+ * Prerequisites: The script automatically checks and ensures:
+ * 1. GitHub App is properly installed and has permissions
+ * 2. Repository exists (creates if missing)
+ * 3. Containers exist (creates if missing)
+ * 4. Required files exist (creates if missing)
  * 
  * Note: Make sure you have the necessary permissions for the token to perform write operations.
  * 
@@ -42,7 +55,7 @@
 
 /* eslint-disable no-console */
 
-import { Studies, Companies, Interactions, Actions } from '../src/api/gitHubServer.js';
+import { Studies, Companies, Interactions } from '../src/api/gitHubServer.js';
 import GitHubFunctions from '../src/api/github.js';
 import fs from 'fs';
 import path from 'path';
@@ -106,291 +119,6 @@ function logResult(operationName, result, showData = true) {
     console.log('Data:', JSON.stringify(data, null, 2));
   }
 }
-
-/**
- * Demonstrates Actions write operations
- * @param {string} token - GitHub token
- * @param {string} org - GitHub organization
- * @param {Array<string>} operations - Specific operations to run
- */
-async function demonstrateActionsOperations(token, org, operations) {
-  console.log(`\n${SECTION_DIVIDER}`);
-  console.log('ACTIONS WRITE OPERATIONS');
-  console.log(SECTION_DIVIDER);
-  
-  // Create visible tmp directory in the project root
-  const tmpDir = path.join(__dirname, '../tmp');
-  console.log(`Creating visible tmp directory at: ${tmpDir}`);
-  fs.mkdirSync(tmpDir, { recursive: true });
-  
-  try {
-    // Set environment variable to direct the Actions class to use our tmp directory
-    process.env.MR4GH_TMP_DIR = tmpDir;
-    console.log(`Set temporary directory to: ${process.env.MR4GH_TMP_DIR}`);
-    
-    const actions = new Actions(token, org, 'example-process');
-    const runAll = operations.length === 0;
-    
-    // Install Actions workflows
-    if (runAll || operations.includes('install')) {
-      console.log(`\n${SECTION_DIVIDER}`);
-      console.log('INSTALL ACTIONS WORKFLOWS');
-      console.log(SECTION_DIVIDER);
-      
-      // Confirm before proceeding
-      const confirmed = await confirmAction('This will install GitHub Actions workflows from mr4gh-automations. Continue?');
-      
-      if (!confirmed) {
-        console.log('\nInstallation cancelled by user.');
-      } else {
-        // Install workflows from mr4gh-automations
-        console.log('\nInstalling GitHub Actions workflows...');
-        console.log('This operation will download assets from mr4gh-automations repository');
-        console.log(`All files will be visible in: ${tmpDir}`);
-        
-        // Call the installActions method with extra debug mode
-        const installResult = await actions.installActions(true); // true = debug mode
-        logResult('installActions()', installResult);
-        
-        // Show files downloaded in tmp directory
-        console.log('\nFiles downloaded to tmp directory:');
-        if (fs.existsSync(tmpDir)) {
-          const files = fs.readdirSync(tmpDir);
-          files.forEach(file => {
-            console.log(`- ${file}`);
-            
-            // If it's a directory, show its contents too
-            const filePath = path.join(tmpDir, file);
-            if (fs.statSync(filePath).isDirectory()) {
-              const subFiles = fs.readdirSync(filePath);
-              subFiles.forEach(subFile => {
-                console.log(`  └─ ${subFile}`);
-              });
-            }
-          });
-        }
-      }
-    }
-    
-    // Update Actions workflows
-    if (runAll || operations.includes('update')) {
-      console.log(`\n${SECTION_DIVIDER}`);
-      console.log('UPDATE ACTIONS WORKFLOWS');
-      console.log(SECTION_DIVIDER);
-      
-      try {
-        // First, check if actions are installed and get current version
-        console.log('\nChecking current installation status...');
-        const versionResult = await actions.getCurrentVersion();
-        logResult('getCurrentVersion()', versionResult, false);
-        
-        if (!versionResult[0] || !versionResult[2].installed) {
-          console.log(`\n${WARNING_PREFIX} No actions installation detected.`);
-          
-          // Ask user if they want to install instead
-          const installInstead = await confirmAction('Would you like to install actions instead of updating?');
-          
-          if (installInstead) {
-            console.log('\nSwitching to installation...');
-            
-            // This uses the same code as the installation section
-            console.log('\nInstalling GitHub Actions workflows...');
-            console.log('This operation will download assets from mr4gh-automations repository');
-            console.log(`All files will be visible in: ${tmpDir}`);
-            
-            // Call the installActions method with extra debug mode
-            const installResult = await actions.installActions(true); // true = debug mode
-            logResult('installActions()', installResult);
-          } else {
-            console.log('\nUpdate canceled. Please install actions first.');
-          }
-          
-          // Use return to exit early instead of continue
-          return;
-        } 
-
-        // Get the current version info
-        const currentVersion = versionResult[2].version_file?.content?.version || 'unknown';
-        console.log(`\n${SUCCESS_PREFIX} Found existing actions installation, version: ${currentVersion}`);
-        
-        // List currently installed workflows
-        console.log('\nCurrently installed workflows:');
-        if (versionResult[2].files?.workflows?.length > 0) {
-          versionResult[2].files.workflows.forEach(wf => {
-            console.log(`  - ${wf.name}`);
-          });
-        } else {
-          console.log('  (No workflows found)');
-        }
-        
-        // Check for updates
-        console.log('\nChecking for updates...');
-        const updateCheckResult = await actions.checkForUpdates();
-        logResult('checkForUpdates()', updateCheckResult, false);
-        
-        if (!updateCheckResult[0]) {
-          console.log(`\n${ERROR_PREFIX} Failed to check for updates.`);
-          return;
-        }
-        
-        // Determine if update is needed
-        if (updateCheckResult[2].update_available) {
-          console.log(`\n${SUCCESS_PREFIX} Update available!`);
-          console.log(`Current version: ${updateCheckResult[2].current_version}`);
-          console.log(`Latest version: ${updateCheckResult[2].latest_version}`);
-          console.log(`Release published: ${new Date(updateCheckResult[2].latest_release.published_at).toLocaleString()}`);
-          
-          // Confirm before proceeding
-          const confirmed = await confirmAction('Would you like to update GitHub Actions workflows to the latest version?');
-          
-          if (!confirmed) {
-            console.log('\nUpdate cancelled by user.');
-          } else {
-            // Update workflows
-            console.log('\nUpdating GitHub Actions workflows...');
-            const updateResult = await actions.updateActions();
-            logResult('updateActions()', updateResult);
-            
-            // Verify the update
-            if (updateResult[0]) {
-              console.log('\nVerifying update...');
-              const verifyResult = await actions.getCurrentVersion();
-              
-              if (verifyResult[0]) {
-                const newVersion = verifyResult[2].version_file?.content?.version || 'unknown';
-                console.log(`\n${SUCCESS_PREFIX} Update verification: now at version ${newVersion}`);
-                
-                // List updated workflows
-                console.log('\nUpdated workflows:');
-                if (verifyResult[2].files?.workflows?.length > 0) {
-                  verifyResult[2].files.workflows.forEach(wf => {
-                    console.log(`  - ${wf.name}`);
-                  });
-                } else {
-                  console.log('  (No workflows found)');
-                }
-              }
-            }
-          }
-        } else {
-          console.log(`\n${SUCCESS_PREFIX} Your actions are already up to date!`);
-          console.log(`Current version: ${updateCheckResult[2].current_version}`);
-          console.log(`Latest version: ${updateCheckResult[2].latest_version}`);
-          
-          // Ask if user wants to force update anyway
-          const forceUpdate = await confirmAction('Would you like to force an update anyway?');
-          
-          if (forceUpdate) {
-            console.log('\nForcing update of GitHub Actions workflows...');
-            const updateResult = await actions.updateActions();
-            logResult('updateActions()', updateResult);
-          } else {
-            console.log('\nNo update needed. Skipping.');
-          }
-        }
-        
-        // Get workflow run statistics
-        console.log('\nFetching workflow run statistics...');
-        const runsResult = await actions.getAll();
-        
-        if (runsResult[0] && runsResult[2]?.workflow_runs?.length > 0) {
-          console.log(`\n${SUCCESS_PREFIX} Found ${runsResult[2].workflow_runs.length} workflow runs`);
-          
-          // Group runs by workflow
-          const workflowStats = {};
-          runsResult[2].workflow_runs.forEach(run => {
-            const name = run.name || run.workflow_id;
-            if (!workflowStats[name]) {
-              workflowStats[name] = {
-                total: 0,
-                success: 0,
-                failure: 0,
-                other: 0
-              };
-            }
-            workflowStats[name].total++;
-            if (run.conclusion === 'success') {
-              workflowStats[name].success++;
-            } else if (run.conclusion === 'failure') {
-              workflowStats[name].failure++;
-            } else {
-              workflowStats[name].other++;
-            }
-          });
-          
-          // Display stats
-          console.log('\nWorkflow run statistics:');
-          Object.entries(workflowStats).forEach(([name, stats]) => {
-            console.log(`  ${name}:`);
-            console.log(`    Total runs: ${stats.total}`);
-            console.log(`    Success: ${stats.success}`);
-            console.log(`    Failure: ${stats.failure}`);
-            console.log(`    Other: ${stats.other}`);
-          });
-        } else {
-          console.log(`\n${WARNING_PREFIX} No workflow runs found.`);
-        }
-      } catch (error) {
-        console.error(`\n${ERROR_PREFIX} Error during update operations:`, error.message);
-      }
-    }
-    
-    // Delete Actions workflows
-    if (runAll || operations.includes('delete')) {
-      console.log(`\n${SECTION_DIVIDER}`);
-      console.log('DELETE ACTIONS WORKFLOWS');
-      console.log(SECTION_DIVIDER);
-      
-      // Show current workflows first
-      console.log('\nFetching current workflow runs...');
-      const currentWorkflows = await actions.getAll();
-      logResult('Current workflows (getAll)', currentWorkflows);
-      
-      // Ask if specific workflows should be deleted
-      const rl = createReadlineInterface();
-      const specificWorkflows = await new Promise((resolve) => {
-        rl.question(`${WARNING_PREFIX} Delete specific workflows? Enter comma-separated names or leave blank for all: `, (answer) => {
-          rl.close();
-          if (answer.trim() === '') {
-            resolve(null);
-          } else {
-            resolve(answer.split(',').map(name => name.trim()));
-          }
-        });
-      });
-      
-      // Ask if action files should also be deleted
-      const includeActions = await confirmAction('Would you like to delete action files in .github/actions/ directory as well?');
-      
-      // Final confirmation based on what will be deleted
-      const message = specificWorkflows 
-        ? `This will delete these workflows: ${specificWorkflows.join(', ')}${includeActions ? ' AND ALL ACTION FILES in .github/actions/' : ''}. Continue?`
-        : `This will delete ALL GitHub Actions workflows${includeActions ? ' AND ALL ACTION FILES in .github/actions/' : ''}. Continue?`;
-        
-      const confirmed = await confirmAction(message);
-      
-      if (!confirmed) {
-        console.log('\nDeletion cancelled by user.');
-      } else {
-        // Delete workflows and possibly actions
-        console.log('\nDeleting GitHub Actions files...');
-        const deleteResult = await actions.deleteActions(specificWorkflows, includeActions);
-        logResult('deleteActions()', deleteResult);
-        
-        // Get updated workflow runs to show changes
-        console.log('\nFetching remaining workflow runs...');
-        const remainingWorkflows = await actions.getAll();
-        logResult('Remaining workflows (getAll)', remainingWorkflows);
-      }
-    }
-  } catch (error) {
-    console.error('\n❌ Error in Actions operations:', error.message);
-    if (error.stack) {
-      console.error('Stack trace:', error.stack);
-    }
-  }
-}
-
 /**
  * Demonstrates Studies write operations
  * @param {string} token - GitHub token
@@ -418,9 +146,198 @@ async function demonstrateCompaniesOperations(token, org, operations) {
   console.log('COMPANIES WRITE OPERATIONS');
   console.log(SECTION_DIVIDER);
   
-  console.log('\nCompanies write operations will be implemented in a future version.');
-  
-  // Reserved for future implementation
+  try {
+    // First, check repository and container prerequisites
+    console.log('\n🔍 Checking prerequisites for companies operations...');
+    
+    const github = new GitHubFunctions(token, org, 'companies-prerequisite-check');
+    
+    // Check if repository exists
+    const repoResult = await github.getRepoSize();
+    if (!repoResult[0]) {
+      console.error(`${ERROR_PREFIX} Repository does not exist or is not accessible`);
+      console.log('📋 Please run repository setup first:');
+      console.log('   node examples/github-write-operations.js repository');
+      return;
+    }
+    console.log('✅ Repository exists and is accessible');
+    
+    // Check if Companies container exists
+    console.log('🔍 Checking Companies container...');
+    const containerResult = await github.getContent('Companies');
+    if (!containerResult[0]) {
+      console.error(`${ERROR_PREFIX} Companies container does not exist`);
+      console.log('📋 Please run container setup first:');
+      console.log('   node examples/github-write-operations.js repository:containers');
+      return;
+    }
+    console.log('✅ Companies container exists');
+    
+    // Check if Companies.json file exists
+    console.log('🔍 Checking Companies.json file...');
+    const companiesFileResult = await github.getContent('Companies/Companies.json');
+    if (!companiesFileResult[0]) {
+      console.log(`${WARNING_PREFIX} Companies.json file does not exist, will be created`);
+      
+      // Create an empty companies file
+      console.log('📝 Creating empty Companies.json file...');
+      const emptyCompaniesResult = await github.writeBlob(
+        'Companies',
+        'Companies.json',
+        JSON.stringify([], null, 2),
+        'main'
+      );
+      
+      if (!emptyCompaniesResult[0]) {
+        console.error(`${ERROR_PREFIX} Failed to create Companies.json file: ${emptyCompaniesResult[1]}`);
+        return;
+      }
+      console.log('✅ Created empty Companies.json file');
+    } else {
+      console.log('✅ Companies.json file exists');
+    }
+    
+    console.log(`\n${SUCCESS_PREFIX} All prerequisites satisfied for companies operations`);
+    
+    // Load sample company data
+    const sampleDataPath = path.join(__dirname, 'sample_data', 'companies.json');
+    console.log(`\n📄 Loading sample company data from: ${sampleDataPath}`);
+    
+    if (!fs.existsSync(sampleDataPath)) {
+      console.error(`${ERROR_PREFIX} Sample data file not found: ${sampleDataPath}`);
+      return;
+    }
+    
+    const sampleCompanies = JSON.parse(fs.readFileSync(sampleDataPath, 'utf8'));
+    console.log(`${SUCCESS_PREFIX} Loaded ${sampleCompanies.length} sample companies`);
+    
+    // Initialize Companies entity class
+    const companies = new Companies(token, org, 'company-operations-example');
+    const runAll = operations.length === 0;
+    
+    // Create initial test companies (first 2)
+    if (runAll || operations.includes('create-test')) {
+      console.log(`\n${SECTION_DIVIDER}`);
+      console.log('CREATE TEST COMPANIES (First 2)');
+      console.log(SECTION_DIVIDER);
+      
+      const testCompanies = sampleCompanies.slice(0, 2);
+      console.log(`\n📝 Creating ${testCompanies.length} test companies:`);
+      testCompanies.forEach((company, index) => {
+        console.log(`  ${index + 1}. ${company.name}`);
+      });
+      
+      // Confirm before proceeding
+      const confirmed = await confirmAction(`Create ${testCompanies.length} test companies?`);
+      
+      if (!confirmed) {
+        console.log('\nTest company creation cancelled by user.');
+      } else {
+        await createCompaniesWithContainer(companies, testCompanies, 'test companies');
+      }
+    }
+    
+    // Create all remaining companies
+    if (runAll || operations.includes('create-all')) {
+      console.log(`\n${SECTION_DIVIDER}`);
+      console.log('CREATE ALL REMAINING COMPANIES');
+      console.log(SECTION_DIVIDER);
+      
+      // Get existing companies to avoid duplicates
+      const existingCompaniesResult = await companies.getAll();
+      let existingCompanyNames = [];
+      
+      if (existingCompaniesResult[0] && existingCompaniesResult[2]) {
+        existingCompanyNames = existingCompaniesResult[2].map(company => company.name);
+        console.log(`\n📋 Found ${existingCompanyNames.length} existing companies`);
+      } else {
+        console.log('\n📋 No existing companies found (or container doesn\'t exist yet)');
+      }
+      
+      // Filter out companies that already exist
+      const remainingCompanies = sampleCompanies.filter(company => 
+        !existingCompanyNames.includes(company.name)
+      );
+      
+      if (remainingCompanies.length === 0) {
+        console.log(`\n${SUCCESS_PREFIX} All sample companies already exist. Nothing to create.`);
+      } else {
+        console.log(`\n📝 Creating ${remainingCompanies.length} remaining companies:`);
+        remainingCompanies.slice(0, 5).forEach((company, index) => {
+          console.log(`  ${index + 1}. ${company.name}`);
+        });
+        if (remainingCompanies.length > 5) {
+          console.log(`  ... and ${remainingCompanies.length - 5} more`);
+        }
+        
+        // Confirm before proceeding
+        const confirmed = await confirmAction(`Create ${remainingCompanies.length} remaining companies?`);
+        
+        if (!confirmed) {
+          console.log('\nRemaining company creation cancelled by user.');
+        } else {
+          await createCompaniesWithContainer(companies, remainingCompanies, 'remaining companies');
+        }
+      }
+    }
+    
+    // List all companies
+    if (runAll || operations.includes('list')) {
+      console.log(`\n${SECTION_DIVIDER}`);
+      console.log('LIST ALL COMPANIES');
+      console.log(SECTION_DIVIDER);
+      
+      console.log('\n📋 Fetching all companies...');
+      const allCompaniesResult = await companies.getAll();
+      logResult('getAll()', allCompaniesResult, false);
+      
+      if (allCompaniesResult[0] && allCompaniesResult[2]) {
+        const allCompanies = allCompaniesResult[2];
+        console.log(`\n${SUCCESS_PREFIX} Company Summary:`);
+        console.log(`  Total companies: ${allCompanies.length}`);
+        
+        // Group by role
+        const roleGroups = {};
+        allCompanies.forEach(company => {
+          const role = company.role || 'Unknown';
+          roleGroups[role] = (roleGroups[role] || 0) + 1;
+        });
+        
+        console.log('  By role:');
+        Object.entries(roleGroups).forEach(([role, count]) => {
+          console.log(`    ${role}: ${count}`);
+        });
+        
+        // Group by region
+        const regionGroups = {};
+        allCompanies.forEach(company => {
+          const region = company.region || 'Unknown';
+          regionGroups[region] = (regionGroups[region] || 0) + 1;
+        });
+        
+        console.log('  By region:');
+        Object.entries(regionGroups).forEach(([region, count]) => {
+          console.log(`    ${region}: ${count}`);
+        });
+        
+        // Show first few companies
+        console.log('\n  Recent companies:');
+        allCompanies.slice(0, 5).forEach(company => {
+          console.log(`    • ${company.name} (${company.role || 'Unknown role'})`);
+        });
+        
+        if (allCompanies.length > 5) {
+          console.log(`    ... and ${allCompanies.length - 5} more`);
+        }
+      }
+    }
+    
+  } catch (error) {
+    console.error('\n❌ Error in Companies operations:', error.message);
+    if (error.stack) {
+      console.error('Stack trace:', error.stack);
+    }
+  }
 }
 
 /**
@@ -816,6 +733,140 @@ async function promptForExistingInstallations(installationStatus) {
 }
 
 /**
+ * Helper function to create companies using the container pattern (catch/release)
+ * @param {Companies} companies - Companies instance
+ * @param {Array} companiesToCreate - Array of company objects to create
+ * @param {string} operationDescription - Description for logging
+ */
+async function createCompaniesWithContainer(companies, companiesToCreate, operationDescription) {
+  try {
+    console.log(`\n🔒 Starting container-based creation of ${operationDescription}...`);
+    
+    // Step 1: Catch the Companies container (creates lock, branch, reads objects)
+    console.log('\n📦 Step 1: Catching Companies container...');
+    const repoMetadata = {
+      containers: {
+        Companies: {}
+      },
+      branch: {}
+    };
+    
+    const caughtResult = await companies.serverCtl.catchContainer(repoMetadata);
+    logResult('catchContainer()', caughtResult, false);
+    
+    if (!caughtResult[0]) {
+      console.error(`${ERROR_PREFIX} Failed to catch Companies container`);
+      return;
+    }
+    
+    const metadata = caughtResult[2];
+    console.log(`${SUCCESS_PREFIX} Container caught successfully`);
+    console.log(`  📝 Branch: ${metadata.branch.name}`);
+    console.log(`  📊 Existing companies: ${metadata.containers.Companies.objects.length}`);
+    
+    // Step 2: Add new companies to the container
+    console.log(`\n📝 Step 2: Adding ${companiesToCreate.length} companies to container...`);
+    
+    let addedCount = 0;
+    for (const [index, company] of companiesToCreate.entries()) {
+      try {
+        console.log(`\n  Adding ${index + 1}/${companiesToCreate.length}: ${company.name}`);
+        
+        // Check if company already exists in the current container
+        const existingCompany = metadata.containers.Companies.objects.find(
+          existing => existing.name === company.name
+        );
+        
+        if (existingCompany) {
+          console.log(`    ⚠️  Company "${company.name}" already exists, skipping`);
+          continue;
+        }
+        
+        // Add timestamp fields for creation/modification
+        const now = new Date().toISOString();
+        const companyWithTimestamps = {
+          ...company,
+          creation_date: company.creation_date || now,
+          modification_date: now
+        };
+        
+        // Add the company to the objects array
+        metadata.containers.Companies.objects.push(companyWithTimestamps);
+        addedCount++;
+        
+        console.log(`    ✅ Added "${company.name}"`);
+        
+      } catch (error) {
+        console.error(`    ❌ Failed to add "${company.name}": ${error.message}`);
+      }
+    }
+    
+    console.log(`\n${SUCCESS_PREFIX} Added ${addedCount} new companies`);
+    console.log(`📊 Total companies in container: ${metadata.containers.Companies.objects.length}`);
+    
+    // Step 3: Write the updated objects back to the repository
+    console.log('\n💾 Step 3: Writing updated company data...');
+    const writeResult = await companies.serverCtl.writeObject(
+      'Companies',
+      metadata.containers.Companies.objects,
+      metadata.branch.name,
+      metadata.containers.Companies.objectSha
+    );
+    logResult('writeObject()', writeResult, false);
+    
+    if (!writeResult[0]) {
+      console.error(`${ERROR_PREFIX} Failed to write company data`);
+      // Still try to release the container to clean up
+      await companies.serverCtl.releaseContainer(metadata);
+      return;
+    }
+    
+    console.log(`${SUCCESS_PREFIX} Company data written to branch: ${metadata.branch.name}`);
+    
+    // Step 4: Release the container (merges branch, unlocks)
+    console.log('\n🔓 Step 4: Releasing Companies container...');
+    const releaseResult = await companies.serverCtl.releaseContainer(metadata);
+    logResult('releaseContainer()', releaseResult, false);
+    
+    if (!releaseResult[0]) {
+      console.error(`${ERROR_PREFIX} Failed to release Companies container`);
+      console.error('⚠️  Manual intervention may be required to clean up locks and branch');
+      return;
+    }
+    
+    console.log(`${SUCCESS_PREFIX} Container released successfully`);
+    console.log(`🎉 Successfully created ${addedCount} ${operationDescription}!`);
+    
+    // Step 5: Verify the creation by reading back
+    console.log('\n🔍 Step 5: Verifying creation...');
+    const verificationResult = await companies.getAll();
+    
+    if (verificationResult[0]) {
+      const totalCompanies = verificationResult[2].length;
+      console.log(`${SUCCESS_PREFIX} Verification complete: ${totalCompanies} total companies in repository`);
+      
+      // Show the recently added companies
+      console.log('\n📋 Recently added companies:');
+      companiesToCreate.slice(0, Math.min(addedCount, 5)).forEach((company, index) => {
+        console.log(`  ${index + 1}. ${company.name} (${company.role || 'Unknown role'})`);
+      });
+      
+      if (addedCount > 5) {
+        console.log(`  ... and ${addedCount - 5} more`);
+      }
+    } else {
+      console.log(`${WARNING_PREFIX} Could not verify creation: ${verificationResult[1]}`);
+    }
+    
+  } catch (error) {
+    console.error(`\n${ERROR_PREFIX} Error during company creation:`, error.message);
+    if (error.stack) {
+      console.error('Stack trace:', error.stack);
+    }
+  }
+}
+
+/**
  * Main function to run the example
  */
 async function main() {
@@ -864,7 +915,6 @@ async function main() {
     // Parse arguments to determine which entity types and operations to run
     const entityOperations = {
       repository: [],
-      actions: [],
       studies: [],
       companies: [],
       interactions: [],
@@ -887,24 +937,53 @@ async function main() {
       }
     }
     
-    // Run selected demonstrations
+    // Run selected demonstrations in order (repository first, then others)
+    let repositorySetupSuccess = false;
+    
+    // Always run repository setup first if running all or if repository is specified
     if (runAllEntities || args.includes('repository') || entityOperations.repository.length > 0) {
-      await demonstrateRepositorySetup(token, org, entityOperations.repository);
+      console.log('\n🔧 Running repository setup first...');
+      try {
+        await demonstrateRepositorySetup(token, org, entityOperations.repository);
+        repositorySetupSuccess = true;
+        console.log('\n✅ Repository setup completed successfully');
+      } catch (error) {
+        console.error('\n❌ Repository setup failed:', error.message);
+        console.error('Cannot proceed with other operations without repository setup');
+        return;
+      }
+    } else if (runAllEntities || args.includes('companies') || args.includes('studies') || args.includes('interactions')) {
+      // If trying to run entity operations without repository, check if repo exists
+      console.log('\n🔍 Checking repository prerequisites...');
+      try {
+        const github = new GitHubFunctions(token, org, 'prerequisite-check');
+        const repoCheck = await github.getRepoSize();
+        if (repoCheck[0]) {
+          repositorySetupSuccess = true;
+          console.log('\n✅ Repository exists and is accessible');
+        } else {
+          console.log('\n❌ Repository does not exist. Running repository setup first...');
+          await demonstrateRepositorySetup(token, org, []);
+          repositorySetupSuccess = true;
+        }
+      } catch (error) {
+        console.error('\n❌ Cannot access repository. Running repository setup first...');
+        await demonstrateRepositorySetup(token, org, []);
+        repositorySetupSuccess = true;
+      }
     }
     
-    if (runAllEntities || args.includes('actions') || entityOperations.actions.length > 0) {
-      await demonstrateActionsOperations(token, org, entityOperations.actions);
-    }
-    
-    if (runAllEntities || args.includes('studies') || entityOperations.studies.length > 0) {
-      await demonstrateStudiesOperations(token, org, entityOperations.studies);
-    }
-    
-    if (runAllEntities || args.includes('companies') || entityOperations.companies.length > 0) {
+    // Only proceed with other operations if repository setup was successful
+    if ((runAllEntities || args.includes('companies') || entityOperations.companies.length > 0) && repositorySetupSuccess) {
+      console.log('\n🏢 Preparing for companies operations...');
       await demonstrateCompaniesOperations(token, org, entityOperations.companies);
     }
     
-    if (runAllEntities || args.includes('interactions') || entityOperations.interactions.length > 0) {
+    if ((runAllEntities || args.includes('studies') || entityOperations.studies.length > 0) && repositorySetupSuccess) {
+      await demonstrateStudiesOperations(token, org, entityOperations.studies);
+    }
+    
+    if ((runAllEntities || args.includes('interactions') || entityOperations.interactions.length > 0) && repositorySetupSuccess) {
       await demonstrateInteractionsOperations(token, org, entityOperations.interactions);
     }
     
