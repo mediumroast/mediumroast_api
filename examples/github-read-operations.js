@@ -41,7 +41,7 @@
 /* eslint-disable no-console */
 
 // Update the import statement to include Storage
-import { Studies, Companies, Interactions, Users, Actions, Storage } from '../src/api/gitHubServer.js';
+import { Studies, Companies, Interactions, Users, Storage } from '../src/api/gitHubServer.js';
 import fs from 'fs';
 import path from 'path';
 import ConfigParser from 'configparser';
@@ -240,54 +240,6 @@ async function demonstrateUsersOperations(token, org) {
 }
 
 /**
- * Demonstrates Actions read operations
- * @param {string} token - GitHub token
- * @param {string} org - GitHub organization
- */
-async function demonstrateActionsOperations(token, org) {
-  console.log(`\n${SECTION_DIVIDER}`);
-  console.log('ACTIONS OPERATIONS');
-  console.log(SECTION_DIVIDER);
-  
-  try {
-    const actions = new Actions(token, org, 'example-process');
-    
-    // Get all workflow runs
-    console.log('\nFetching all workflow runs...');
-    const allWorkflows = await actions.getAll();
-    logResult('getAll()', allWorkflows);
-    
-    // Get actions billing information
-    console.log('\nFetching GitHub Actions billing information...');
-    const billingInfo = await actions.getActionsBilling();
-    logResult('getActionsBilling()', billingInfo);
-    
-    // If workflow runs exist, demonstrate getting a specific run
-    if (allWorkflows[0] && allWorkflows[2] && Array.isArray(allWorkflows[2]) && allWorkflows[2].length > 0) {
-      const sampleRunId = allWorkflows[2][0].id;
-      
-      console.log(`\nFetching details for workflow run ID: ${sampleRunId}...`);
-      const workflowRun = await actions.getWorkflowRun(sampleRunId);
-      logResult('getWorkflowRun()', workflowRun);
-      
-      console.log('\nNOTE: The following operations would modify data and are commented out by default:');
-      console.log('// Cancel a workflow run');
-      console.log(`// const cancelResult = await actions.cancelWorkflowRun('${sampleRunId}');`);
-      console.log('// logResult(\'cancelWorkflowRun()\', cancelResult);');
-      
-      console.log('\n// Trigger a workflow');
-      console.log('// const triggerResult = await actions.triggerWorkflow(\'main.yml\', { ref: \'main\' });');
-      console.log('// logResult(\'triggerWorkflow()\', triggerResult);');
-    }
-  } catch (error) {
-    console.error('\n❌ Error in Actions operations:', error.message);
-    if (error.stack) {
-      console.error('Stack trace:', error.stack);
-    }
-  }
-}
-
-/**
  * Demonstrates Branch Status operations using Octokit
  * @param {string} token - GitHub token
  * @param {string} org - GitHub organization
@@ -472,11 +424,6 @@ async function main() {
     
     if (runAll || args.includes('users')) {
       await demonstrateUsersOperations(token, org);
-    }
-    
-    // Run actions operations
-    if (runAll || args.includes('actions')) {
-      await demonstrateActionsOperations(token, org);
     }
     
     // Run storage operations

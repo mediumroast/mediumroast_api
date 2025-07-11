@@ -2304,4 +2304,79 @@ export class Actions extends BaseObjects {
       tracking.end();
     }
   }
+
+  /**
+   * Get a simplified installation status summary for programmatic use
+   * @param {boolean} [suppressConsole=false] - Suppress console output for API use
+   * @returns {Promise<Object>} Installation status object
+   */
+  async getInstallationStatus(suppressConsole = false) {
+    try {
+      if (!suppressConsole) {
+        logger.info('Checking for existing Actions installation...');
+      }
+      
+      const versionResult = await this.getCurrentVersion();
+      
+      const status = {
+        installed: false,
+        version: null,
+        workflows: [],
+        error: null,
+        versionFileExists: false,
+        directories: {
+          github: false,
+          workflows: false,
+          actions: false
+        }
+      };
+
+      if (versionResult[0]) {
+        const versionInfo = versionResult[2];
+        status.installed = versionInfo.installed || false;
+        status.version = versionInfo.version_file?.content?.version || null;
+        status.workflows = versionInfo.version_file?.content?.workflows_installed || [];
+        status.versionFileExists = versionInfo.version_file?.exists || false;
+        
+        // Directory status
+        if (versionInfo.directories) {
+          status.directories.github = versionInfo.directories.github_exists || false;
+          status.directories.workflows = versionInfo.directories.workflows_exists || false;
+          status.directories.actions = versionInfo.directories.actions_exists || false;
+        }
+        
+        if (!suppressConsole) {
+          if (status.installed) {
+            logger.info(`Actions installation found: version ${status.version}`);
+            logger.info(`Workflows: ${status.workflows.join(', ')}`);
+          } else {
+            logger.info('No Actions installation found.');
+          }
+        }
+      } else {
+        status.error = versionResult[1];
+        if (!suppressConsole) {
+          logger.warn('Could not determine Actions installation status.');
+        }
+      }
+
+      return status;
+    } catch (error) {
+      if (!suppressConsole) {
+        logger.error('Error during Actions installation check:', error.message);
+      }
+      return {
+        installed: false,
+        version: null,
+        workflows: [],
+        error: error.message,
+        versionFileExists: false,
+        directories: {
+          github: false,
+          workflows: false,
+          actions: false
+        }
+      };
+    }
+  }
 }

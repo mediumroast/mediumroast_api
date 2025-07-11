@@ -1,39 +1,24 @@
 # GitHub Repository Management Tutorial
 
+## Navigation
+
+- **[⬅️ Getting Started](./github-getting-started.md)** - Prerequisites, installation, and basic setup
+- **[📋 All Tutorials](./README.md)** - Complete tutorial directory
+- **[⚡ Actions Tutorial](./github-actions.md)** - GitHub Actions workflow management
+
 ## Introduction
 
 This tutorial provides a comprehensive guide for client application developers to implement GitHub repository management operations using the Mediumroast API. You'll learn how to create repositories, set up container directories, and manage repository configurations with robust pre-flight checks and user-friendly prompts. The workflow includes safety measures to prevent permission errors and accidental overwrites.
 
-## Prerequisites
+> **Prerequisites**: Before starting this tutorial, complete the [Getting Started Guide](./github-getting-started.md) to set up your development environment, install dependencies, and configure your GitHub integration.
 
-Before you begin, ensure you have:
+## Repository-Specific Configuration
 
-1. **Node.js** (v16 or higher) installed
-2. **Mediumroast for GitHub App** installed on your GitHub organization
-   - The app provides the necessary permissions for repository management
-   - Install it from: [GitHub Apps Marketplace](https://github.com/apps/mediumroast-for-github)
-3. **Admin access** to the GitHub organization where you want to create repositories
-4. **The Mediumroast API** package installed in your project
-
-## Installation and Setup
-
-### Install the Mediumroast API
-
-```bash
-npm install mediumroast_api
-```
-
-### Configuration Setup
-
-Create a `config.ini` file in your project directory:
+For repository management operations, add these specific settings to your `config.ini`:
 
 ```ini
 [GitHub]
-# GitHub organization name
-org = YOUR_ORGANIZATION_NAME
-
-# GitHub personal access token (for testing/development)
-token = YOUR_GITHUB_TOKEN
+# ... (basic configuration from getting started guide)
 
 # Repository configuration
 repoName = my-discovery-repo
@@ -42,8 +27,6 @@ repoDescription = A repository for discovery and data collection
 # Container configuration
 containerTypes = Studies,Companies,Interactions
 ```
-
-> **Note**: While a GitHub token can be used for development, the Mediumroast for GitHub App is the recommended approach for production applications as it provides better security and permission management.
 
 ## Understanding the Repository Management Workflow
 
@@ -1660,3 +1643,17 @@ For more information and advanced features, refer to the complete API documentat
 - Review the complete example implementations
 - Test individual operations before running the full workflow
 - Use the provided diagnostic tools to identify issues
+
+---
+
+## Navigation
+
+- **[⬅️ Getting Started](./github-getting-started.md)** - Prerequisites, installation, and basic setup
+- **[📋 All Tutorials](./README.md)** - Complete tutorial directory
+- **[⚡ Actions Tutorial](./github-actions.md)** - GitHub Actions workflow management
+
+## Related Resources
+
+- [GitHub API Documentation](https://docs.github.com/en/rest)
+- [Mediumroast API Documentation](../docs/)
+- [GitHub Apps Documentation](https://docs.github.com/en/developers/apps)
