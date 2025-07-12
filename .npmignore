@@ -3,6 +3,7 @@
 .github/
 .gitignore
 .eslintrc.js
+.eslintrc.json
 .eslintignore
 vitest.config.js
 coverage/
@@ -11,6 +12,14 @@ tests/
 # Examples and documentation that shouldn't be published
 examples/
 docs/
+api-docs.md
+CONTAINER_REFACTORING_SUMMARY.md
+RESTRUCTURING_SUMMARY.md
+
+# Temporary and build files
+tmp/
+build/
+dist/build-temp/
 
 # Configuration files
 config.ini
@@ -30,12 +39,12 @@ npm-debug.log*
 # Dependency directories
 node_modules/
 
-# Build output
-dist/build-temp/
-
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Development scripts and utilities
+cleanup-json-files.js
 
 # Files to exclude from npm package
 *_deprecate.js
