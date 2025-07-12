@@ -240,11 +240,61 @@ class ContainerOperations {
    * @returns {Promise<Array>} ResponseFactory result
    */
   async releaseContainers(repoMetadata, mergeBranchFn) {
-    // TODO: Implement actual release logic
-    return ResponseFactory.success('Containers released successfully', {
-      metadata: repoMetadata,
-      mergeFn: mergeBranchFn
-    });
+    try {
+      // Step 1: Merge the branch to main (creates PR and merges)
+      const mergeResult = await mergeBranchFn(
+        repoMetadata.branch.name, 
+        repoMetadata.branch.sha
+      );
+      if (!mergeResult[0]) {
+        return ResponseFactory.error(
+          `Failed to merge branch ${repoMetadata.branch.name}: ${mergeResult[1]}`,
+          mergeResult[2],
+          500
+        );
+      }
+
+      // Step 2: Unlock all containers
+      const unlockResults = [];
+      for (const containerName in repoMetadata.containers) {
+        const container = repoMetadata.containers[containerName];
+        const unlockResult = await this.unlockContainer(
+          containerName,
+          container.lockSha,
+          this.mainBranchName // Unlock on main branch after merge
+        );
+        
+        unlockResults.push({
+          container: containerName,
+          success: unlockResult[0],
+          message: unlockResult[1],
+          data: unlockResult[2]
+        });
+        
+        if (!unlockResult[0]) {
+          // Log error but continue with other containers
+          // Note: This is a warning condition, not a fatal error
+        }
+      }
+
+      const successfulUnlocks = unlockResults.filter(r => r.success).length;
+      const totalContainers = Object.keys(repoMetadata.containers).length;
+
+      return ResponseFactory.success(
+        `Released ${totalContainers} container(s). Merge completed, ${successfulUnlocks}/${totalContainers} containers unlocked successfully.`,
+        {
+          merge: mergeResult[2],
+          unlocks: unlockResults,
+          branch: repoMetadata.branch
+        }
+      );
+    } catch (err) {
+      return ResponseFactory.error(
+        `Failed to release containers: ${err.message}`,
+        err,
+        500
+      );
+    }
   }
 
   /**

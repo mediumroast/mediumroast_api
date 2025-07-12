@@ -12,6 +12,8 @@ This tutorial provides a comprehensive guide for client application developers t
 
 > **Prerequisites**: Before starting this tutorial, complete the [Getting Started Guide](./github-getting-started.md) to set up your development environment, install dependencies, and configure your GitHub integration.
 
+> **📝 Note**: This tutorial includes both basic examples with console.log for learning purposes and production-ready examples using the built-in structured logging system. For production applications, always use the structured logging patterns shown in the [Monitoring and Logging](#monitoring-and-logging) section.
+
 ## Repository-Specific Configuration
 
 For repository management operations, add these specific settings to your `config.ini`:
@@ -342,6 +344,7 @@ demonstrateRepositoryManagement();
 #### Creating a Discovery Repository
 
 ```javascript
+// Basic example (learning purposes)
 async function createRepository(github, org) {
     console.log(`📁 Creating discovery repository: ${org}_discovery`);
     
@@ -356,6 +359,49 @@ async function createRepository(github, org) {
     } else {
         console.error(`❌ Failed to create repository: ${result[1]}`);
         throw new Error(result[1]);
+    }
+}
+
+// Production example (structured logging)
+import logger from '../src/api/gitHubServer/logger.js';
+
+async function createRepositoryProduction(github, org) {
+    const operationTracker = logger.trackOperation('repository', 'create');
+    
+    try {
+        logger.info('Starting repository creation', {
+            organization: org,
+            repository: `${org}_discovery`
+        });
+        
+        const result = await github.createRepository();
+        
+        if (result[0]) {
+            logger.info('Repository created successfully', {
+                organization: org,
+                repository: result[2].name,
+                url: result[2].html_url,
+                private: result[2].private
+            });
+            
+            logger.debug('Repository creation result details', result[2]);
+            return result[2];
+        } else {
+            logger.error('Repository creation failed', {
+                organization: org,
+                error: result[1]
+            });
+            throw new Error(result[1]);
+        }
+    } catch (error) {
+        logger.error('Unexpected error during repository creation', {
+            organization: org,
+            error: error.message,
+            stack: error.stack
+        });
+        throw error;
+    } finally {
+        operationTracker.end();
     }
 }
 ```
@@ -801,110 +847,163 @@ export function getEnvironmentConfig() {
 
 ### Monitoring and Logging
 
+The Mediumroast API includes a built-in structured logging system that provides environment-aware logging levels and consistent formatting. 
+
+#### When to Use Each Approach
+
+- **console.log with emojis**: Use for learning examples, CLI applications, and user-facing output
+- **Structured logging**: Use for library code, production applications, and when logging needs to be parsed or analyzed
+
+| Context | Recommended Approach | Example |
+|---------|---------------------|---------|
+| Tutorial examples | console.log with emojis | `console.log('✅ Repository created');` |
+| CLI applications | console.log with chalk colors | `console.log(chalk.green('✅ Success'));` |
+| Library/API code | Structured logging | `logger.info('Repository created', {repo: name});` |
+| Production services | Structured logging | `logger.error('Failed', {error, context});` |
+| Debug information | Structured logging | `logger.debug('Details', {data});` |
+
+#### Built-in Structured Logging
+
+Instead of using console.log for production applications, use the logger module:
+
 ```javascript
-class RepositoryOperationsLogger {
-    constructor(logLevel = 'info') {
-        this.logLevel = logLevel;
-        this.operations = [];
-        this.metrics = {
-            repositories_created: 0,
-            containers_created: 0,
-            errors: 0,
-            api_calls: 0
-        };
-    }
-    
-    log(level, operation, message, data = null) {
-        const timestamp = new Date().toISOString();
-        const entry = {
-            timestamp,
-            level,
-            operation,
-            message,
-            data
-        };
-        
-        this.operations.push(entry);
-        
-        if (this.shouldLog(level)) {
-            const prefix = this.getLogPrefix(level);
-            console.log(`[${timestamp}] ${prefix} ${operation}: ${message}`);
-            
-            if (data && level === 'debug') {
-                console.log('   Data:', JSON.stringify(data, null, 2));
-            }
-        }
-    }
-    
-    shouldLog(level) {
-        const levels = { error: 0, warn: 1, info: 2, debug: 3 };
-        return levels[level] <= levels[this.logLevel];
-    }
-    
-    getLogPrefix(level) {
-        const prefixes = {
-            error: '❌',
-            warn: '⚠️',
-            info: 'ℹ️',
-            debug: '🔍'
-        };
-        return prefixes[level] || 'ℹ️';
-    }
-    
-    incrementMetric(metric) {
-        if (metric in this.metrics) {
-            this.metrics[metric]++;
-        }
-    }
-    
-    getMetrics() {
-        return {
-            ...this.metrics,
-            operations_total: this.operations.length,
-            uptime: process.uptime()
-        };
-    }
-    
-    exportLogs(format = 'json') {
-        if (format === 'json') {
-            return JSON.stringify({
-                operations: this.operations,
-                metrics: this.metrics,
-                exported_at: new Date().toISOString()
-            }, null, 2);
-        }
-        
-        // CSV format
-        const headers = ['timestamp', 'level', 'operation', 'message'];
-        const rows = this.operations.map(op => [
-            op.timestamp,
-            op.level,
-            op.operation,
-            op.message
-        ]);
-        
-        return [headers, ...rows]
-            .map(row => row.join(','))
-            .join('\n');
-    }
-}
+import logger from '../src/api/gitHubServer/logger.js';
 
-// Usage in your application
-const logger = new RepositoryOperationsLogger('info');
-
-async function monitoredRepositoryOperation(operation) {
+/**
+ * Example of structured logging for repository operations
+ * The logger provides debug, info, warn, and error levels
+ */
+async function repositoryOperationWithLogging(github, operationName) {
+    const operationTracker = logger.trackOperation('repository', operationName);
+    
     try {
-        logger.log('info', 'Repository Operation', 'Starting operation', { operation });
-        const result = await operation();
-        logger.log('info', 'Repository Operation', 'Operation completed successfully');
-        logger.incrementMetric('repositories_created');
-        return result;
+        logger.info(`Starting ${operationName} operation`, {
+            operation: operationName,
+            timestamp: new Date().toISOString()
+        });
+        
+        // Perform the operation
+        const result = await github.createRepository();
+        
+        if (result[0]) {
+            logger.info(`${operationName} completed successfully`, {
+                operation: operationName,
+                success: true,
+                message: result[1]
+            });
+            
+            // Debug-level data logging (only shows when LOG_LEVEL=debug)
+            logger.debug(`${operationName} result data`, result[2]);
+            
+            return result;
+        } else {
+            logger.error(`${operationName} failed`, {
+                operation: operationName,
+                success: false,
+                error: result[1]
+            });
+            throw new Error(result[1]);
+        }
+        
     } catch (error) {
-        logger.log('error', 'Repository Operation', 'Operation failed', { error: error.message });
-        logger.incrementMetric('errors');
+        logger.error(`Unexpected error in ${operationName}`, {
+            operation: operationName,
+            error: error.message,
+            stack: error.stack
+        });
         throw error;
+    } finally {
+        operationTracker.end();
     }
 }
+
+// Environment-controlled logging levels
+// Set LOG_LEVEL environment variable to control output:
+
+// LOG_LEVEL=error  - Only errors
+// LOG_LEVEL=warn   - Warnings and errors  
+// LOG_LEVEL=info   - Info, warnings, and errors (default)
+// LOG_LEVEL=debug  - All logging including debug details
+
+// Usage examples:
+logger.debug('Detailed diagnostic information', { details: 'debug data' });
+logger.info('General operational information', { operation: 'create-repo' });
+logger.warn('Warning condition detected', { warning: 'rate limit approaching' });
+logger.error('Error occurred', { error: 'API failure', stack: error.stack });
+```
+
+### Operation Tracking
+
+The logger includes built-in operation and transaction tracking:
+
+```javascript
+async function batchRepositoryOperations(github) {
+    const transactionTracker = logger.trackTransaction('batch-repository-setup');
+    
+    try {
+        // Track individual operations
+        const repoTracker = logger.trackOperation('repository', 'create');
+        const result = await github.createRepository();
+        repoTracker.end();
+        
+        const containerTracker = logger.trackOperation('containers', 'create');
+        const containerResult = await github.containerOps.createContainers();
+        containerTracker.end();
+        
+        logger.info('Batch operations completed successfully', {
+            repository: result[0],
+            containers: containerResult[0],
+            total_operations: 2
+        });
+        
+    } catch (error) {
+        logger.error('Batch operations failed', {
+            error: error.message,
+            operations_attempted: 2
+        });
+        throw error;
+    } finally {
+        transactionTracker.end();
+    }
+}
+```
+
+### Production Logging Patterns
+
+For production applications, follow these logging patterns:
+
+```javascript
+// ✅ Good: Structured logging with context
+logger.info('Repository created successfully', {
+    repository: repoName,
+    organization: orgName,
+    operation_id: operationId
+});
+
+// ❌ Avoid: Direct console.log in production
+console.log('✅ Repository created successfully');
+
+// ✅ Good: Error logging with full context
+logger.error('Repository creation failed', {
+    repository: repoName,
+    organization: orgName,
+    error: error.message,
+    stack: error.stack,
+    operation_id: operationId
+});
+
+// ❌ Avoid: Basic error logging
+console.error('❌ Repository creation failed:', error.message);
+
+// ✅ Good: Debug information (controlled by environment)
+logger.debug('API response details', {
+    status: response.status,
+    headers: response.headers,
+    data_length: response.data.length
+});
+
+// ❌ Avoid: Always-visible debug info
+console.log('Debug:', response);
 ```
 
 ## Troubleshooting Guide

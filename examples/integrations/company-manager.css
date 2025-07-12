@@ -1,0 +1,723 @@
+/**
+ * CSS Styles for GitHub Companies Manager React Component
+ * 
+ * This stylesheet provides a modern, responsive design for the company manager
+ * with GitHub-inspired styling and smooth animations.
+ * 
+ * Features:
+ * - Responsive grid layout for company listings
+ * - GitHub-inspired color scheme and styling
+ * - Smooth animations and transitions for interactions
+ * - Loading states and spinners for async operations
+ * - Status badges and role indicators
+ * - Mobile-responsive design with touch-friendly controls
+ * - Modal forms for company creation and editing
+ * - Analytics visualization components
+ * 
+ * Usage:
+ *   Import this CSS file in your React application
+ *   or include it in your build process
+ */
+
+.company-manager {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e1e5e9;
+}
+
+.header h2 {
+    margin: 0;
+    color: #24292e;
+}
+
+.header p {
+    margin: 5px 0 0 0;
+    color: #586069;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 50px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #0366d6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-panel {
+    background: #ffeef0;
+    border: 1px solid #fdaeb7;
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.error-panel h3 {
+    color: #d1242f;
+    margin-top: 0;
+}
+
+.installation-help {
+    margin-top: 15px;
+}
+
+.installation-help ol {
+    margin: 10px 0;
+}
+
+.installation-help code {
+    background: #f1f3f4;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+}
+
+.error-alert {
+    background: #ffeef0;
+    border: 1px solid #fdaeb7;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.error-icon {
+    font-size: 16px;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.loading-bar {
+    width: 100%;
+    height: 4px;
+    background: #e1e5e9;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.loading-progress {
+    height: 100%;
+    background: #0366d6;
+    animation: progress 2s ease-in-out infinite;
+}
+
+@keyframes progress {
+    0% { width: 0%; }
+    50% { width: 100%; }
+    100% { width: 0%; }
+}
+
+.filters-section {
+    background: #f6f8fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.filters-section h3 {
+    margin-top: 0;
+    color: #24292e;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e1e5e9;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: #24292e;
+    font-size: 14px;
+}
+
+.filter-group select,
+.filter-group input {
+    padding: 8px 12px;
+    border: 1px solid #d1d5da;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+}
+
+.filter-group select:focus,
+.filter-group input:focus {
+    outline: none;
+    border-color: #0366d6;
+    box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.1);
+}
+
+.company-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.companies-panel {
+    background: #f6f8fa;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.companies-panel h3 {
+    margin-top: 0;
+    color: #24292e;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e1e5e9;
+}
+
+.company-details-panel {
+    background: #f6f8fa;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.company-details-panel h3 {
+    margin-top: 0;
+    color: #24292e;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e1e5e9;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #586069;
+}
+
+.companies-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.company-item {
+    background: white;
+    border: 1px solid #e1e5e9;
+    border-radius: 6px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.company-item:hover {
+    border-color: #0366d6;
+    box-shadow: 0 2px 8px rgba(3, 102, 214, 0.1);
+}
+
+.company-item.active {
+    border-color: #0366d6;
+    background: #f1f8ff;
+}
+
+.company-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.company-header h4 {
+    margin: 0;
+    color: #24292e;
+}
+
+.company-details {
+    margin-bottom: 15px;
+}
+
+.company-details p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #586069;
+}
+
+.company-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.company-info h4 {
+    margin: 0 0 15px 0;
+    color: #24292e;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-item label {
+    font-weight: 600;
+    font-size: 12px;
+    color: #586069;
+    text-transform: uppercase;
+}
+
+.info-item span {
+    color: #24292e;
+}
+
+.info-item a {
+    color: #0366d6;
+    text-decoration: none;
+}
+
+.info-item a:hover {
+    text-decoration: underline;
+}
+
+.description {
+    margin-bottom: 20px;
+}
+
+.description label {
+    font-weight: 600;
+    font-size: 12px;
+    color: #586069;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.description p {
+    margin: 0;
+    color: #24292e;
+    line-height: 1.5;
+}
+
+.linked-interactions {
+    margin-bottom: 20px;
+}
+
+.linked-interactions label {
+    font-weight: 600;
+    font-size: 12px;
+    color: #586069;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.linked-interactions ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.linked-interactions li {
+    margin-bottom: 5px;
+    color: #24292e;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.profile-panel {
+    background: #f6f8fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.profile-panel h3 {
+    margin-top: 0;
+    color: #24292e;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e1e5e9;
+}
+
+.analytics {
+    margin-bottom: 20px;
+}
+
+.analytics h4 {
+    margin: 0 0 15px 0;
+    color: #24292e;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.metric {
+    background: white;
+    border: 1px solid #e1e5e9;
+    border-radius: 6px;
+    padding: 15px;
+    text-align: center;
+}
+
+.metric label {
+    display: block;
+    font-weight: 600;
+    font-size: 12px;
+    color: #586069;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.metric span {
+    font-size: 24px;
+    font-weight: bold;
+    color: #0366d6;
+}
+
+.content-types {
+    background: white;
+    border: 1px solid #e1e5e9;
+    border-radius: 6px;
+    padding: 15px;
+}
+
+.content-types h5 {
+    margin: 0 0 15px 0;
+    color: #24292e;
+}
+
+.content-type {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.content-type:last-child {
+    border-bottom: none;
+}
+
+.interaction-summary {
+    background: white;
+    border: 1px solid #e1e5e9;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.interaction-summary h4 {
+    margin: 0 0 15px 0;
+    color: #24292e;
+}
+
+.interaction-summary ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.interaction-summary li {
+    margin-bottom: 15px;
+    color: #24292e;
+}
+
+.interaction-summary p {
+    margin: 5px 0 0 0;
+    color: #586069;
+    font-size: 14px;
+    font-style: italic;
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.badge-success {
+    background: #dcffe4;
+    color: #28a745;
+}
+
+.badge-danger {
+    background: #ffeef0;
+    color: #d1242f;
+}
+
+.badge-info {
+    background: #f1f8ff;
+    color: #0366d6;
+}
+
+.badge-warning {
+    background: #fff8dc;
+    color: #b08800;
+}
+
+.badge-secondary {
+    background: #f1f3f4;
+    color: #586069;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: #0366d6;
+    color: white;
+    border-color: #0366d6;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #0256cc;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+    border-color: #6c757d;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #5a6268;
+}
+
+.btn-danger {
+    background: #d73a49;
+    color: white;
+    border-color: #d73a49;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: #cb2431;
+}
+
+.btn-outline {
+    background: white;
+    color: #0366d6;
+    border-color: #0366d6;
+}
+
+.btn-outline:hover:not(:disabled) {
+    background: #f1f8ff;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: white;
+    border-radius: 8px;
+    padding: 30px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal h3 {
+    margin: 0 0 20px 0;
+    color: #24292e;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e1e5e9;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #24292e;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 8px 12px;
+    border: 1px solid #d1d5da;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #0366d6;
+    box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.1);
+}
+
+.form-group input.readonly {
+    background: #f6f8fa;
+    color: #586069;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e1e5e9;
+}
+
+@media (max-width: 768px) {
+    .company-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .analytics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .company-actions {
+        flex-direction: column;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .modal {
+        width: 95%;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .company-manager {
+        padding: 10px;
+    }
+    
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .companies-panel,
+    .company-details-panel,
+    .profile-panel {
+        padding: 15px;
+    }
+}

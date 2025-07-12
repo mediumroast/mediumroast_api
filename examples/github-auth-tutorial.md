@@ -32,6 +32,22 @@ The Mediumroast API supports multiple authentication approaches through the `Git
 - **Benefits**: Fine-grained permissions, organizational control
 - **Security**: Limited scope, audit trail, managed by organization admins
 
+## Logging and Output Patterns
+
+Authentication implementations require different logging approaches depending on their use case:
+
+### 🖥️ **Interactive Authentication** (CLI Applications, User-Facing Tools)
+- **Console Output**: Use `console.log()` for user interaction and status updates
+- **User Experience**: Provide immediate visual feedback for authentication steps
+- **Error Display**: Show clear, actionable error messages to users
+
+### 🔧 **Backend Authentication** (Services, Automated Scripts)
+- **Structured Logging**: Use the logger module for operational visibility
+- **Debug Information**: Include authentication context in structured logs
+- **Production Ready**: Environment-aware logging levels and error tracking
+
+**Example**: The main authentication example (`github-device-auth.js`) uses structured logging for debugging while preserving console output for user experience. Tutorial examples focus on user-facing patterns appropriate for interactive applications.
+
 ## Device Flow Authentication Implementation
 
 ### Understanding the Device Flow Process
@@ -446,6 +462,9 @@ node examples/github-device-auth.js
 3. **Token Validation**: Tests the token with a GitHub API call
 4. **Error Handling**: Comprehensive error management
 5. **User Experience**: Clear prompts and status messages
+6. **Production Logging**: Structured logging for debugging and operational visibility
+
+> **Note**: The example uses both console output for user interaction and structured logging for debugging. This hybrid approach provides excellent user experience while maintaining production-ready operational patterns.
 
 ### Example Output
 
@@ -458,11 +477,11 @@ Using Client ID: your-client-id
 Setting up GitHub authentication...
 Starting device flow authentication...
 
-┌─────────────────────┬─────────────────────────────────────┐
-│ Authorization website: │ https://github.com/login/device      │
-├─────────────────────┼─────────────────────────────────────┤
-│ Authorization code:    │ ABCD-1234                           │
-└─────────────────────┴─────────────────────────────────────┘
+┌─────────────────────────┬─────────────────────────────────────┐
+│ Authorization website:  │ https://github.com/login/device     │
+├─────────────────────────┼─────────────────────────────────────┤
+│ Authorization code:     │ ABCD-1234                           │
+└─────────────────────────┴─────────────────────────────────────┘
 
 Authentication successful!
 Token received: ghp_xx...

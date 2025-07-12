@@ -5,6 +5,7 @@
 - **[⬅️ Getting Started](./github-getting-started.md)** - Prerequisites, installation, and basic setup
 - **[📋 All Tutorials](./README.md)** - Complete tutorial directory
 - **[📁 Repository Tutorial](./github-repository.md)** - Repository management operations
+- **[🏢 Companies Tutorial](./github-companies.md)** - Company data management operations
 
 ## Introduction
 
@@ -26,6 +27,21 @@ workflowDescription = Main CI/CD workflow for the repository
 workflowFile = .github/workflows/main.yml
 ```
 
+### Environment Variables for Logging Control
+
+Control the logging behavior of the main example files:
+
+```bash
+# Set log level (debug, info, warn, error) - default: info
+export LOG_LEVEL=debug
+
+# Run the example with debug logging
+LOG_LEVEL=debug node examples/github-actions.js
+
+# Run with minimal logging
+LOG_LEVEL=error node examples/github-actions.js
+```
+
 ### Additional Prerequisites for Actions
 
 - **GitHub Actions enabled** on your repository (enabled by default on public repos)
@@ -43,6 +59,28 @@ The Mediumroast API provides a safe, step-by-step workflow that includes:
 6. **Robust error handling** with clear, actionable messages
 7. **Detailed status reporting** for workflow execution and management
 
+## Logging and Output Patterns
+
+This tutorial demonstrates **production-ready logging patterns** using the structured logger module for operational visibility and debugging. Different components use appropriate logging approaches:
+
+### 📊 **Main Example Files** (`github-actions.js`)
+- **Structured Logging**: Uses `logger.info()`, `logger.error()`, `logger.debug()` for production environments
+- **Transaction Tracking**: Tracks operations with timing and context data
+- **Environment Aware**: Respects `LOG_LEVEL` environment variable (debug, info, warn, error)
+- **Operational Data**: Includes organization, repository, and operation details in log entries
+
+### 🖥️ **CLI Integration Examples** (`actions-manager-cli.js`)
+- **Console Output**: Uses `console.log()` for direct user interaction and feedback
+- **Interactive Experience**: Provides immediate visual feedback for user actions
+- **Menu Systems**: Clear, formatted output for navigation and status
+
+### 🌐 **React Web Components** (`workflow-manager.jsx`)
+- **UI State Management**: Uses React state and error boundaries
+- **User Notifications**: Visual feedback through UI components
+- **Development Logging**: `console.log()` for development debugging only
+
+**Choose the right pattern**: Use structured logging in backend services and APIs, console output for user-facing CLI tools, and UI state management for web applications.
+
 ## Basic Client Implementation
 
 ### Import Required Modules
@@ -53,7 +91,10 @@ import ConfigParser from 'configparser';
 import { readFileSync } from 'fs';
 import inquirer from 'inquirer';
 import { formatResult } from 'mediumroast_api/src/api/gitHubServer/utils/formatting.js';
+import logger from 'mediumroast_api/src/api/gitHubServer/logger.js';
 ```
+
+> **Note on Logging Patterns**: The main example files (`github-actions.js`, `github-repository.js`) use structured logging via the `logger` module for production-ready patterns with environment-aware log levels and transaction tracking. The CLI and React integration examples appropriately use `console.log` for direct user-facing output and interactive feedback.
 
 ### Initialize the API Client
 
@@ -79,39 +120,64 @@ The workflow starts by verifying that the Mediumroast for GitHub App is properly
 
 ```javascript
 async function checkGitHubAppInstallation(github) {
-    console.log('🔍 Checking GitHub App installation...');
+    const operationTracker = logger.trackTransaction('github-app-installation-check');
     
-    // Use the new API method for installation status
-    const appCheckResult = await github.actions.getInstallationStatus();
-    
-    if (!appCheckResult[0]) {
-        const appCheck = appCheckResult[2];
-        console.error('❌ GitHub App Installation Issue:', appCheck.error);
+    try {
+        logger.debug('Starting GitHub App installation check');
+        console.log('🔍 Checking GitHub App installation...');
         
-        if (!appCheck.canAccessOrg) {
-            console.error('❌ Cannot access organization');
-            console.log('Please ensure:');
-            console.log('1. The organization name is correct');
-            console.log('2. Your token has access to the organization');
+        // Use the new API method for installation status
+        const appCheckResult = await github.actions.getInstallationStatus();
+        
+        if (!appCheckResult[0]) {
+            const appCheck = appCheckResult[2];
+            logger.error('GitHub App installation check failed', {
+                error: appCheck.error,
+                canAccessOrg: appCheck.canAccessOrg
+            });
+            
+            console.error('❌ GitHub App Installation Issue:', appCheck.error);
+            
+            if (!appCheck.canAccessOrg) {
+                console.error('❌ Cannot access organization');
+                console.log('Please ensure:');
+                console.log('1. The organization name is correct');
+                console.log('2. Your token has access to the organization');
+                return false;
+            }
+            
+            console.log('❌ Mediumroast for GitHub App is not properly installed');
+            console.log('\\nTo fix this:');
+            console.log('1. Go to https://github.com/apps/mediumroast-for-github');
+            console.log('2. Click "Install" or "Configure"');
+            console.log('3. Select your organization');
+            console.log('4. Grant repository and Actions permissions');
             return false;
         }
         
-        console.log('❌ Mediumroast for GitHub App is not properly installed');
-        console.log('\\nTo fix this:');
-        console.log('1. Go to https://github.com/apps/mediumroast-for-github');
-        console.log('2. Click "Install" or "Configure"');
-        console.log('3. Select your organization');
-        console.log('4. Grant repository and Actions permissions');
+        const appCheck = appCheckResult[2];
+        logger.info('GitHub App installation validated', {
+            repositorySelection: appCheck.repositorySelection,
+            repositoryAccess: appCheck.repositoryAccess
+        });
+        
+        console.log('✅ GitHub App Installation Check:');
+        console.log(`   App Status: Properly installed`);
+        console.log(`   Repository Access: ${appCheck.repositorySelection === 'all' ? 'All repositories' : `${appCheck.repositoryAccess} repositories`}`);
+        console.log('   Actions Permissions: Valid');
+        
+        return true;
+        
+    } catch (error) {
+        logger.error('GitHub App installation check failed', {
+            error: error.message,
+            stack: error.stack
+        });
+        console.error('❌ Error checking GitHub App installation:', error.message);
         return false;
+    } finally {
+        operationTracker.end();
     }
-    
-    const appCheck = appCheckResult[2];
-    console.log('✅ GitHub App Installation Check:');
-    console.log(`   App Status: Properly installed`);
-    console.log(`   Repository Access: ${appCheck.repositorySelection === 'all' ? 'All repositories' : `${appCheck.repositoryAccess} repositories`}`);
-    console.log('   Actions Permissions: Valid');
-    
-    return true;
 }
 ```
 
@@ -121,18 +187,22 @@ Before managing workflows, verify that the repository exists and Actions are ena
 
 ```javascript
 async function checkRepositoryAndActions(github, repoName) {
-    console.log('🔍 Checking repository and Actions availability...');
+    const operationTracker = logger.trackTransaction('repository-actions-check');
     
-    const status = {
-        repository: { exists: false, error: null },
-        actions: { enabled: false, error: null }
-    };
-
     try {
+        logger.debug('Checking repository and Actions availability', { repository: repoName });
+        console.log('🔍 Checking repository and Actions availability...');
+        
+        const status = {
+            repository: { exists: false, error: null },
+            actions: { enabled: false, error: null }
+        };
+
         // Check if repository exists
         const repoResult = await github.getRepoSize();
         if (repoResult[0]) {
             status.repository.exists = true;
+            logger.info('Repository verified', { repository: repoName });
             console.log('✅ Repository exists');
             
             // Check if Actions are enabled
@@ -140,24 +210,41 @@ async function checkRepositoryAndActions(github, repoName) {
                 const actionsResult = await github.actions.getWorkflows();
                 if (actionsResult[0]) {
                     status.actions.enabled = true;
+                    logger.info('GitHub Actions enabled', { repository: repoName });
                     console.log('✅ GitHub Actions are enabled');
                 } else {
+                    logger.warn('GitHub Actions may be disabled', { repository: repoName });
                     console.log('⚠️  GitHub Actions may be disabled or no workflows exist');
                 }
             } catch (actionsError) {
                 status.actions.error = actionsError.message;
+                logger.error('Cannot access Actions', {
+                    repository: repoName,
+                    error: actionsError.message
+                });
                 console.log('❌ Cannot access Actions - may be disabled');
             }
         } else {
             status.repository.error = 'Repository not found';
+            logger.error('Repository not found', { repository: repoName });
             console.log('❌ Repository does not exist');
         }
+        
+        return status;
+        
     } catch (repoError) {
-        status.repository.error = repoError.message;
+        logger.error('Repository access check failed', {
+            repository: repoName,
+            error: repoError.message
+        });
         console.log('❌ Cannot access repository');
+        return {
+            repository: { exists: false, error: repoError.message },
+            actions: { enabled: false, error: null }
+        };
+    } finally {
+        operationTracker.end();
     }
-    
-    return status;
 }
 ```
 
@@ -181,17 +268,45 @@ async function confirmDestructiveOperation(operation, details) {
 
 // Usage examples
 async function safeDeleteWorkflow(github, workflowId) {
-    const confirmed = await confirmDestructiveOperation(
-        'delete this workflow',
-        `This will permanently delete workflow ID: ${workflowId}`
-    );
+    const operationTracker = logger.trackTransaction('safe-delete-workflow');
     
-    if (!confirmed) {
-        console.log('❌ Operation cancelled by user');
-        return [false, 'Operation cancelled', null];
+    try {
+        logger.info('Starting safe workflow deletion', { workflowId });
+        
+        const confirmed = await confirmDestructiveOperation(
+            'delete this workflow',
+            `This will permanently delete workflow ID: ${workflowId}`
+        );
+        
+        if (!confirmed) {
+            logger.info('Workflow deletion cancelled by user', { workflowId });
+            console.log('❌ Operation cancelled by user');
+            return [false, 'Operation cancelled', null];
+        }
+        
+        const result = await github.actions.deleteWorkflow(workflowId);
+        
+        if (result[0]) {
+            logger.info('Workflow deleted successfully', { workflowId });
+        } else {
+            logger.error('Workflow deletion failed', {
+                workflowId,
+                error: result[1]
+            });
+        }
+        
+        return result;
+        
+    } catch (error) {
+        logger.error('Safe workflow deletion failed', {
+            workflowId,
+            error: error.message,
+            stack: error.stack
+        });
+        return [false, error.message, null];
+    } finally {
+        operationTracker.end();
     }
-    
-    return await github.actions.deleteWorkflow(workflowId);
 }
 ```
 
@@ -204,9 +319,17 @@ For a comprehensive implementation that demonstrates the full workflow managemen
 - Menu-driven interface for all CRUD operations
 - Pre-flight checks and error handling
 - Configuration file support
+- **User-facing console output** for immediate feedback
 - Usage: `node integrations/actions-manager-cli.js`
 
-This example provides a full-featured command-line interface for managing GitHub Actions workflows with the following features:
+**➡️ [Workflow Manager React Component](./integrations/workflow-manager.jsx)**
+- Full web-based UI for workflow management
+- Real-time workflow monitoring and status updates
+- Responsive design with loading states
+- **UI state management** for user notifications
+- Usage: `<WorkflowManager token="..." org="..." repoName="..." />`
+
+> **Note**: These integration examples use `console.log()` and UI state management for user-facing output, which is appropriate for interactive applications. The main tutorial examples (`github-actions.js`) demonstrate structured logging patterns suitable for backend services and automation scripts.
 
 ### Key Features
 - **Interactive Menu System**: Easy-to-use menu for selecting operations
@@ -237,11 +360,16 @@ The CLI will guide you through all available operations with interactive prompts
 ```javascript
 import GitHubFunctions from 'mediumroast_api/src/api/github.js';
 import { formatResult } from 'mediumroast_api/src/api/gitHubServer/utils/formatting.js';
+import logger from 'mediumroast_api/src/api/gitHubServer/logger.js';
 
 async function createWorkflow() {
-    const github = new GitHubFunctions(token, org, 'workflow-creator');
+    const operationTracker = logger.trackTransaction('create-workflow');
     
-    const workflowContent = `name: CI Pipeline
+    try {
+        logger.info('Starting workflow creation');
+        const github = new GitHubFunctions(token, org, 'workflow-creator');
+        
+        const workflowContent = `name: CI Pipeline
 
 on:
   push:
@@ -268,18 +396,36 @@ jobs:
     - name: Run tests
       run: npm test
 `;
-    
-    const result = await github.actions.createWorkflow(
-        '.github/workflows/ci.yml',
-        workflowContent,
-        'Add CI workflow'
-    );
-    
-    console.log(formatResult(result, 'Workflow created successfully'));
-    
-    if (result[0]) {
-        console.log('✅ Workflow file created at:', result[2].path);
-        console.log('🔗 View at:', result[2].html_url);
+        
+        const result = await github.actions.createWorkflow(
+            '.github/workflows/ci.yml',
+            workflowContent,
+            'Add CI workflow'
+        );
+        
+        console.log(formatResult(result, 'Workflow created successfully'));
+        
+        if (result[0]) {
+            logger.info('Workflow created successfully', {
+                path: result[2].path,
+                url: result[2].html_url
+            });
+            console.log('✅ Workflow file created at:', result[2].path);
+            console.log('🔗 View at:', result[2].html_url);
+        } else {
+            logger.error('Workflow creation failed', {
+                error: result[1]
+            });
+        }
+        
+    } catch (error) {
+        logger.error('Workflow creation failed', {
+            error: error.message,
+            stack: error.stack
+        });
+        console.error('❌ Error creating workflow:', error.message);
+    } finally {
+        operationTracker.end();
     }
 }
 ```
@@ -288,33 +434,62 @@ jobs:
 
 ```javascript
 async function getWorkflowInfo() {
-    const github = new GitHubFunctions(token, org, 'workflow-reader');
+    const operationTracker = logger.trackTransaction('get-workflow-info');
     
-    // Get all workflows
-    const workflowsResult = await github.actions.getWorkflows();
-    console.log(formatResult(workflowsResult, 'Workflows retrieved successfully'));
-    
-    if (workflowsResult[0] && workflowsResult[2].workflows) {
-        const workflows = workflowsResult[2].workflows;
+    try {
+        logger.info('Starting workflow information retrieval');
+        const github = new GitHubFunctions(token, org, 'workflow-reader');
         
-        console.log(`\\n📊 Found ${workflows.length} workflow(s):`);
+        // Get all workflows
+        const workflowsResult = await github.actions.getWorkflows();
+        console.log(formatResult(workflowsResult, 'Workflows retrieved successfully'));
         
-        for (const workflow of workflows) {
-            console.log(`\\n📋 Workflow: ${workflow.name}`);
-            console.log(`   ID: ${workflow.id}`);
-            console.log(`   Path: ${workflow.path}`);
-            console.log(`   State: ${workflow.state}`);
-            console.log(`   Created: ${new Date(workflow.created_at).toLocaleString()}`);
-            console.log(`   Updated: ${new Date(workflow.updated_at).toLocaleString()}`);
+        if (workflowsResult[0] && workflowsResult[2].workflows) {
+            const workflows = workflowsResult[2].workflows;
             
-            // Get detailed workflow information
-            const detailResult = await github.actions.getWorkflow(workflow.id);
-            if (detailResult[0]) {
-                const detail = detailResult[2];
-                console.log(`   Badge URL: ${detail.badge_url}`);
-                console.log(`   HTML URL: ${detail.html_url}`);
+            logger.info('Workflows retrieved successfully', {
+                count: workflows.length,
+                workflows: workflows.map(w => ({ id: w.id, name: w.name, path: w.path }))
+            });
+            
+            console.log(`\\n📊 Found ${workflows.length} workflow(s):`);
+            
+            for (const workflow of workflows) {
+                console.log(`\\n📋 Workflow: ${workflow.name}`);
+                console.log(`   ID: ${workflow.id}`);
+                console.log(`   Path: ${workflow.path}`);
+                console.log(`   State: ${workflow.state}`);
+                console.log(`   Created: ${new Date(workflow.created_at).toLocaleString()}`);
+                console.log(`   Updated: ${new Date(workflow.updated_at).toLocaleString()}`);
+                
+                // Get detailed workflow information
+                const detailResult = await github.actions.getWorkflow(workflow.id);
+                if (detailResult[0]) {
+                    const detail = detailResult[2];
+                    console.log(`   Badge URL: ${detail.badge_url}`);
+                    console.log(`   HTML URL: ${detail.html_url}`);
+                } else {
+                    logger.warn('Could not retrieve workflow details', {
+                        workflowId: workflow.id,
+                        error: detailResult[1]
+                    });
+                }
             }
+        } else {
+            logger.warn('No workflows found or failed to retrieve workflows', {
+                success: workflowsResult[0],
+                error: workflowsResult[1]
+            });
         }
+        
+    } catch (error) {
+        logger.error('Workflow information retrieval failed', {
+            error: error.message,
+            stack: error.stack
+        });
+        console.error('❌ Error retrieving workflow information:', error.message);
+    } finally {
+        operationTracker.end();
     }
 }
 ```

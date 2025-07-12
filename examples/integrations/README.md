@@ -20,6 +20,14 @@ This directory contains complete implementation examples for integrating GitHub 
 | `repository-manager.jsx` | React Component | Web UI for repository and container operations | Web applications, admin dashboards |
 | `repository-manager.css` | CSS Styles | Responsive styling for the repository component | Web UI styling |
 
+### GitHub Companies Integration
+
+| File | Type | Description | Use Case |
+|------|------|-------------|----------|
+| `companies-manager-cli.js` | Node.js CLI | Complete CLI for company data management | Data entry, company analysis, CLI automation |
+| `company-manager.jsx` | React Component | Web UI for company CRUD operations and analytics | Web applications, data dashboards |
+| `company-manager.css` | CSS Styles | Responsive styling for the company component | Web UI styling |
+
 ### Integration Patterns
 
 Each example demonstrates different integration approaches:
@@ -60,6 +68,16 @@ node repository-manager-cli.js create --org your-org
 node repository-manager-cli.js status --detailed
 ```
 
+### GitHub Companies CLI
+
+```bash
+# Install dependencies
+npm install inquirer configparser
+
+# Run the Companies CLI
+node companies-manager-cli.js
+```
+
 ### React Components
 
 ```bash
@@ -77,6 +95,12 @@ import RepositoryManager from './integrations/repository-manager.jsx';
 import './integrations/repository-manager.css';
 
 <RepositoryManager token="your-token" org="your-org" />
+
+# Companies Manager Component
+import CompanyManager from './integrations/company-manager.jsx';
+import './integrations/company-manager.css';
+
+<CompanyManager token="your-token" org="your-org" />
 ```
 
 ## 🎯 Features Comparison
@@ -109,6 +133,21 @@ import './integrations/repository-manager.css';
 | **Configuration Management** | ✅ | ❌ |
 | **Detailed Information** | ✅ | ✅ |
 
+### GitHub Companies Examples
+
+| Feature | Companies CLI | Companies React Component |
+|---------|---------------|---------------------------|
+| **Company CRUD Operations** | ✅ | ✅ |
+| **Two-step Creation Process** | ✅ | ❌ |
+| **Profile Generation** | ✅ | ✅ |
+| **Analytics Visualization** | ✅ | ✅ |
+| **Interaction Linking** | ✅ | ✅ |
+| **Role-based Filtering** | ✅ | ✅ |
+| **Real-time Updates** | ❌ | ✅ |
+| **Responsive Design** | N/A | ✅ |
+| **Safe Deletion** | ✅ | ✅ |
+| **Comprehensive Testing** | ✅ | ❌ |
+
 ## 📖 Usage Examples
 
 ### GitHub Actions CLI
@@ -124,9 +163,18 @@ manager.config.set('GitHub', 'org', 'my-org');
 await manager.run();
 ```
 
-### Repository Management CLI
+### GitHub Companies CLI
 
-```bash
+```javascript
+// Basic usage
+const manager = new GitHubCompaniesManager('./config.ini');
+await manager.run();
+
+// Custom configuration
+const manager = new GitHubCompaniesManager();
+manager.config.set('GitHub', 'org', 'my-org');
+await manager.run();
+```
 # Interactive setup wizard
 node repository-manager-cli.js setup
 
@@ -156,6 +204,12 @@ node repository-manager-cli.js info --org my-org
   org="your-organization"
 />
 
+// Companies Manager Component
+<CompanyManager
+  token="ghp_your_token"
+  org="your-organization"
+/>
+
 // With error handling
 const [token, setToken] = useState('');
 const [org, setOrg] = useState('');
@@ -163,6 +217,7 @@ const [org, setOrg] = useState('');
 {token && org && (
   <div>
     <RepositoryManager token={token} org={org} />
+    <CompanyManager token={token} org={org} />
     <WorkflowManager token={token} org={org} repoName="discovery" />
   </div>
 )}
@@ -402,6 +457,7 @@ These examples are provided under the same license as the Mediumroast API packag
 **Need Help?**
 
 - Check the main [GitHub Actions Tutorial](../github-actions.md) for detailed explanations
-- Review the [Getting Started Guide](../github-getting-started.md) for setup instructions
+- Review the [Getting Started Guide](../github-getting-started.md) for setup instructions  
 - Test individual components to isolate issues
-- Use the built-in error handling and logging for debugging
+- Use the built-in structured logging system (`LOG_LEVEL=debug`) for detailed diagnostics
+- Enable error handling and retry logic patterns shown in the examples

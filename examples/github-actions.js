@@ -70,6 +70,7 @@
 import GitHubFunctions from '../src/api/github.js';
 import { Actions } from '../src/api/gitHubServer.js';
 import { formatResult } from '../src/api/gitHubServer/utils/formatting.js';
+import { logger } from '../src/api/gitHubServer/logger.js';
 import fs from 'fs';
 import path from 'path';
 import ConfigParser from 'configparser';
@@ -82,8 +83,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // For formatting output
-const SUCCESS_PREFIX = '✅ ';
-const ERROR_PREFIX = '❌ ';
 const WARNING_PREFIX = '⚠️ ';
 const SECTION_DIVIDER = '='.repeat(80);
 
@@ -121,30 +120,57 @@ async function confirmAction(message) {
  * @param {Array<string>} operations - Specific operations to run
  */
 async function demonstrateActionsOperations(token, org, operations) {
+  const operationTracker = logger.trackTransaction('github-actions-operations');
+  
   console.log(`\n${SECTION_DIVIDER}`);
   console.log('GITHUB ACTIONS OPERATIONS');
   console.log(SECTION_DIVIDER);
   
   try {
+    logger.debug('Starting GitHub Actions operations', { organization: org });
+    
     const github = new GitHubFunctions(token, org, 'actions-operations-example');
     const actions = new Actions(token, org, 'actions-operations-example');
     
     // First, check if the GitHub App is properly installed
     console.log('\n📋 Pre-flight checks...');
+    logger.debug('Starting pre-flight checks');
     const appCheckResult = await github.checkGitHubAppInstallation();
     
     if (!appCheckResult[0]) {
       const appCheck = appCheckResult[2];
-      console.log(`\n${ERROR_PREFIX} GitHub App Installation Issue:`);
+      logger.error('GitHub App installation check failed', {
+        organization: org,
+        error: appCheck.error,
+        canAccessOrg: appCheck.canAccessOrg
+      });
+      
+      console.log('\n❌ GitHub App Installation Issue:');
       console.log(`Message: ${appCheck.error}`);
       
       if (!appCheck.canAccessOrg) {
+        logger.error('Cannot access organization', {
+          organization: org,
+          message: 'Please ensure the organization name is correct and your token has access'
+        });
         console.log('\n❌ Cannot proceed: Unable to access the organization.');
         console.log('Please ensure:');
         console.log('1. The organization name is correct');
         console.log('2. Your token has access to the organization');
         return;
       }
+      
+      // Log detailed troubleshooting info
+      logger.error('GitHub App not properly installed', {
+        organization: org,
+        installUrl: 'https://github.com/apps/mediumroast-for-github',
+        requiredPermissions: [
+          'Repository administration',
+          'Contents (read/write)',
+          'Actions (read/write)',
+          'Metadata (read)'
+        ]
+      });
       
       console.log('\n❌ Cannot proceed: Mediumroast for GitHub app is not properly installed.');
       console.log('\nTo fix this:');
@@ -163,14 +189,22 @@ async function demonstrateActionsOperations(token, org, operations) {
         // Recursive call to re-check
         return await demonstrateActionsOperations(token, org, operations);
       } else {
+        logger.info('Setup cancelled - GitHub App installation required');
         console.log('\nSetup cancelled. Please install the GitHub App and try again.');
         return;
       }
     }
     
-    // Display successful app installation info
+    // Log successful app installation
     const appCheck = appCheckResult[2];
-    console.log(`\n${SUCCESS_PREFIX} GitHub App Installation Check:`);
+    logger.info('GitHub App installation validated', {
+      organization: org,
+      repositorySelection: appCheck.repositorySelection,
+      repositoryAccess: appCheck.repositoryAccess
+    });
+    
+    // Display successful app installation info
+    console.log('\n✅ GitHub App Installation Check:');
     console.log('✅ Mediumroast for GitHub app is properly installed');
     console.log(`✅ Repository access: ${appCheck.repositorySelection === 'all' ? 'All repositories' : `${appCheck.repositoryAccess} repositories`}`);
     console.log('✅ App has required permissions');
@@ -225,10 +259,14 @@ async function demonstrateActionsOperations(token, org, operations) {
     }
     
   } catch (error) {
+    logger.error('GitHub Actions operations failed', {
+      organization: org,
+      error: error.message,
+      stack: error.stack
+    });
     console.error('\n❌ Error in Actions operations:', error.message);
-    if (error.stack) {
-      console.error('Stack trace:', error.stack);
-    }
+  } finally {
+    operationTracker.end();
   }
 }
 
@@ -285,10 +323,11 @@ async function demonstrateActionsCreateOperations(actions, installationStatus) {
     }
     
   } catch (error) {
+    logger.error('Actions CREATE operations failed', {
+      error: error.message,
+      stack: error.stack
+    });
     console.error('\n❌ Error in Actions CREATE operations:', error.message);
-    if (error.stack) {
-      console.error('Stack trace:', error.stack);
-    }
   }
 }
 
@@ -314,7 +353,11 @@ async function demonstrateActionsReadOperations(actions) {
     
     // Display workflow run statistics
     if (allWorkflows[0] && allWorkflows[2]?.workflow_runs?.length > 0) {
-      console.log(`\n${SUCCESS_PREFIX} Found ${allWorkflows[2].workflow_runs.length} workflow runs`);
+      console.log(`\n✅ Found ${allWorkflows[2].workflow_runs.length} workflow runs`);
+      
+      logger.info('Workflow runs found', {
+        total_runs: allWorkflows[2].workflow_runs.length
+      });
       
       // Group runs by workflow
       const workflowStats = {};
@@ -362,16 +405,24 @@ async function demonstrateActionsReadOperations(actions) {
         console.log(`\n${WARNING_PREFIX} Update available!`);
         console.log(`Current version: ${updateInfo.current_version}`);
         console.log(`Latest version: ${updateInfo.latest_version}`);
+        logger.info('Update available', {
+          current_version: updateInfo.current_version,
+          latest_version: updateInfo.latest_version
+        });
       } else {
-        console.log(`\n${SUCCESS_PREFIX} You are running the latest version: ${updateInfo.current_version}`);
+        console.log(`\n✅ You are running the latest version: ${updateInfo.current_version}`);
+        logger.info('Already on latest version', {
+          current_version: updateInfo.current_version
+        });
       }
     }
     
   } catch (error) {
+    logger.error('Actions READ operations failed', {
+      error: error.message,
+      stack: error.stack
+    });
     console.error('\n❌ Error in Actions READ operations:', error.message);
-    if (error.stack) {
-      console.error('Stack trace:', error.stack);
-    }
   }
 }
 
@@ -421,11 +472,17 @@ async function demonstrateActionsUpdateOperations(actions) {
         
         if (verifyResult[0]) {
           const newVersion = verifyResult[2].version_file?.content?.version || 'unknown';
-          console.log(`\n${SUCCESS_PREFIX} Update verification: now at version ${newVersion}`);
+          console.log(`\n✅ Update verification: now at version ${newVersion}`);
+          logger.info('Update verification successful', {
+            new_version: newVersion
+          });
         }
       }
     } else {
-      console.log(`\n${SUCCESS_PREFIX} You are already running the latest version: ${updateInfo.current_version}`);
+      console.log(`\n✅ You are already running the latest version: ${updateInfo.current_version}`);
+      logger.info('Already on latest version', {
+        current_version: updateInfo.current_version
+      });
       
       // Ask if user wants to force update anyway
       const forceUpdate = await confirmAction('Would you like to force an update anyway (reinstall current version)?');
@@ -440,10 +497,11 @@ async function demonstrateActionsUpdateOperations(actions) {
     }
     
   } catch (error) {
+    logger.error('Actions UPDATE operations failed', {
+      error: error.message,
+      stack: error.stack
+    });
     console.error('\n❌ Error in Actions UPDATE operations:', error.message);
-    if (error.stack) {
-      console.error('Stack trace:', error.stack);
-    }
   }
 }
 
@@ -509,10 +567,11 @@ async function demonstrateActionsDeleteOperations(actions) {
     }
     
   } catch (error) {
+    logger.error('Actions DELETE operations failed', {
+      error: error.message,
+      stack: error.stack
+    });
     console.error('\n❌ Error in Actions DELETE operations:', error.message);
-    if (error.stack) {
-      console.error('Stack trace:', error.stack);
-    }
   }
 }
 
@@ -593,8 +652,10 @@ Prerequisites:
     
     // Check if config exists
     if (!fs.existsSync(configFile)) {
-      console.error(`${ERROR_PREFIX} Configuration file not found: ${configFile}`);
-      console.error('Please create a config.ini file with your GitHub token and organization.');
+      logger.error('Configuration file not found', {
+        configFile,
+        message: 'Please create a config.ini file with your GitHub token and organization.'
+      });
       console.error('Example:');
       console.error('[GitHub]');
       console.error('token = YOUR_GITHUB_TOKEN');
@@ -608,8 +669,10 @@ Prerequisites:
         
     // Get GitHub token and org from config
     if (!config.hasSection('GitHub') || !config.hasKey('GitHub', 'token') || !config.hasKey('GitHub', 'org')) {
-      console.error(`${ERROR_PREFIX} Configuration file missing required GitHub section or keys.`);
-      console.error('Please ensure your config.ini file has:');
+      logger.error('GitHub configuration not found in config.ini', {
+        configFile,
+        message: 'Please make sure you have [GitHub] section with \'token\' and \'org\' settings.'
+      });
       console.error('[GitHub]');
       console.error('token = YOUR_GITHUB_TOKEN');
       console.error('org = YOUR_ORGANIZATION_NAME');
@@ -619,6 +682,7 @@ Prerequisites:
     const token = config.get('GitHub', 'token');
     const org = config.get('GitHub', 'org');
         
+    logger.info('Starting GitHub Actions example', { organization: org });
     console.log(`Using organization: ${org}`);
     
     // Warn about write operations
@@ -626,6 +690,7 @@ Prerequisites:
     const globalConfirmation = await confirmAction('Do you want to continue with this example?');
     
     if (!globalConfirmation) {
+      logger.info('GitHub Actions example cancelled by user');
       console.log('\nExample cancelled by user.');
       process.exit(0);
     }
@@ -633,22 +698,37 @@ Prerequisites:
     // Get command-line arguments to determine which operations to run
     const operations = args.length > 0 ? args : []; // Empty array means run all
         
+    logger.info('GitHub Actions operations selected', {
+      operations: operations.length > 0 ? operations : ['all'],
+      organization: org
+    });
     console.log(`Operations to run: ${operations.length > 0 ? operations.join(', ') : 'all'}`);
     
     // Run the Actions operations
+    const startTime = Date.now();
     await demonstrateActionsOperations(token, org, operations);
     
+    const duration = Date.now() - startTime;
+    logger.info('GitHub Actions example completed successfully', {
+      organization: org,
+      operations: operations.length > 0 ? operations : ['all'],
+      duration_ms: duration
+    });
+    
   } catch (error) {
-    console.error(`${ERROR_PREFIX} Error in main:`, error.message);
-    if (error.stack) {
-      console.error('Stack trace:', error.stack);
-    }
+    logger.error('GitHub Actions example failed', {
+      error: error.message,
+      stack: error.stack
+    });
     process.exit(1);
   }
 }
 
 // Run the example
 main().catch(error => {
-  console.error('Unhandled error:', error);
+  logger.error('Unhandled error in GitHub Actions example', {
+    error: error.message,
+    stack: error.stack
+  });
   process.exit(1);
 });

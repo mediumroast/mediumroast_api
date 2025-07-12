@@ -206,4 +206,26 @@ export class Companies extends BaseObjects {
       tracking.end();
     }
   }
+  
+  /**
+   * Override deleteObj to handle cross-entity references
+   * @param {string} objName - Name of the company to delete
+   * @returns {Promise<Array>} Operation result
+   */
+  async deleteObj(objName) {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'deleteObj') : 
+      { end: () => {} };
+    
+    try {
+      const source = {
+        from: 'Companies',
+        to: ['Interactions']
+      };
+      return await super.deleteObj(objName, source);
+    } finally {
+      tracking.end();
+    }
+  }
 }

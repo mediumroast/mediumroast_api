@@ -35,7 +35,7 @@ export class BaseObjects {
     this.objType = objType || 'BaseObject';
     
     // Initialize GitHub API client
-    this.serverCtl = new GitHub(this.token, this.org);
+    this.serverCtl = new GitHub(this.token, this.org, this.processName);
     
     // Initialize cache manager
     this.cache = new CacheManager();
@@ -69,7 +69,8 @@ export class BaseObjects {
         'region', 'country', 'city', 'state_province', 'zip_postal', 'street_address', 'latitude', 'longitude', 'phone',
         'google_maps_url', 'google_news_url', 'google_finance_url', 'google_patents_url',
         'cik', 'stock_symbol', 'stock_exchange', 'recent_10k_url', 'recent_10q_url', 'firmographic_url', 'filings_url', 'owner_tranasactions',
-        'industry', 'industry_code', 'industry_group_code', 'industry_group_description', 'major_group_code', 'major_group_description'
+        'industry', 'industry_code', 'industry_group_code', 'industry_group_description', 'major_group_code', 'major_group_description',
+        'linked_interactions'
       ],
       Interactions: [
         'status', 'content_type', 'file_size', 'reading_time', 'word_count', 'page_count', 'description', 'abstract',
@@ -491,6 +492,8 @@ export class BaseObjects {
     if (validationError) return validationError;
 
     // Use transaction pattern for safer operations
+    let containerData = null; // Store container data for use in later steps
+    
     return this._executeTransaction([
       // Step 1: Catch container
       async () => {
@@ -500,7 +503,11 @@ export class BaseObjects {
           },
           branch: {}
         };
-        return await this.serverCtl.catchContainer(repoMetadata);
+        const result = await this.serverCtl.catchContainer(repoMetadata);
+        if (result[0]) {
+          containerData = result[2]; // Store container data for later use
+        }
+        return result;
       },
             
       // Step 2: Get SHA
@@ -513,23 +520,23 @@ export class BaseObjects {
       },
             
       // Step 3: Merge and write objects
-      async (sha, data) => {
-        // Append the new object to the existing objects
-        const mergedObjects = [...data.containers[this.objType].objects, ...objs];
+      async (sha) => {
+        // Use stored container data and the SHA from previous step
+        const mergedObjects = [...containerData.containers[this.objType].objects, ...objs];
                 
         // Write the new objects to the container
         return await this.serverCtl.writeObject(
           this.objType, 
           mergedObjects, 
-          data.branch.name,
+          containerData.branch.name,
           sha
         );
       },
             
       // Step 4: Release container
-      async (data) => {
-        // Release the container
-        const result = await this.serverCtl.releaseContainer(data);
+      async () => {
+        // Release the container using stored container data
+        const result = await this.serverCtl.releaseContainer(containerData);
                 
         // Invalidate cache if successful
         if (result[0]) {

@@ -52,6 +52,7 @@
 /* eslint-disable no-console */
 
 import GitHubFunctions from '../src/api/github.js';
+import { logger } from '../src/api/gitHubServer/logger.js';
 import fs from 'fs';
 import path from 'path';
 import ConfigParser from 'configparser';
@@ -64,8 +65,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // For formatting output
-const SUCCESS_PREFIX = '✅ ';
-const ERROR_PREFIX = '❌ ';
 const WARNING_PREFIX = '⚠️ ';
 const SECTION_DIVIDER = '='.repeat(80);
 
@@ -97,21 +96,26 @@ async function confirmAction(message) {
 }
 
 /**
- * Formats and logs operation results
+ * Formats and logs operation results using structured logging
  * @param {string} operationName - Name of the operation
  * @param {Array} result - Result array [success, message, data]
- * @param {boolean} showData - Whether to display full data object
+ * @param {boolean} showData - Whether to include data in debug logs
  */
 function logResult(operationName, result, showData = true) {
   const [success, message, data] = result;
-  const prefix = success ? SUCCESS_PREFIX : ERROR_PREFIX;
-    
-  console.log(`\n${prefix} ${operationName}:`);
-  console.log(`Status: ${success ? 'Success' : 'Failed'}`);
-  console.log(`Message: ${message?.status_msg || message}`);
-    
-  if (data && showData) {
-    console.log('Data:', JSON.stringify(data, null, 2));
+  const logData = {
+    operation: operationName,
+    success,
+    message: message?.status_msg || message
+  };
+  
+  if (success) {
+    logger.info(`Operation completed: ${operationName}`, logData);
+    if (data && showData) {
+      logger.debug(`Operation data for ${operationName}:`, data);
+    }
+  } else {
+    logger.error(`Operation failed: ${operationName}`, logData);
   }
 }
 
@@ -122,64 +126,65 @@ function logResult(operationName, result, showData = true) {
  * @param {Array<string>} operations - Specific operations to run
  */
 async function demonstrateRepositorySetup(token, org, operations) {
-  console.log(`\n${SECTION_DIVIDER}`);
-  console.log('REPOSITORY AND CONTAINER SETUP');
-  console.log(SECTION_DIVIDER);
+  const operationTracker = logger.trackTransaction('repository-setup');
   
   try {
+    logger.debug('Starting repository and container setup', { organization: org });
+    
     const github = new GitHubFunctions(token, org, 'repository-setup-example');
     
     // First, check if the GitHub App is properly installed
-    console.log('\n📋 Pre-flight checks...');
+    logger.debug('Starting pre-flight checks');
     const appCheckResult = await github.checkGitHubAppInstallation();
     
     if (!appCheckResult[0]) {
       const appCheck = appCheckResult[2];
-      console.log(`\n${ERROR_PREFIX} GitHub App Installation Issue:`);
-      console.log(`Message: ${appCheck.error}`);
+      logger.error('GitHub App installation check failed', {
+        organization: org,
+        error: appCheck.error,
+        canAccessOrg: appCheck.canAccessOrg
+      });
       
       if (!appCheck.canAccessOrg) {
-        console.log('\n❌ Cannot proceed: Unable to access the organization.');
-        console.log('Please ensure:');
-        console.log('1. The organization name is correct');
-        console.log('2. Your token has access to the organization');
+        logger.error('Cannot access organization', {
+          organization: org,
+          message: 'Please ensure the organization name is correct and your token has access'
+        });
         return;
       }
       
-      console.log('\n❌ Cannot proceed: Mediumroast for GitHub app is not properly installed.');
-      console.log('\nTo fix this:');
-      console.log('1. Go to https://github.com/apps/mediumroast-for-github');
-      console.log('2. Click "Install" or "Configure"');
-      console.log(`3. Select the "${org}" organization`);
-      console.log('4. Grant access to repositories (All repositories or select specific ones)');
-      console.log('5. Ensure the app has permissions for:');
-      console.log('   - Repository administration');
-      console.log('   - Contents (read/write)');
-      console.log('   - Actions (read/write)');
-      console.log('   - Metadata (read)');
+      // Log detailed troubleshooting info
+      logger.error('GitHub App not properly installed', {
+        organization: org,
+        installUrl: 'https://github.com/apps/mediumroast-for-github',
+        requiredPermissions: [
+          'Repository administration',
+          'Contents (read/write)',
+          'Actions (read/write)',
+          'Metadata (read)'
+        ]
+      });
       
       const retry = await confirmAction('Have you installed the GitHub App? Would you like to retry the check?');
       if (retry) {
         // Recursive call to re-check
         return await demonstrateRepositorySetup(token, org, operations);
       } else {
-        console.log('\nSetup cancelled. Please install the GitHub App and try again.');
+        logger.info('Setup cancelled - GitHub App installation required');
         return;
       }
     }
     
-    // Display successful app installation info
+    // Log successful app installation
     const appCheck = appCheckResult[2];
-    console.log(`\n${SUCCESS_PREFIX} GitHub App Installation Check:`);
-    console.log('✅ Mediumroast for GitHub app is properly installed');
-    console.log(`✅ Repository access: ${appCheck.repositorySelection === 'all' ? 'All repositories' : `${appCheck.repositoryAccess} repositories`}`);
-    console.log('✅ App has required permissions');
+    logger.info('GitHub App installation validated', {
+      organization: org,
+      repositorySelection: appCheck.repositorySelection,
+      repositoryAccess: appCheck.repositoryAccess
+    });
     
     // Check for existing installations
-    console.log(`\n${SECTION_DIVIDER}`);
-    console.log('CHECKING EXISTING INSTALLATIONS');
-    console.log(SECTION_DIVIDER);
-    
+    logger.debug('Checking for existing installations');
     const installationStatus = await checkExistingInstallations(github);
     
     // If anything exists, prompt the user
@@ -193,131 +198,172 @@ async function demonstrateRepositorySetup(token, org, operations) {
     };
     
     if (hasExistingComponents) {
+      logger.info('Existing installations detected', {
+        repository: installationStatus.repository.exists,
+        containers: installationStatus.containers.existing.length
+      });
       userDecisions = await promptForExistingInstallations(installationStatus);
       
       if (userDecisions.skipAll) {
-        console.log('\n🚫 All operations cancelled by user.');
+        logger.info('All operations cancelled by user');
         return;
       }
     } else {
-      console.log('\n✅ No existing installations detected. Proceeding with fresh setup...');
+      logger.info('No existing installations detected, proceeding with fresh setup');
     }
     
     const runAll = operations.length === 0;
     
     // Create Repository
     if ((runAll || operations.includes('repository')) && userDecisions.proceedWithRepository) {
-      console.log(`\n${SECTION_DIVIDER}`);
-      console.log('CREATE DISCOVERY REPOSITORY');
-      console.log(SECTION_DIVIDER);
+      const repoTracker = logger.trackOperation('repository', 'create');
       
-      console.log(`\nCreating repository: ${org}_discovery`);
-      console.log('This repository will store all mediumroast.io application assets.');
-      
-      // Confirm before proceeding
-      const confirmed = await confirmAction(`This will create the repository ${org}_discovery in your organization. Continue?`);
-      
-      if (!confirmed) {
-        console.log('\nRepository creation cancelled by user.');
-      } else {
-        console.log('\nCreating repository...');
-        const createRepoResult = await github.createRepository();
-        logResult('createRepository()', createRepoResult);
+      try {
+        logger.debug('Starting repository creation', {
+          repository: `${org}_discovery`,
+          organization: org
+        });
         
-        if (createRepoResult[0]) {
-          console.log(`\n${SUCCESS_PREFIX} Repository ${org}_discovery created successfully!`);
-          console.log(`Repository URL: https://github.com/${org}/${org}_discovery`);
+        // Confirm before proceeding
+        const confirmed = await confirmAction(`This will create the repository ${org}_discovery in your organization. Continue?`);
+        
+        if (!confirmed) {
+          logger.info('Repository creation cancelled by user');
+        } else {
+          const createRepoResult = await github.createRepository();
+          logResult('createRepository()', createRepoResult);
+          
+          if (createRepoResult[0]) {
+            logger.info('Repository created successfully', {
+              organization: org,
+              repository: `${org}_discovery`,
+              url: `https://github.com/${org}/${org}_discovery`
+            });
+          }
         }
+      } finally {
+        repoTracker.end();
       }
     }
     
     // Create Containers
     if ((runAll || operations.includes('containers')) && userDecisions.proceedWithContainers) {
-      console.log(`\n${SECTION_DIVIDER}`);
-      console.log('CREATE CONTAINERS (DIRECTORIES)');
-      console.log(SECTION_DIVIDER);
+      const containerTracker = logger.trackOperation('containers', 'create');
       
-      console.log('\nCreating container directories for Studies, Companies, and Interactions...');
-      
-      // Confirm before proceeding
-      const confirmed = await confirmAction('This will create three directories (Studies, Companies, Interactions) in the discovery repository. Continue?');
-      
-      if (!confirmed) {
-        console.log('\nContainer creation cancelled by user.');
-      } else {
-        console.log('\nCreating containers...');
-        const createContainersResult = await github.containerOps.createContainers();
-        logResult('containerOps.createContainers()', createContainersResult);
+      try {
+        logger.debug('Starting container creation', {
+          containers: ['Studies', 'Companies', 'Interactions'],
+          organization: org
+        });
         
-        if (createContainersResult[0]) {
-          console.log(`\n${SUCCESS_PREFIX} Containers created successfully!`);
+        // Confirm before proceeding
+        const confirmed = await confirmAction('This will create three directories (Studies, Companies, Interactions) in the discovery repository. Continue?');
+        
+        if (!confirmed) {
+          logger.info('Container creation cancelled by user');
+        } else {
+          const createContainersResult = await github.containerOps.createContainers();
+          logResult('containerOps.createContainers()', createContainersResult);
           
-          // Show the created containers
-          const containerData = createContainersResult[2];
-          if (containerData && Array.isArray(containerData)) {
-            console.log('\nContainer creation results:');
-            containerData.forEach(result => {
-              const status = result.success ? SUCCESS_PREFIX : ERROR_PREFIX;
-              const message = typeof result.message === 'object' && result.message.status_msg 
-                ? result.message.status_msg 
-                : result.message;
-              console.log(`  ${status} ${result.container}: ${message}`);
-            });
+          if (createContainersResult[0]) {
+            // Aggregate container results
+            const containerData = createContainersResult[2];
+            if (containerData && Array.isArray(containerData)) {
+              const summary = { success: 0, failed: 0, failures: [] };
+              
+              containerData.forEach(result => {
+                if (result.success) {
+                  summary.success++;
+                } else {
+                  summary.failed++;
+                  summary.failures.push({
+                    container: result.container,
+                    message: typeof result.message === 'object' && result.message.status_msg 
+                      ? result.message.status_msg 
+                      : result.message
+                  });
+                }
+              });
+              
+              logger.info('Container creation completed', {
+                total: containerData.length,
+                succeeded: summary.success,
+                failed: summary.failed,
+                organization: org
+              });
+              
+              // Log failures in detail
+              if (summary.failed > 0) {
+                logger.warn('Container creation failures', summary.failures);
+              }
+              
+              logger.debug('JSON files automatically created as part of container creation');
+            }
           }
-          
-          console.log('\n📝 JSON files are automatically created as part of container creation.');
-          console.log('No additional JSON file creation needed - containers are ready to use!');
         }
+      } finally {
+        containerTracker.end();
       }
     }
     
     // Get Organization info
     if (runAll || operations.includes('orginfo')) {
-      console.log(`\n${SECTION_DIVIDER}`);
-      console.log('ORGANIZATION INFORMATION');
-      console.log(SECTION_DIVIDER);
+      const orgTracker = logger.trackOperation('organization', 'getInfo');
       
-      console.log('\nFetching organization information...');
-      const orgResult = await github.getGitHubOrg();
-      logResult('getGitHubOrg()', orgResult, false);
-      
-      if (orgResult[0]) {
-        const orgData = orgResult[2];
-        console.log(`\n${SUCCESS_PREFIX} Organization Details:`);
-        console.log(`  Name: ${orgData.name || orgData.login}`);
-        console.log(`  Login: ${orgData.login}`);
-        console.log(`  Description: ${orgData.description || 'No description'}`);
-        console.log(`  Location: ${orgData.location || 'Not specified'}`);
-        console.log(`  Public repos: ${orgData.public_repos}`);
-        console.log(`  Private repos: ${orgData.total_private_repos || 'N/A'}`);
-        console.log(`  Members: ${orgData.collaborators || 'N/A'}`);
-        console.log(`  Created: ${new Date(orgData.created_at).toLocaleDateString()}`);
+      try {
+        logger.debug('Fetching organization information', { organization: org });
+        const orgResult = await github.getGitHubOrg();
+        logResult('getGitHubOrg()', orgResult, false);
+        
+        if (orgResult[0]) {
+          const orgData = orgResult[2];
+          logger.info('Organization information retrieved', {
+            name: orgData.name || orgData.login,
+            login: orgData.login,
+            description: orgData.description || 'No description',
+            location: orgData.location || 'Not specified',
+            public_repos: orgData.public_repos,
+            private_repos: orgData.total_private_repos || 'N/A',
+            members: orgData.collaborators || 'N/A',
+            created: new Date(orgData.created_at).toLocaleDateString()
+          });
+        }
+      } finally {
+        orgTracker.end();
       }
     }
     
     // Get Repository size
     if (runAll || operations.includes('reposize')) {
-      console.log(`\n${SECTION_DIVIDER}`);
-      console.log('REPOSITORY SIZE INFORMATION');
-      console.log(SECTION_DIVIDER);
+      const sizeTracker = logger.trackOperation('repository', 'getSize');
       
-      console.log('\nFetching repository size...');
-      const sizeResult = await github.getRepoSize();
-      logResult('getRepoSize()', sizeResult, false);
-      
-      if (sizeResult[0]) {
-        const sizeData = sizeResult[2];
-        console.log(`\n${SUCCESS_PREFIX} Repository Size:`);
-        console.log(`  Repository: ${sizeData.repository}`);
-        console.log(`  Size: ${sizeData.size_kb} KB (${sizeData.size_mb} MB)`);
+      try {
+        logger.debug('Fetching repository size information', { organization: org });
+        const sizeResult = await github.getRepoSize();
+        logResult('getRepoSize()', sizeResult, false);
+        
+        if (sizeResult[0]) {
+          const sizeData = sizeResult[2];
+          logger.info('Repository size information retrieved', {
+            repository: sizeData.repository,
+            size_kb: sizeData.size_kb,
+            size_mb: sizeData.size_mb,
+            organization: org
+          });
+        }
+      } finally {
+        sizeTracker.end();
       }
     }
     
   } catch (error) {
-    console.error('\n❌ Error in Repository setup operations:', error.message);
-    if (error.stack) {
-      console.error('Stack trace:', error.stack);
-    }
+    logger.error('Repository setup operations failed', {
+      organization: org,
+      error: error.message,
+      stack: error.stack
+    });
+  } finally {
+    operationTracker.end();
   }
 }
 
@@ -334,21 +380,21 @@ async function checkExistingInstallations(github) {
 
   try {
     // Check if repository exists
-    console.log('🔍 Checking if repository exists...');
+    logger.debug('Checking if repository exists');
     try {
       const repoResult = await github.getRepoSize();
       if (repoResult[0]) {
         status.repository.exists = true;
-        console.log('✅ Repository exists');
+        logger.debug('Repository exists');
       }
     } catch (err) {
       status.repository.error = err.message;
-      console.log('❌ Repository does not exist');
+      logger.debug('Repository does not exist');
     }
 
     // Check if containers exist (only if repository exists)
     if (status.repository.exists) {
-      console.log('🔍 Checking container directories...');
+      logger.debug('Checking container directories');
       const containers = ['Studies', 'Companies', 'Interactions'];
       
       for (const container of containers) {
@@ -356,14 +402,14 @@ async function checkExistingInstallations(github) {
           const contentResult = await github.getContent(container);
           if (contentResult[0]) {
             status.containers.existing.push(container);
-            console.log(`✅ ${container} directory exists`);
+            logger.debug(`${container} directory exists`);
           } else {
             status.containers.missing.push(container);
-            console.log(`❌ ${container} directory missing`);
+            logger.debug(`${container} directory missing`);
           }
         } catch (err) {
           status.containers.missing.push(container);
-          console.log(`❌ ${container} directory missing`);
+          logger.debug(`${container} directory missing`);
         }
       }
       
@@ -371,7 +417,10 @@ async function checkExistingInstallations(github) {
     }
 
   } catch (error) {
-    console.error('Error during installation check:', error.message);
+    logger.error('Error during installation check', {
+      error: error.message,
+      stack: error.stack
+    });
   }
 
   return status;
@@ -398,7 +447,7 @@ async function promptForExistingInstallations(installationStatus) {
     const proceed = await confirmAction('Repository already exists. Do you want to proceed anyway? (This will skip repository creation)');
     decisions.proceedWithRepository = proceed;
     if (!proceed) {
-      console.log('Repository operations will be skipped.');
+      logger.info('Repository operations will be skipped by user choice');
     }
   } else {
     console.log('  📁 Repository: ❌ NOT FOUND (will be created)');
@@ -417,7 +466,7 @@ async function promptForExistingInstallations(installationStatus) {
     const proceed = await confirmAction('Some containers already exist. Do you want to proceed? (Existing containers will be left unchanged)');
     decisions.proceedWithContainers = proceed;
     if (!proceed) {
-      console.log('Container operations will be skipped.');
+      logger.info('Container operations will be skipped by user choice');
     }
   } else if (installationStatus.repository.exists) {
     console.log('  📂 Containers: ❌ NOT FOUND (will be created)');
@@ -434,6 +483,7 @@ async function promptForExistingInstallations(installationStatus) {
     }
   }
 
+  logger.debug('User decisions for existing installations', decisions);
   return decisions;
 }
 
@@ -451,8 +501,10 @@ async function main() {
     
     // Check if config exists
     if (!fs.existsSync(configFile)) {
-      console.error(`Error: Config file not found at ${configFile}`);
-      console.error('Please create a config.ini file in the examples directory with your GitHub token and org.');
+      logger.error('Configuration file not found', {
+        configFile,
+        message: 'Please create a config.ini file in the examples directory with your GitHub token and org.'
+      });
       return;
     }
         
@@ -462,22 +514,24 @@ async function main() {
         
     // Get GitHub token and org from config
     if (!config.hasSection('GitHub') || !config.hasKey('GitHub', 'token') || !config.hasKey('GitHub', 'org')) {
-      console.error('Error: GitHub configuration not found in config.ini.');
-      console.error('Please make sure you have [GitHub] section with \'token\' and \'org\' settings.');
+      logger.error('GitHub configuration not found in config.ini', {
+        configFile,
+        message: 'Please make sure you have [GitHub] section with \'token\' and \'org\' settings.'
+      });
       return;
     }
         
     const token = config.get('GitHub', 'token');
     const org = config.get('GitHub', 'org');
         
-    console.log(`Using organization: ${org}`);
+    logger.info('Starting repository setup example', { organization: org });
     
     // Warn about write operations
     console.log(`${WARNING_PREFIX} This example performs WRITE operations that will modify your repository.`);
     const globalConfirmation = await confirmAction('Do you want to continue with these examples?');
     
     if (!globalConfirmation) {
-      console.log('\nExample cancelled by user.');
+      logger.info('Repository setup cancelled by user');
       return;
     }
         
@@ -485,25 +539,35 @@ async function main() {
     const args = process.argv.slice(2);
     const operations = args.length > 0 ? args : []; // Empty array means run all
     
-    console.log(`\nRunning operations: ${operations.length > 0 ? operations.join(', ') : 'all'}`);
+    logger.info('Repository setup operations selected', {
+      operations: operations.length > 0 ? operations : ['all'],
+      organization: org
+    });
     
     // Run repository setup demonstration
+    const startTime = Date.now();
     await demonstrateRepositorySetup(token, org, operations);
     
-    console.log(`\n${SECTION_DIVIDER}`);
-    console.log('Repository setup example completed successfully!');
-    console.log(`${SECTION_DIVIDER}`);
+    const duration = Date.now() - startTime;
+    logger.info('Repository setup example completed successfully', {
+      organization: org,
+      operations: operations.length > 0 ? operations : ['all'],
+      duration_ms: duration
+    });
         
   } catch (error) {
-    console.error('\nAn error occurred while running the example:');
-    console.error(error.message);
-    console.error('\nStack trace:');
-    console.error(error.stack);
+    logger.error('Repository setup example failed', {
+      error: error.message,
+      stack: error.stack
+    });
   }
 }
 
 // Run the example
 main().catch(error => {
-  console.error('Unhandled error:', error);
+  logger.error('Unhandled error in repository setup example', {
+    error: error.message,
+    stack: error.stack
+  });
   process.exit(1);
 });

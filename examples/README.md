@@ -19,6 +19,7 @@ Welcome to the comprehensive collection of GitHub integration examples and tutor
 |----------|-------------|-------|------------------|
 | **[Getting Started](./github-getting-started.md)** | Prerequisites, installation, and basic setup | Beginner | Environment setup, authentication, basic API usage |
 | **[Repository Management](./github-repository.md)** | Complete repository lifecycle management | Intermediate | Create repos, manage containers, batch operations |
+| **[Companies Management](./github-companies.md)** | Company data lifecycle and operations | Intermediate | CRUD operations, profile generation, interaction linking |
 | **[GitHub Actions](./github-actions.md)** | Workflow automation and management | Advanced | CRUD operations, workflow triggers, monitoring |
 
 ### Specialized Tutorials
@@ -36,10 +37,12 @@ Welcome to the comprehensive collection of GitHub integration examples and tutor
 **Building your first integration?**
 1. Start with [Getting Started](./github-getting-started.md)
 2. Follow [Repository Management](./github-repository.md) for basic operations
-3. Explore [GitHub Actions](./github-actions.md) for automation
+3. Try [Companies Management](./github-companies.md) for data operations
+4. Explore [GitHub Actions](./github-actions.md) for automation
 
 **Need specific functionality?**
 - **Repository Operations** → [Repository Tutorial](./github-repository.md)
+- **Company Data Management** → [Companies Tutorial](./github-companies.md)
 - **Workflow Automation** → [Actions Tutorial](./github-actions.md)
 - **Authentication Setup** → [Auth Tutorial](./github-auth-tutorial.md)
 
@@ -49,6 +52,7 @@ Welcome to the comprehensive collection of GitHub integration examples and tutor
 1. Complete [Getting Started](./github-getting-started.md) for environment setup
 2. Review [Authentication](./github-auth-tutorial.md) for security best practices
 3. Implement [Repository Management](./github-repository.md) for team workflows
+4. Use [Companies Management](./github-companies.md) for data collection and analysis
 
 ## 🛠️ Example Applications
 
@@ -57,7 +61,7 @@ Welcome to the comprehensive collection of GitHub integration examples and tutor
 | File | Description | Use Case |
 |------|-------------|----------|
 | `github-actions.js` | Complete CLI for GitHub Actions management | Workflow automation, CI/CD management |
-| `github-companies.js` | Company data integration example | Data collection, organization management |
+| `github-companies.js` | Company data management with CRUD operations | Data collection, organization management, analytics |
 | `github-device-auth.js` | Device authentication flow | Secure authentication for desktop apps |
 
 ### 🔧 Integration Examples

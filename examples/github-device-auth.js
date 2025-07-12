@@ -49,6 +49,7 @@ import path from 'path';
 import ConfigParser from 'configparser';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { logger } from '../src/api/gitHubServer/logger.js';
 
 // Helper to get current directory with ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -83,8 +84,15 @@ class Environ {
         config.addSection(section);
       }
       config.set(section, option, value);
+      logger.debug('Configuration setting updated', { section, option });
       return [true, config];
     } catch (error) {
+      logger.error('Error updating config setting', {
+        section,
+        option,
+        error: error.message,
+        stack: error.stack
+      });
       console.error(`Error updating config: ${error.message}`);
       return [false, config];
     }
@@ -95,62 +103,84 @@ class Environ {
  * Main function to demonstrate GitHub device flow authentication
  */
 async function main() {
-  // Define config files - sample and user config
-  const sampleConfigFile = path.join(__dirname, 'config', 'sample-config.ini');
-  const userConfigFile = path.join(__dirname, 'config.ini');
-  
-  // Check if either config exists
-  const sampleExists = fs.existsSync(sampleConfigFile);
-  const userExists = fs.existsSync(userConfigFile);
-  
-  // Choose which config to use (prefer user config if it exists)
-  const configFile = userExists ? userConfigFile : (sampleExists ? sampleConfigFile : userConfigFile);
-  const configExists = userExists || sampleExists;
+  const operationTracker = logger.trackTransaction('github-device-flow-auth');
   
   console.log('GitHub Device Flow Authentication Example');
   console.log('=======================================\n');
   
-  // Create environ helper
-  const environ = new Environ();
-  
-  // Create environment object - use sample values as fallback
-  let env = {
-    // Default GitHub client ID if no config exists
-    GitHub: {
-      clientId: 'YOUR_GITHUB_CLIENT_ID' // Will be replaced if config exists
-    }
-  };
-  
-  // If config exists, read GitHub client ID from it
-  if (configExists) {
-    console.log(`Using configuration from: ${configFile}`);
-    const config = environ.readConfig(configFile);
-    
-    if (config.hasSection('GitHub') && config.hasKey('GitHub', 'clientId')) {
-      env.clientId = config.get('GitHub', 'clientId');
-      console.log(`Using Client ID: ${env.clientId}`);
-    }
-  } else {
-    console.log('No configuration file found. Using default values.');
-    console.log('You will need to provide a valid GitHub client ID in the script or use a config file.');
-  }
-  
-  console.log('Setting up GitHub authentication...');
-  
   try {
+    logger.info('Starting GitHub device flow authentication example');
+    
+    // Define config files - sample and user config
+    const sampleConfigFile = path.join(__dirname, 'config', 'sample-config.ini');
+    const userConfigFile = path.join(__dirname, 'config.ini');
+    
+    // Check if either config exists
+    const sampleExists = fs.existsSync(sampleConfigFile);
+    const userExists = fs.existsSync(userConfigFile);
+    
+    logger.debug('Configuration file check', {
+      sampleConfigFile,
+      userConfigFile,
+      sampleExists,
+      userExists
+    });
+    
+    // Choose which config to use (prefer user config if it exists)
+    const configFile = userExists ? userConfigFile : (sampleExists ? sampleConfigFile : userConfigFile);
+    const configExists = userExists || sampleExists;
+    
+    // Create environ helper
+    const environ = new Environ();
+    
+    // Create environment object - use sample values as fallback
+    let env = {
+      // Default GitHub client ID if no config exists
+      GitHub: {
+        clientId: 'YOUR_GITHUB_CLIENT_ID' // Will be replaced if config exists
+      }
+    };
+    
+    // If config exists, read GitHub client ID from it
+    if (configExists) {
+      logger.info('Loading configuration from file', { configFile });
+      console.log(`Using configuration from: ${configFile}`);
+      const config = environ.readConfig(configFile);
+      
+      if (config.hasSection('GitHub') && config.hasKey('GitHub', 'clientId')) {
+        env.clientId = config.get('GitHub', 'clientId');
+        logger.debug('Client ID loaded from configuration', { clientId: env.clientId });
+        console.log(`Using Client ID: ${env.clientId}`);
+      }
+    } else {
+      logger.warn('No configuration file found, using default values');
+      console.log('No configuration file found. Using default values.');
+      console.log('You will need to provide a valid GitHub client ID in the script or use a config file.');
+    }
+    
+    logger.info('Setting up GitHub authentication');
+    console.log('Setting up GitHub authentication...');
+    
     // Create GitHub Auth instance
     const github = new GitHubAuth(env, environ, configFile, configExists);
     
+    logger.info('Starting device flow authentication process');
     console.log('Starting device flow authentication...');
     console.log('You will see instructions for browser authentication shortly.\n');
     
     // This will trigger the browser to open and show device code
     const tokenData = await github.getAccessTokenDeviceFlow();
     
+    logger.info('Device flow authentication successful', {
+      tokenLength: tokenData.token.length,
+      deviceCode: tokenData.deviceCode
+    });
+    
     console.log('\nAuthentication successful!');
     console.log(`Token received: ${tokenData.token.substring(0, 6)}...`);
     
     // Create or update config file
+    logger.info('Saving token to configuration file', { configFile: userConfigFile });
     console.log(`Saving token to: ${userConfigFile}`);
     const config = environ.readConfig(userConfigFile);
     
@@ -161,6 +191,7 @@ async function main() {
     
     // If we're using the sample config, copy other values
     if (configFile === sampleConfigFile && !userExists) {
+      logger.debug('Copying settings from sample configuration');
       const sampleConfig = environ.readConfig(sampleConfigFile);
       if (sampleConfig.hasKey('GitHub', 'clientId')) {
         result = environ.updateConfigSetting(result[1], 'GitHub', 'clientId', 
@@ -178,9 +209,11 @@ async function main() {
     
     // Write to user config file
     await result[1].write(userConfigFile);
+    logger.info('Token successfully saved to configuration file');
     console.log('Token saved to configuration file.');
     
     // Make a test API call to verify the token works
+    logger.info('Testing token with GitHub API call');
     console.log('\nTesting token with a simple API call...');
     const response = await fetch('https://api.github.com/user', {
       headers: {
@@ -191,21 +224,41 @@ async function main() {
     
     if (response.ok) {
       const userData = await response.json();
+      logger.info('Token validation successful', {
+        username: userData.login,
+        name: userData.name,
+        email: userData.email
+      });
+      
       console.log('Authentication validated! User details:');
       console.log(`- Username: ${userData.login}`);
       console.log(`- Name: ${userData.name || 'Not provided'}`);
       console.log(`- Email: ${userData.email || 'Not provided'}`);
     } else {
+      logger.error('Token validation failed', {
+        status: response.status,
+        statusText: response.statusText
+      });
       console.error('Token validation failed:', response.statusText);
     }
     
   } catch (error) {
+    logger.error('GitHub device flow authentication failed', {
+      error: error.message,
+      stack: error.stack
+    });
     console.error('Error during authentication:', error.message);
+  } finally {
+    operationTracker.end();
   }
 }
 
 // Run the example
 main().catch(error => {
+  logger.error('Unhandled error in GitHub device flow authentication example', {
+    error: error.message,
+    stack: error.stack
+  });
   console.error('Unhandled error:', error);
   process.exit(1);
 });
