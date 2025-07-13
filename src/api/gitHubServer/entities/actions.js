@@ -313,17 +313,17 @@ export class Actions extends BaseObjects {
                 mainBranch
               );
               
-              // Make sure the directory exists
+              // Make sure the directory exists using smart directory creation
               const dirPath = path.dirname(action.path);
               if (dirPath !== '.github/actions') {
                 logger.debug(`Ensuring directory exists: ${dirPath}`);
-                await this.serverCtl.repositoryManager.createDirectory(dirPath, mainBranch);
+                await this.serverCtl.repositoryManager.ensureDirectory(dirPath, mainBranch, true);
               }
               
               if (existsResp[0] && existsResp[2] && existsResp[2].exists) {
-                // Update existing action file
+                // Update existing action file with automatic .gitkeep cleanup
                 logger.debug(`Updating existing action file: ${action.path}`);
-                const result = await this.serverCtl.repositoryManager.createOrUpdateFile(
+                const result = await this.serverCtl.repositoryManager.createOrUpdateFileWithCleanup(
                   action.path,
                   action.content,
                   `Update action file ${action.name} to ${this._tempRelease.tag_name}`,
@@ -340,13 +340,15 @@ export class Actions extends BaseObjects {
                   timestamp: new Date().toISOString()
                 });
               } else {
-                // Create new action file
+                // Create new action file with automatic .gitkeep cleanup
                 logger.debug(`Creating new action file: ${action.path}`);
-                const result = await this.serverCtl.repositoryManager.createOrUpdateFile(
+                const result = await this.serverCtl.repositoryManager.createOrUpdateFileWithCleanup(
                   action.path,
                   action.content,
                   `Add action file ${action.name} from mr4gh-automations ${this._tempRelease.tag_name}`,
-                  mainBranch
+                  mainBranch,
+                  null,
+                  true  // Enable .gitkeep cleanup
                 );
                 
                 updateResults.push({
@@ -477,9 +479,31 @@ export class Actions extends BaseObjects {
           }
         },
 
-        // Step 4: Verify update
+        // Step 4: Clean up stale .gitkeep files
         async () => {
-          logger.debug('Starting Step 4 - Verifying update');
+          logger.debug('Starting Step 4 - Cleaning up stale .gitkeep files');
+          
+          try {
+            const cleanupResp = await this.cleanupStaleGitkeepFiles('.github', true);
+            
+            if (cleanupResp[0]) {
+              const { removed, skipped } = cleanupResp[2];
+              logger.info(`Gitkeep cleanup: ${removed} removed, ${skipped} skipped`);
+            } else {
+              logger.warn(`Gitkeep cleanup had issues: ${cleanupResp[1]}`);
+            }
+            
+            // Continue regardless of cleanup results
+            return this._createSuccess('Gitkeep cleanup completed', cleanupResp[2]);
+          } catch (err) {
+            logger.warn(`Gitkeep cleanup failed but continuing: ${err.message}`);
+            return this._createSuccess('Gitkeep cleanup skipped due to error');
+          }
+        },
+
+        // Step 5: Verify update
+        async () => {
+          logger.debug('Starting Step 5 - Verifying update');
           
           // Verify the update using the same verification method as install
           const verificationResp = await this.verifyActionsInstallation(
@@ -948,9 +972,10 @@ export class Actions extends BaseObjects {
             
             if (!githubDirResp[0] || !githubDirResp[2] || !githubDirResp[2].exists) {
               logger.info('Creating .github directory');
-              await this.serverCtl.repositoryManager.createDirectory(
+              await this.serverCtl.repositoryManager.ensureDirectory(
                 '.github',
-                mainBranch
+                mainBranch,
+                false  // Don't clean up .gitkeep for top-level .github
               );
             }
             
@@ -962,9 +987,10 @@ export class Actions extends BaseObjects {
             
             if (!workflowsDirResp[0] || !workflowsDirResp[2] || !workflowsDirResp[2].exists) {
               logger.info('Creating .github/workflows directory');
-              await this.serverCtl.repositoryManager.createDirectory(
+              await this.serverCtl.repositoryManager.ensureDirectory(
                 '.github/workflows',
-                mainBranch
+                mainBranch,
+                true  // Enable cleanup for workflows directory
               );
             }
           } catch (dirErr) {
@@ -1083,33 +1109,36 @@ export class Actions extends BaseObjects {
                 mainBranch
               );
               
-              // Make sure the directory exists
+              // Make sure the directory exists using smart directory creation
               const dirPath = path.dirname(action.path);
               if (dirPath !== '.github/actions') {
-                // Create any subdirectories needed
+                // Create any subdirectories needed with smart cleanup
                 logger.debug(`Ensuring directory exists: ${dirPath}`);
-                await this.serverCtl.repositoryManager.createDirectory(dirPath, mainBranch);
+                await this.serverCtl.repositoryManager.ensureDirectory(dirPath, mainBranch, true);
               }
               
               let result;
               if (existsResp[0] && existsResp[2] && existsResp[2].exists) {
-                // Update existing action file
+                // Update existing action file with automatic .gitkeep cleanup
                 logger.debug(`Updating existing action file: ${action.path}`);
-                result = await this.serverCtl.repositoryManager.createOrUpdateFile(
+                result = await this.serverCtl.repositoryManager.createOrUpdateFileWithCleanup(
                   action.path,
                   action.content,
                   `Update action file ${action.name} from mr4gh-automations`,
                   mainBranch,
-                  existsResp[2].sha
+                  existsResp[2].sha,
+                  true  // Enable .gitkeep cleanup
                 );
               } else {
-                // Create new action file
+                // Create new action file with automatic .gitkeep cleanup
                 logger.debug(`Creating new action file: ${action.path}`);
-                result = await this.serverCtl.repositoryManager.createOrUpdateFile(
+                result = await this.serverCtl.repositoryManager.createOrUpdateFileWithCleanup(
                   action.path,
                   action.content,
                   `Add action file ${action.name} from mr4gh-automations`,
-                  mainBranch
+                  mainBranch,
+                  null,
+                  true  // Enable .gitkeep cleanup
                 );
               }
               
@@ -1254,9 +1283,31 @@ export class Actions extends BaseObjects {
           }
         },
 
-        // Step 4: Verify installation
+        // Step 4: Clean up stale .gitkeep files
         async () => {
-          logger.debug('Starting Step 4 - Verifying installation');
+          logger.debug('Starting Step 4 - Cleaning up stale .gitkeep files');
+          
+          try {
+            const cleanupResp = await this.cleanupStaleGitkeepFiles('.github', true);
+            
+            if (cleanupResp[0]) {
+              const { removed, skipped } = cleanupResp[2];
+              logger.info(`Gitkeep cleanup: ${removed} removed, ${skipped} skipped`);
+            } else {
+              logger.warn(`Gitkeep cleanup had issues: ${cleanupResp[1]}`);
+            }
+            
+            // Continue regardless of cleanup results
+            return this._createSuccess('Gitkeep cleanup completed', cleanupResp[2]);
+          } catch (err) {
+            logger.warn(`Gitkeep cleanup failed but continuing: ${err.message}`);
+            return this._createSuccess('Gitkeep cleanup skipped due to error');
+          }
+        },
+
+        // Step 5: Verify installation
+        async () => {
+          logger.debug('Starting Step 5 - Verifying installation');
           // Use the workflow names we stored in Step 3
           const installedWorkflowNames = this._tempWorkflowNames;
           
@@ -2245,6 +2296,7 @@ export class Actions extends BaseObjects {
       let isInstalled = false;
       
       if (currentVersionResp[0]) {
+       
         isInstalled = currentVersionResp[2].installed;
         if (isInstalled && 
             currentVersionResp[2].version_file && 
@@ -2377,6 +2429,146 @@ export class Actions extends BaseObjects {
           actions: false
         }
       };
+    }
+  }
+
+  /**
+   * Clean up stale .gitkeep files from the .github directory structure
+   * @param {String} basePath - Base path to clean (defaults to '.github')
+   * @param {Boolean} recursive - Whether to clean recursively (default: true)
+   * @returns {Promise<Array>} Operation result with cleanup summary
+   */
+  async cleanupStaleGitkeepFiles(basePath = '.github', recursive = true) {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'cleanupStaleGitkeepFiles') : 
+      { end: () => {} };
+    
+    try {
+      logger.info(`Starting .gitkeep cleanup in ${basePath} (recursive: ${recursive})`);
+      
+      const cleanupResp = await this.serverCtl.repositoryManager.cleanupGitkeepFiles(
+        basePath,
+        'main',
+        recursive
+      );
+      
+      if (cleanupResp[0]) {
+        const { removed, skipped, details } = cleanupResp[2];
+        logger.info(`Gitkeep cleanup completed: ${removed} removed, ${skipped} skipped`);
+        
+        // Log detailed results
+        if (details && details.length > 0) {
+          logger.debug('Cleanup details:');
+          details.forEach(detail => {
+            if (detail.action === 'removed') {
+              logger.debug(`  ✓ Removed: ${detail.path}`);
+            } else if (detail.action === 'skipped') {
+              logger.debug(`  - Skipped: ${detail.path} (${detail.message})`);
+            } else if (detail.action === 'failed') {
+              logger.warn(`  ✗ Failed: ${detail.path} - ${detail.message}`);
+            }
+          });
+        }
+        
+        return this._createSuccess(
+          `Gitkeep cleanup completed: ${removed} files removed, ${skipped} skipped`,
+          cleanupResp[2]
+        );
+      } else {
+        return this._createError(
+          `Failed to cleanup .gitkeep files: ${cleanupResp[1]}`,
+          cleanupResp[2],
+          cleanupResp[3] || 500
+        );
+      }
+    } catch (error) {
+      return this._createError(
+        `Gitkeep cleanup failed: ${error.message}`,
+        error,
+        500
+      );
+    } finally {
+      tracking.end();
+    }
+  }
+
+  /**
+   * Perform comprehensive cleanup of Actions directory structure
+   * This includes removing stale .gitkeep files and providing analysis
+   * @returns {Promise<Array>} Operation result with cleanup and analysis
+   */
+  async performMaintenanceCleanup() {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'performMaintenanceCleanup') : 
+      { end: () => {} };
+    
+    try {
+      logger.info('Starting comprehensive Actions maintenance cleanup');
+      
+      const results = {
+        gitkeep_cleanup: null,
+        directory_analysis: null,
+        summary: {
+          gitkeep_files_removed: 0,
+          gitkeep_files_skipped: 0,
+          directories_analyzed: 0,
+          issues_found: []
+        }
+      };
+      
+      // Step 1: Clean up .gitkeep files
+      logger.info('Step 1: Cleaning up .gitkeep files');
+      const gitkeepCleanup = await this.cleanupStaleGitkeepFiles('.github', true);
+      results.gitkeep_cleanup = gitkeepCleanup;
+      
+      if (gitkeepCleanup[0]) {
+        const cleanupData = gitkeepCleanup[2];
+        results.summary.gitkeep_files_removed = cleanupData.removed || 0;
+        results.summary.gitkeep_files_skipped = cleanupData.skipped || 0;
+      } else {
+        results.summary.issues_found.push('Failed to cleanup .gitkeep files');
+      }
+      
+      // Step 2: Analyze directory structure for potential issues
+      logger.info('Step 2: Analyzing directory structure');
+      const analysisResp = await this.analyzeActionsState();
+      results.directory_analysis = analysisResp;
+      
+      if (analysisResp[0]) {
+        const analysisData = analysisResp[2];
+        if (analysisData.directories_analyzed) {
+          results.summary.directories_analyzed = Object.keys(analysisData.directories_analyzed).length;
+        }
+        
+        // Check for potential issues
+        if (analysisData.directories_analyzed) {
+          Object.entries(analysisData.directories_analyzed).forEach(([path, info]) => {
+            if (info.has_only_gitkeep) {
+              results.summary.issues_found.push(`Directory ${path} contains only .gitkeep file`);
+            }
+          });
+        }
+      }
+      
+      // Generate summary message
+      const totalIssues = results.summary.issues_found.length;
+      const summary = `Maintenance cleanup completed: ${results.summary.gitkeep_files_removed} .gitkeep files removed, ` +
+                      `${results.summary.gitkeep_files_skipped} skipped, ${results.summary.directories_analyzed} directories analyzed` +
+                      (totalIssues > 0 ? `, ${totalIssues} issues found` : '');
+      
+      logger.info(summary);
+      
+      return this._createSuccess(summary, results);
+    } catch (error) {
+      return this._createError(
+        `Maintenance cleanup failed: ${error.message}`,
+        error,
+        500
+      );
+    } finally {
+      tracking.end();
     }
   }
 }
