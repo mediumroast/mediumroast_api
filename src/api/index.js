@@ -12,6 +12,8 @@ import {
 
 import GitHubFunctions from './github.js';
 
+import { logger } from './gitHubServer/logger.js';
+
 export {
   Interactions,
   Companies,
@@ -20,5 +22,6 @@ export {
   Storage,
   Actions,
   GitHubAuth,
-  GitHubFunctions
+  GitHubFunctions,
+  logger
 };
