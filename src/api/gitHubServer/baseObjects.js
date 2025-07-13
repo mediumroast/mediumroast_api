@@ -122,7 +122,6 @@ export class BaseObjects {
    * @returns {Array} Standardized error response
    */
   _createError(message, data = null, statusCode = 400) {
-    logger.error(message, { data, statusCode });
     return [false, { status_code: statusCode, status_msg: message }, data];
   }
     
