@@ -373,7 +373,7 @@ export class BaseObjects {
    * @param {Object} allObjects - Optional pre-fetched objects to search within
    * @returns {Promise<Array>} Array containing [success, statusObject, results]
    */
-  async findByName(name, fuzzy = false, allObjects = null) {
+  async findByName(name, fuzzy = true, allObjects = null) {
     const tracking = logger.trackOperation ? 
       logger.trackOperation(this.objType, 'findByName') : 
       { end: () => {} };
