@@ -379,3 +379,11 @@ For information about the intelligent `.gitkeep` file management and cleanup fun
 - [Cleanup Demo Example](examples/gitkeep-cleanup-demo.js)
 
 This functionality addresses production issues with stale `.gitkeep` files and provides automated cleanup for GitHub Actions installations.
+
+### Fuzzy Search Functionality
+
+Enhanced search capabilities for `BaseObjects` with fuzzy (partial string) matching support:
+- [Fuzzy Search Guide](docs/FUZZY_SEARCH.md)
+- [Fuzzy Search Demo Example](examples/fuzzy-search-demo.js)
+
+This enhancement allows for partial string matching in `findByName()` and `findByX()` methods, making object discovery more flexible and user-friendly.

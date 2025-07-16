@@ -368,13 +368,17 @@ export class BaseObjects {
    * @async
    * @function findByName
    * @description Find all objects by name from the mediumroast.io application
+   * @param {string} name - The name to search for
+   * @param {boolean} fuzzy - Whether to perform fuzzy search (partial string matching). Default: false
+   * @param {Object} allObjects - Optional pre-fetched objects to search within
+   * @returns {Promise<Array>} Array containing [success, statusObject, results]
    */
-  async findByName(name) {
+  async findByName(name, fuzzy = false, allObjects = null) {
     const tracking = logger.trackOperation ? 
       logger.trackOperation(this.objType, 'findByName') : 
       { end: () => {} };
     try {
-      return await this.findByX('name', name);
+      return await this.findByX('name', name, allObjects, fuzzy);
     } finally {
       tracking.end();
     }
@@ -396,10 +400,15 @@ export class BaseObjects {
    * @async
    * @function findByX
    * @description Find all objects by attribute and value pair
+   * @param {string} attribute - The attribute to search by
+   * @param {*} value - The value to search for
+   * @param {Object} allObjects - Optional pre-fetched objects to search within
+   * @param {boolean} fuzzy - Whether to perform fuzzy search (partial string matching). Default: false
+   * @returns {Promise<Array>} Array containing [success, statusObject, results]
    */
-  async findByX(attribute, value, allObjects=null) {
-    // Create a cache key for this operation
-    const cacheKey = `${this._cacheKeys.byAttribute}_${attribute}_${value}`;
+  async findByX(attribute, value, allObjects = null, fuzzy = false) {
+    // Create a cache key for this operation (include fuzzy flag in cache key)
+    const cacheKey = `${this._cacheKeys.byAttribute}_${attribute}_${value}_${fuzzy}`;
     
     // Track this operation
     const tracking = logger.trackOperation ? 
@@ -446,21 +455,38 @@ export class BaseObjects {
             attribute == 'name' ? 
               currentObject = allObjects[obj][attribute]?.toLowerCase() : 
               currentObject = allObjects[obj][attribute];
+            
+            // Skip if current object value is null or undefined
+            if(currentObject === null || currentObject === undefined) {
+              continue;
+            }
                       
-            if(currentObject === value) {
+            // Perform exact or fuzzy matching based on fuzzy flag
+            let isMatch = false;
+            if(fuzzy && typeof currentObject === 'string' && typeof value === 'string') {
+              // Fuzzy search: check if the value is contained within the current object
+              isMatch = currentObject.includes(value);
+            } else {
+              // Exact search: direct equality comparison
+              isMatch = currentObject === value;
+            }
+            
+            if(isMatch) {
               myObjects.push(allObjects[obj]);
             }
           }
        
           if (myObjects.length === 0) { 
+            const searchType = fuzzy ? 'containing' : 'equal to';
             return this._createError(
-              `No ${this.objType} found where ${attribute} = ${value}`,
+              `No ${this.objType} found where ${attribute} is ${searchType} ${value}`,
               null,
               404
             );
           } else {
+            const searchType = fuzzy ? 'containing' : 'equal to';
             return this._createSuccess(
-              `Found ${myObjects.length} objects where ${attribute} = ${value}`,
+              `Found ${myObjects.length} objects where ${attribute} is ${searchType} ${value}`,
               myObjects
             );
           }
