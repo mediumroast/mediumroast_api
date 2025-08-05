@@ -212,15 +212,16 @@ export class BaseObjects {
                     
           if (!result[0]) {
             // Operation failed, abort transaction
+            const errorMessage = result[1]?.status_msg || result[1] || 'Unknown error';
             return this._createError(
-              `Transaction [${transactionName}] failed at step [${operationName}]: ${result[1].status_msg}`,
+              `Transaction [${transactionName}] failed at step [${operationName}]: ${errorMessage}`,
               { 
                 transactionId,
                 failedStep: operationName,
                 stepResult: result,
                 completedSteps: i
               },
-              result[1].status_code || 500
+              result[1]?.status_code || 500
             );
           }
         } catch (err) {

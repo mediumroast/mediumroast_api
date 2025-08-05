@@ -48,71 +48,13 @@ export class Studies extends BaseObjects {
           
       if (validationError) return validationError;
       
+      // Simple source - only manage Studies container, not cross-references
       const source = {
         from: 'Studies',
-        to: ['Companies', 'Interactions']
+        to: ['Studies'] // Only reference itself for simpler locking
       };
       
-      return await this._executeTransaction([
-        // Step 1: Catch containers
-        async () => {
-          let repoMetadata = {
-            containers: {
-              Studies: {},
-              Companies: {},
-              Interactions: {}
-            }, 
-            branch: {}
-          };
-          return this.serverCtl.catchContainer(repoMetadata);
-        },
-              
-        // Step 2: Get study info
-        async (data) => {
-          const studyObj = await this.findByX('name', objName, data.containers.Studies.objects);
-          if (!studyObj[0]) {
-            return studyObj; // Will abort transaction
-          }
-                  
-          // Store linked objects for later steps
-          this._tempStudy = studyObj[2][0];
-          return this._createSuccess('Found study');
-        },
-              
-        // Step 3: Delete study
-        async (data) => {
-          const deleteResult = await this.serverCtl.deleteObject(
-            objName, 
-            source, 
-            data, 
-            false
-          );
-                  
-          if (!deleteResult[0]) {
-            return deleteResult; // Will abort transaction
-          }
-                  
-          return this._createSuccess('Deleted study object');
-        },
-              
-        // Step 4: Release containers
-        async (data) => {
-          const result = await this.serverCtl.releaseContainer(data);
-          if (result[0]) {
-            // Invalidate all related caches
-            this._invalidateCache();
-            
-            // Also invalidate related entities' caches
-            this.cache.invalidate('container_Companies');
-            this.cache.invalidate('container_Interactions');
-            if (this.serverCtl.invalidateCache) {
-              this.serverCtl.invalidateCache('container_Companies');
-              this.serverCtl.invalidateCache('container_Interactions');
-            }
-          }
-          return result;
-        }
-      ], `delete-study-${objName}`);
+      return await super.deleteObj(objName, source);
     } finally {
       tracking.end();
     }

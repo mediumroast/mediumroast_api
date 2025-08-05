@@ -2,3 +2,5 @@ node_modules/
 config.ini
 tmp/
 test-*.js
+debug*.js
+*.log

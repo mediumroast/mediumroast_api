@@ -292,8 +292,12 @@ class GitHubFunctions {
         400
       );
     }
+
+    // Only pull in the file name (remove any path components)
+    const fileBits = fileName.split('/');
+    const shortFilename = fileBits[fileBits.length - 1];
         
-    const safePath = `${containerName}/${customEncodeURIComponent(fileName)}`;
+    const safePath = `${containerName}/${shortFilename}`;
     return this.repositoryManager.getSha(safePath, branchName);
   }
 
@@ -548,12 +552,100 @@ class GitHubFunctions {
         400
       );
     }
-        
-    // Create an enhanced repository manager method that handles decoding
-    return this.repositoryManager.readBlobWithDecoding(
-      customEncodeURIComponent(fileName), 
-      this.token
-    );
+
+    // Custom encoding function to handle special characters
+    const customEncodeURIComponent = (str) => {
+      return str.split('').map(char => {
+        return encodeURIComponent(char).replace(/[!'()*]/g, (c) => {
+          return '%' + c.charCodeAt(0).toString(16).toUpperCase();
+        });
+      }).join('');
+    };
+
+    const originalFileNameEncoded = customEncodeURIComponent(fileName);
+
+    // Try to download the file from the repository using the download URL
+    const downloadFile = async (url) => {
+      try {
+        const axios = (await import('axios')).default;
+        const downloadResult = await axios.get(url, { responseType: 'arraybuffer' });
+        return [true, downloadResult.data];
+      } catch (e) {
+        if (e instanceof TypeError && (e.message.includes('Request path contains unescaped characters') || e.message.includes('ERR_UNESCAPED_CHARACTERS'))) {
+          return [false, 'ERR_UNESCAPED_CHARACTERS'];
+        }
+        return [false, e];
+      }
+    };
+
+    // Re-encode the download URL
+    const reEncodeDownloadUrl = (url, originalFileName) => {
+      let urlParts = url.split('/');
+      const lastPart = urlParts.pop();
+      urlParts.pop();
+      
+      const altLastPart = lastPart.split('?');
+      const queryParams = altLastPart[altLastPart.length - 1];
+      
+      return `${urlParts.join('/')}/${originalFileName}${queryParams ? '?' + queryParams : ''}`;
+    };
+
+    // Encode the file name and obtain the download URL
+    const encodedFileName = encodeURIComponent(fileName);
+    
+    // Set the object URL
+    const objectUrl = `https://api.github.com/repos/${this.orgName}/${this.repoName}/contents/${encodedFileName}`;
+    
+    // Set the headers
+    const headers = { 'Authorization': `token ${this.token}` };
+    
+    try {
+      const axios = (await import('axios')).default;
+      
+      // Obtain the download URL
+      const result = await axios.get(objectUrl, { headers });
+      let downloadUrl = result.data.download_url;
+
+      // Attempt to download the file from the repository
+      let blobData = await downloadFile(downloadUrl);
+
+      // Check if the file was downloaded successfully
+      if (blobData[0]) {
+        return [
+          true,
+          { status_code: 200, status_msg: `read object [${fileName}]` },
+          blobData[1]
+        ];
+      } else {
+        // Check if the error is due to unescaped characters
+        if (blobData[1] === 'ERR_UNESCAPED_CHARACTERS') {
+          downloadUrl = reEncodeDownloadUrl(downloadUrl, originalFileNameEncoded);
+
+          // Try to download the file from the repository again
+          blobData = await downloadFile(downloadUrl);
+          if (blobData[0]) {
+            return [
+              true,
+              { status_code: 200, status_msg: `read object [${fileName}]` },
+              blobData[1]
+            ];
+          }
+        }
+      }
+
+      return [
+        false,
+        { status_code: 503, status_msg: `unable to read object [${fileName}] due to [${blobData[1]}].` },
+        blobData[1]
+      ];
+
+    } catch (error) {
+      return [
+        false,
+        { status_code: 503, status_msg: `unable to read object [${fileName}] due to [${error.message}].` },
+        error
+      ];
+    }
   }
 
   /**
@@ -572,16 +664,40 @@ class GitHubFunctions {
         400
       );
     }
-        
-    const safePath = `${containerName}/${customEncodeURIComponent(fileName)}`;
-    return this.repositoryManager.deleteFile(safePath, `Delete ${fileName} from ${containerName}`, branchName, sha);
+
+    // Only pull in the file name (remove any path components)
+    const fileBits = fileName.split('/');
+    const shortFilename = fileBits[fileBits.length - 1];
+
+    try {
+      const deleteResponse = await this.octCtl.rest.repos.deleteFile({
+        owner: this.orgName,
+        repo: this.repoName,
+        path: `${containerName}/${shortFilename}`,
+        branch: branchName,
+        message: `Delete object [${shortFilename}]`,
+        sha: sha
+      });
+
+      return [
+        true, 
+        { status_code: 200, status_msg: `deleted object [${shortFilename}] from container [${containerName}]` }, 
+        deleteResponse
+      ];
+    } catch (err) { 
+      return [
+        false, 
+        { status_code: 503, status_msg: `unable to delete object [${shortFilename}] from container [${containerName}]` }, 
+        err
+      ];
+    }
   }
 
   /**
      * Write a blob (file) to a container (directory)
      * @param {string} containerName - The container name
      * @param {string} fileName - The file name
-     * @param {string} blob - The blob to write
+     * @param {string} blob - The blob to write (base64 encoded content)
      * @param {string} branchName - The branch name
      * @param {string} sha - The SHA of the file if updating
      * @returns {Array} A list containing success status, message, and response
@@ -594,30 +710,39 @@ class GitHubFunctions {
         400
       );
     }
-        
-    const filePath = `${containerName}/${customEncodeURIComponent(fileName)}`;
-    const commitMessage = `Update ${fileName} in ${containerName}`;
-    
-    // If SHA is not provided, check if file exists and get its SHA
-    let fileSha = sha;
-    if (!fileSha) {
-      try {
-        const existingFile = await this.repositoryManager.getSha(filePath, branchName);
-        if (existingFile[0]) {
-          fileSha = existingFile[2];
-        }
-      } catch (error) {
-        // File doesn't exist, that's fine - we'll create it
-      }
+
+    // Only pull in the file name (remove any path components)
+    const fileBits = fileName.split('/');
+    const shortFilename = fileBits[fileBits.length - 1];
+
+    // Using the github API write a file to the container
+    let octoObj = {
+      owner: this.orgName,
+      repo: this.repoName,
+      path: `${containerName}/${shortFilename}`,
+      message: `Create object [${shortFilename}]`,
+      content: blob,
+      branch: branchName
+    };
+
+    if (sha) {
+      octoObj.sha = sha;
     }
-        
-    return this.repositoryManager.createOrUpdateFile(
-      filePath, 
-      blob, 
-      commitMessage,
-      branchName, 
-      fileSha
-    );
+
+    try {
+      const writeResponse = await this.octCtl.rest.repos.createOrUpdateFileContents(octoObj);
+      return [
+        true, 
+        `SUCCESS: wrote object [${shortFilename}] to container [${containerName}]`, 
+        writeResponse
+      ];
+    } catch (err) { 
+      return [
+        false, 
+        `ERROR: unable to write object [${shortFilename}] to container [${containerName}]`, 
+        err
+      ];
+    }
   }
 
   /**

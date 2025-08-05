@@ -1,5 +1,5 @@
 /**
- * Example demonstrating interactions read operations in the mediumroast.io API
+ * Example demonstrating interactions operations in the mediumroast.io API
  * @author Michael Hay <michael.hay@mediumroast.io>
  * @file github-interactions.js
  * @license Apache-2.0
@@ -7,13 +7,16 @@
  * @copyright 2025 Mediumroast, Inc. All rights reserved.
  * 
  * This example shows how to use the Interactions entity class to perform
- * read operations against a GitHub organization, including the new fuzzy search functionality.
+ * CRUD operations against a GitHub organization, including the new fuzzy search functionality.
  * 
  * It demonstrates:
  * - Basic read operations: getAll(), findByName(), findByX()
  * - Fuzzy search functionality with partial string matching
  * - Interaction analysis and filtering
  * - Content type and metadata exploration
+ * - Create operations with file uploads and company linking
+ * - Update operations with file handling and company linking
+ * - Delete operations with file cleanup and company unlinking
  * - Error handling and prerequisite checking
  * - Branch status operations
  * 
@@ -28,7 +31,7 @@
  * node examples/github-interactions.js
  * 
  * Or specify specific operations:
- * node examples/github-interactions.js basic fuzzy analysis metadata branch
+ * node examples/github-interactions.js basic fuzzy analysis metadata branch create update delete
  * 
  * Available operations:
  * - basic        - Basic read operations (getAll, findByName)
@@ -36,6 +39,9 @@
  * - analysis     - Interaction analysis and filtering
  * - metadata     - Content type and metadata exploration
  * - branch       - Branch status operations
+ * - create       - Create interactions with file uploads and company linking
+ * - update       - Update interactions with file handling and company linking
+ * - delete       - Delete interactions with file cleanup and company unlinking
  * 
  * This will run all operations by default.
  * 
@@ -43,6 +49,8 @@
  * 1. Repository must exist (run github-repository.js first)
  * 2. Interactions container must exist
  * 3. Data in the Interactions.json file
+ * 4. For create operations: sample_data/interactions.json and interactions_files/ directory
+ * 5. For create/update/delete operations: Companies container must exist
  * 
  * The script automatically checks these prerequisites and provides guidance.
  * 
@@ -54,7 +62,8 @@
 
 /* eslint-disable no-console */
 
-import { Interactions } from '../src/api/gitHubServer.js';
+import { Interactions, Companies } from '../src/api/gitHubServer.js';
+import GitHubFunctions from '../src/api/github.js';
 import { logger } from '../src/api/gitHubServer/logger.js';
 import fs from 'fs';
 import path from 'path';
@@ -62,6 +71,7 @@ import ConfigParser from 'configparser';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import readline from 'readline';
+import crypto from 'crypto';
 
 // Helper to get current directory with ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -177,34 +187,116 @@ async function checkPrerequisites(token, org) {
   try {
     logger.debug('Starting prerequisite checks for interactions operations', { organization: org });
     
-    // Use the Interactions class directly to check if we can get data
-    console.log('\n🔍 Checking interactions data...');
-    const interactions = new Interactions(token, org, 'interactions-prerequisite-check');
-    const allInteractionsResult = await interactions.getAll();
+    const github = new GitHubFunctions(token, org, 'interactions-prerequisite-check');
     
-    if (!allInteractionsResult[0]) {
-      logger.error('Interactions data prerequisite check failed', { organization: org, error: allInteractionsResult[1] });
-      console.log(`${ERROR_PREFIX} Cannot access interactions data`);
-      console.log(`${INFO_PREFIX} Error: ${allInteractionsResult[1]?.status_msg || allInteractionsResult[1]}`);
-      console.log(`${INFO_PREFIX} Please ensure:`);
-      console.log('  1. Repository exists (run github-repository.js first)');
-      console.log('  2. Interactions container exists');
-      console.log('  3. Interactions.json file has data');
+    // Check if repository exists
+    console.log('\n🔍 Checking repository...');
+    const repoResult = await github.getRepoSize();
+    if (!repoResult[0]) {
+      logger.error('Repository prerequisite check failed', {
+        organization: org,
+        error: repoResult[1]
+      });
+      console.error(`${ERROR_PREFIX} Repository does not exist or is not accessible`);
+      console.log(`${INFO_PREFIX} Please run repository setup first:`);
+      console.log('   node examples/github-repository.js');
+      return false;
+    }
+    logger.info('Repository prerequisite check passed', { organization: org });
+    console.log(`${SUCCESS_PREFIX} Repository exists and is accessible`);
+    
+    // Check if Interactions container exists
+    console.log('🔍 Checking Interactions container...');
+    const containerResult = await github.getContent('Interactions');
+    if (!containerResult[0]) {
+      logger.error('Interactions container prerequisite check failed', {
+        organization: org,
+        error: containerResult[1]
+      });
+      console.error(`${ERROR_PREFIX} Interactions container does not exist`);
+      console.log(`${INFO_PREFIX} Please run container setup first:`);
+      console.log('   node examples/github-repository.js containers');
+      return false;
+    }
+    logger.info('Interactions container prerequisite check passed', { organization: org });
+    console.log(`${SUCCESS_PREFIX} Interactions container exists`);
+    
+    // Check if Interactions.json file exists (optional for read operations)
+    console.log('🔍 Checking Interactions.json file...');
+    const interactionsFileResult = await github.getContent('Interactions/Interactions.json');
+    if (!interactionsFileResult[0]) {
+      logger.debug('Interactions.json file does not exist, will be created during operations');
+      console.log(`${WARNING_PREFIX} Interactions.json file does not exist, will be created during operations`);
+    } else {
+      logger.info('Interactions.json file exists', { organization: org });
+      console.log(`${SUCCESS_PREFIX} Interactions.json file exists`);
+      
+      // Check existing data for read operations
+      const interactions = new Interactions(token, org, 'interactions-prerequisite-check');
+      const allInteractionsResult = await interactions.getAll();
+      if (allInteractionsResult[0] && allInteractionsResult[2] && allInteractionsResult[2].mrJson && allInteractionsResult[2].mrJson.length > 0) {
+        logger.info('Found existing interactions data', { 
+          organization: org, 
+          interactionCount: allInteractionsResult[2].mrJson.length 
+        });
+        console.log(`${SUCCESS_PREFIX} Found ${allInteractionsResult[2].mrJson.length} existing interactions`);
+      } else {
+        logger.debug('Interactions.json file exists but contains no data');
+        console.log(`${INFO_PREFIX} Interactions.json file exists but contains no data yet`);
+      }
+    }
+    
+    // Check sample data file for CREATE operations
+    console.log('🔍 Checking sample data file...');
+    const sampleDataPath = path.join(__dirname, 'sample_data', 'interactions.json');
+    if (!fs.existsSync(sampleDataPath)) {
+      logger.error('Sample data file prerequisite check failed', { sampleDataPath });
+      console.error(`${ERROR_PREFIX} Sample data file not found: ${sampleDataPath}`);
+      console.log(`${INFO_PREFIX} Please ensure the sample_data/interactions.json file exists for CREATE operations`);
       return false;
     }
     
-    if (!allInteractionsResult[2] || !allInteractionsResult[2].mrJson || allInteractionsResult[2].mrJson.length === 0) {
-      logger.warn('Interactions data is empty', { organization: org });
-      console.log(`${WARNING_PREFIX} Interactions data is empty`);
-      console.log(`${INFO_PREFIX} Please add interaction data to the repository`);
+    // Validate sample data content
+    try {
+      const sampleData = JSON.parse(fs.readFileSync(sampleDataPath, 'utf8'));
+      if (!Array.isArray(sampleData) || sampleData.length === 0) {
+        logger.error('Sample data file is empty or invalid', { sampleDataPath });
+        console.error(`${ERROR_PREFIX} Sample data file is empty or invalid`);
+        return false;
+      }
+      logger.info('Sample data file prerequisite check passed', { 
+        sampleDataPath, 
+        interactionCount: sampleData.length 
+      });
+      console.log(`${SUCCESS_PREFIX} Sample data file found with ${sampleData.length} interactions`);
+    } catch (parseError) {
+      logger.error('Sample data file parse error', { sampleDataPath, error: parseError.message });
+      console.error(`${ERROR_PREFIX} Sample data file is not valid JSON: ${parseError.message}`);
       return false;
     }
     
-    logger.info('Interactions data prerequisite check passed', { 
-      organization: org, 
-      interactionCount: allInteractionsResult[2].mrJson.length 
-    });
-    console.log(`${SUCCESS_PREFIX} Found ${allInteractionsResult[2].mrJson.length} interactions`);
+    // Check sample interaction files directory
+    console.log('🔍 Checking sample interaction files...');
+    const sampleFilesPath = path.join(__dirname, 'sample_data', 'interactions_files');
+    if (!fs.existsSync(sampleFilesPath)) {
+      logger.error('Sample files directory prerequisite check failed', { sampleFilesPath });
+      console.error(`${ERROR_PREFIX} Sample files directory not found: ${sampleFilesPath}`);
+      console.log(`${INFO_PREFIX} Please ensure the sample_data/interactions_files/ directory exists for CREATE operations`);
+      return false;
+    }
+    
+    const sampleFiles = fs.readdirSync(sampleFilesPath).filter(file => file.endsWith('.pdf'));
+    if (sampleFiles.length === 0) {
+      logger.warn('No sample files found', { sampleFilesPath });
+      console.log(`${WARNING_PREFIX} No sample files (.pdf) found in ${sampleFilesPath}`);
+      console.log(`${INFO_PREFIX} CREATE operations may not work without sample files`);
+    } else {
+      logger.info('Sample files prerequisite check passed', { 
+        sampleFilesPath, 
+        fileCount: sampleFiles.length 
+      });
+      console.log(`${SUCCESS_PREFIX} Found ${sampleFiles.length} sample interaction files`);
+    }
     
     logger.info('All prerequisites satisfied for interactions operations', { organization: org });
     console.log(`\n${SUCCESS_PREFIX} All prerequisites satisfied for interactions operations`);
@@ -239,7 +331,9 @@ async function demonstrateBasicReadOperations(interactions) {
     logResult('getAll()', allInteractionsResult, false);
     
     if (!allInteractionsResult[0] || !allInteractionsResult[2] || !allInteractionsResult[2].mrJson || allInteractionsResult[2].mrJson.length === 0) {
-      console.log(`${ERROR_PREFIX} No interactions found - cannot demonstrate other operations`);
+      console.log(`${INFO_PREFIX} No interactions found in repository yet`);
+      console.log(`${INFO_PREFIX} This is expected for a fresh setup - CREATE operations will add data`);
+      console.log(`${INFO_PREFIX} Skipping other read operation demonstrations`);
       return;
     }
     
@@ -746,6 +840,458 @@ async function demonstrateBranchOperations(interactions, org) {
 }
 
 /**
+ * Helper function to create sample interactions with file uploads
+ * @param {Interactions} interactions - Interactions instance
+ * @param {Array} sampleInteractions - Array of interaction objects to create
+ * @param {string} operationDescription - Description for logging
+ */
+async function createInteractionsWithFiles(interactions, sampleInteractions, operationDescription) {
+  const tracker = logger.trackOperation ? 
+    logger.trackOperation('createInteractionsWithFiles', operationDescription) : 
+    { end: () => {} };
+    
+  try {
+    logger.info('Starting interaction creation using container pattern', {
+      operation: operationDescription,
+      interactionCount: sampleInteractions.length
+    });
+    
+    console.log(`\n${INFO_PREFIX} Starting ${operationDescription} creation using container pattern...`);
+    console.log(`${INFO_PREFIX} Interactions to create: ${sampleInteractions.length}`);
+    
+    // Add file paths to interactions
+    const interactionsWithFiles = sampleInteractions.map(interaction => {
+      const interactionCopy = { ...interaction };
+      
+      // If url exists, derive the file path
+      if (interaction.url && interaction.url.startsWith('Interactions/')) {
+        const fileName = interaction.url.replace('Interactions/', '');
+        const filePath = path.join(__dirname, 'sample_data', 'interactions_files', fileName);
+        
+        // Check if file exists
+        if (fs.existsSync(filePath)) {
+          interactionCopy.filePath = filePath;
+          interactionCopy.fileName = fileName;
+        }
+      }
+      
+      return interactionCopy;
+    });
+    
+    // Use the createObj method which handles the full workflow
+    const createResult = await interactions.createObj(interactionsWithFiles);
+    
+    if (createResult[0]) {
+      logger.info('Interaction creation completed successfully', {
+        operation: operationDescription,
+        interactionCount: sampleInteractions.length,
+        workflowData: createResult[2]
+      });
+      
+      console.log(`\n${SUCCESS_PREFIX} ${operationDescription} creation completed successfully!`);
+      console.log(`${SUCCESS_PREFIX} Created ${sampleInteractions.length} interactions`);
+      
+      // Show workflow details if available
+      const workflowData = createResult[2];
+      if (workflowData && workflowData.containers) {
+        console.log(`\n${INFO_PREFIX} Workflow Details:`);
+        console.log('   - Containers processed: ' + Object.keys(workflowData.containers).join(', '));
+        if (workflowData.containers.interactions) {
+          console.log('   - Interactions container updated');
+        }
+        if (workflowData.containers.companies) {
+          console.log('   - Companies container updated with links');
+        }
+      }
+      
+      // List the created interactions
+      console.log(`\n${INFO_PREFIX} Created interactions:`);
+      sampleInteractions.forEach((interaction, index) => {
+        const hasFile = interaction.url ? ' (with file)' : '';
+        console.log(`  ${index + 1}. ${interaction.name}${hasFile}`);
+      });
+      
+    } else {
+      logger.error('Interaction creation failed', {
+        operation: operationDescription,
+        interactionCount: sampleInteractions.length,
+        error: createResult[1],
+        errorData: createResult[2]
+      });
+      
+      console.error(`\n${ERROR_PREFIX} ${operationDescription} creation failed`);
+      console.error(`Error: ${createResult[1]?.status_msg || createResult[1]}`);
+      
+      if (createResult[2]) {
+        console.error('\nDetailed error information:');
+        console.error(JSON.stringify(createResult[2], null, 2));
+      }
+    }
+    
+  } catch (error) {
+    logger.error('Error during interaction creation', {
+      operation: operationDescription,
+      interactionCount: sampleInteractions.length,
+      error: error.message,
+      stack: error.stack
+    });
+    
+    console.error(`\n${ERROR_PREFIX} Error during ${operationDescription} creation:`, error.message);
+    if (error.stack) {
+      console.error('Stack trace:', error.stack);
+    }
+  } finally {
+    tracker.end();
+  }
+}
+
+/**
+ * Demonstrates Interactions CREATE operations
+ * @param {Interactions} interactions - Interactions instance
+ * @param {Array} sampleInteractions - Sample interactions data
+ */
+async function demonstrateInteractionsCreateOperations(interactions, sampleInteractions) {
+  console.log(`\n${SECTION_DIVIDER}`);
+  console.log('INTERACTIONS CREATE OPERATIONS');
+  console.log(SECTION_DIVIDER);
+  
+  try {
+    // Get existing interactions to avoid duplicates
+    const existingInteractionsResult = await interactions.getAll();
+    let existingInteractionNames = [];
+    
+    if (existingInteractionsResult[0] && existingInteractionsResult[2] && existingInteractionsResult[2].mrJson) {
+      existingInteractionNames = existingInteractionsResult[2].mrJson.map(interaction => interaction.name);
+      console.log(`\n${INFO_PREFIX} Found ${existingInteractionNames.length} existing interactions`);
+    } else {
+      console.log('\n${INFO_PREFIX} No existing interactions found (or container doesn\'t exist yet)');
+    }
+    
+    // Filter out interactions that already exist
+    const interactionsToCreate = sampleInteractions.filter(interaction => 
+      !existingInteractionNames.includes(interaction.name)
+    );
+    
+    if (interactionsToCreate.length === 0) {
+      console.log('\n✅ All sample interactions already exist. Nothing to create.');
+      return;
+    }
+    
+    // Step 1: Create first 2 test interactions
+    const testInteractions = interactionsToCreate.slice(0, 2);
+    if (testInteractions.length > 0) {
+      console.log(`\n${INFO_PREFIX} Step 1: Create test interactions`);
+      console.log(`${INFO_PREFIX} First ${testInteractions.length} test interactions to create:`);
+      testInteractions.forEach((interaction, index) => {
+        console.log(`  ${index + 1}. ${interaction.name}`);
+      });
+      
+      const testConfirmed = await confirmAction(`Create ${testInteractions.length} test interactions?`);
+      
+      if (testConfirmed) {
+        await createInteractionsWithFiles(interactions, testInteractions, 'test interactions');
+      } else {
+        console.log('\nTest interaction creation skipped.');
+      }
+    } else {
+      console.log(`\n${INFO_PREFIX} No test interactions to create (first 2 already exist).`);
+    }
+    
+    // Step 2: Create remaining interactions
+    const remainingInteractions = interactionsToCreate.slice(2);
+    if (remainingInteractions.length > 0) {
+      console.log(`\n${INFO_PREFIX} Step 2: Create remaining interactions`);
+      console.log(`${INFO_PREFIX} ${remainingInteractions.length} remaining interactions to create:`);
+      remainingInteractions.slice(0, 3).forEach((interaction, index) => {
+        console.log(`  ${index + 1}. ${interaction.name}`);
+      });
+      if (remainingInteractions.length > 3) {
+        console.log(`  ... and ${remainingInteractions.length - 3} more`);
+      }
+      
+      const remainingConfirmed = await confirmAction(`Create ${remainingInteractions.length} remaining interactions?`);
+      
+      if (remainingConfirmed) {
+        await createInteractionsWithFiles(interactions, remainingInteractions, 'remaining interactions');
+      } else {
+        console.log('\nRemaining interaction creation skipped.');
+      }
+    } else {
+      console.log(`\n${INFO_PREFIX} No remaining interactions to create (all already exist).`);
+    }
+    
+  } catch (error) {
+    logger.error('Interactions CREATE operations failed', {
+      error: error.message,
+      stack: error.stack
+    });
+    console.error('\n❌ Error in Interactions CREATE operations:', error.message);
+  }
+}
+
+/**
+ * Demonstrates Interactions UPDATE operations
+ * @param {Interactions} interactions - Interactions instance
+ */
+async function demonstrateInteractionsUpdateOperations(interactions) {
+  console.log(`\n${SECTION_DIVIDER}`);
+  console.log('INTERACTIONS UPDATE OPERATIONS');
+  console.log(SECTION_DIVIDER);
+  
+  try {
+    // Get all interactions to find one to update
+    console.log('\n🔍 Finding interactions to update...');
+    const allInteractionsResult = await interactions.getAll();
+    
+    if (!allInteractionsResult[0] || !allInteractionsResult[2] || !allInteractionsResult[2].mrJson || allInteractionsResult[2].mrJson.length === 0) {
+      console.log(`${ERROR_PREFIX} No interactions found to update`);
+      return;
+    }
+    
+    const allInteractions = allInteractionsResult[2].mrJson;
+    console.log(`${SUCCESS_PREFIX} Found ${allInteractions.length} interactions`);
+    
+    // Pick the first interaction to update
+    const interactionToUpdate = allInteractions[0];
+    console.log(`\n${INFO_PREFIX} Selected interaction to update: "${interactionToUpdate.name}"`);
+    
+    // Update test 1: Modify description
+    console.log(`\n${SECTION_DIVIDER}`);
+    console.log('UPDATE TEST 1: MODIFY DESCRIPTION');
+    console.log(SECTION_DIVIDER);
+    
+    const confirmed = await confirmAction(`Update description for "${interactionToUpdate.name}"?`);
+    
+    if (confirmed) {
+      const originalDescription = interactionToUpdate.description;
+      const updatedInteraction = {
+        ...interactionToUpdate,
+        description: `${originalDescription} [Updated on ${new Date().toISOString()}]`,
+        modification_date: new Date().toISOString()
+      };
+      
+      console.log(`\n${INFO_PREFIX} Updating interaction description...`);
+      const updateResult = await interactions.updateObj(updatedInteraction);
+      logResult('updateObj() [description update]', updateResult, false);
+      
+      if (updateResult[0]) {
+        console.log(`${SUCCESS_PREFIX} Description updated successfully`);
+        console.log(`${INFO_PREFIX} Original: ${originalDescription.substring(0, 100)}...`);
+        console.log(`${INFO_PREFIX} Updated: ${updatedInteraction.description.substring(0, 100)}...`);
+      }
+    } else {
+      console.log('\nUpdate operation skipped.');
+    }
+    
+    // Update test 2: Add/modify tags
+    console.log(`\n${SECTION_DIVIDER}`);
+    console.log('UPDATE TEST 2: MODIFY TAGS');
+    console.log(SECTION_DIVIDER);
+    
+    const tagsConfirmed = await confirmAction(`Add/modify tags for "${interactionToUpdate.name}"?`);
+    
+    if (tagsConfirmed) {
+      const updatedInteraction = {
+        ...interactionToUpdate,
+        tags: {
+          ...interactionToUpdate.tags,
+          'updated-tag': 5.0,
+          'example-tag': 3.5
+        },
+        modification_date: new Date().toISOString()
+      };
+      
+      console.log(`\n${INFO_PREFIX} Updating interaction tags...`);
+      const updateResult = await interactions.updateObj(updatedInteraction);
+      logResult('updateObj() [tags update]', updateResult, false);
+      
+      if (updateResult[0]) {
+        console.log(`${SUCCESS_PREFIX} Tags updated successfully`);
+        console.log(`${INFO_PREFIX} Added tags: updated-tag (5.0), example-tag (3.5)`);
+      }
+    } else {
+      console.log('\nTags update operation skipped.');
+    }
+    
+    // Update test 3: Modify company links
+    console.log(`\n${SECTION_DIVIDER}`);
+    console.log('UPDATE TEST 3: MODIFY COMPANY LINKS');
+    console.log(SECTION_DIVIDER);
+    
+    const linksConfirmed = await confirmAction(`Update company links for "${interactionToUpdate.name}"?`);
+    
+    if (linksConfirmed) {
+      // Get available companies
+      const companies = new Companies(interactions.token, interactions.org, 'update-test');
+      const companiesResult = await companies.getAll();
+      
+      if (companiesResult[0] && companiesResult[2] && companiesResult[2].mrJson && companiesResult[2].mrJson.length > 0) {
+        const availableCompanies = companiesResult[2].mrJson;
+        const companyToLink = availableCompanies[0];
+        
+        const updatedInteraction = {
+          ...interactionToUpdate,
+          linked_companies: {
+            ...interactionToUpdate.linked_companies,
+            [companyToLink.name]: crypto.createHash('sha256').update(companyToLink.name).digest('hex')
+          },
+          modification_date: new Date().toISOString()
+        };
+        
+        console.log(`\n${INFO_PREFIX} Linking to company: ${companyToLink.name}`);
+        const updateResult = await interactions.updateObj(updatedInteraction);
+        logResult('updateObj() [company links update]', updateResult, false);
+        
+        if (updateResult[0]) {
+          console.log(`${SUCCESS_PREFIX} Company links updated successfully`);
+          console.log(`${INFO_PREFIX} Linked to: ${companyToLink.name}`);
+        }
+      } else {
+        console.log(`${WARNING_PREFIX} No companies available to link to`);
+      }
+    } else {
+      console.log('\nCompany links update operation skipped.');
+    }
+    
+  } catch (error) {
+    logger.error('Interactions UPDATE operations failed', {
+      error: error.message,
+      stack: error.stack
+    });
+    console.error('\n❌ Error in Interactions UPDATE operations:', error.message);
+  }
+}
+
+/**
+ * Demonstrates Interactions DELETE operations
+ * @param {Interactions} interactions - Interactions instance
+ */
+async function demonstrateInteractionsDeleteOperations(interactions) {
+  console.log(`\n${SECTION_DIVIDER}`);
+  console.log('INTERACTIONS DELETE OPERATIONS');
+  console.log(SECTION_DIVIDER);
+  
+  try {
+    // Get all interactions to find ones to delete
+    console.log('\n🔍 Finding interactions to delete...');
+    const allInteractionsResult = await interactions.getAll();
+    
+    if (!allInteractionsResult[0] || !allInteractionsResult[2] || !allInteractionsResult[2].mrJson || allInteractionsResult[2].mrJson.length === 0) {
+      console.log(`${ERROR_PREFIX} No interactions found to delete`);
+      return;
+    }
+    
+    const allInteractions = allInteractionsResult[2].mrJson;
+    console.log(`${SUCCESS_PREFIX} Found ${allInteractions.length} interactions`);
+    
+    // Find interactions that might be safe to delete (look for test interactions)
+    const testInteractions = allInteractions.filter(interaction => 
+      interaction.name.toLowerCase().includes('test') || 
+      interaction.description?.toLowerCase().includes('test') ||
+      interaction.description?.toLowerCase().includes('updated on')
+    );
+    
+    if (testInteractions.length === 0) {
+      console.log(`${WARNING_PREFIX} No test interactions found to safely delete`);
+      console.log(`${INFO_PREFIX} Available interactions:`);
+      allInteractions.slice(0, 3).forEach((interaction, index) => {
+        console.log(`  ${index + 1}. ${interaction.name}`);
+      });
+      
+      const confirmed = await confirmAction(`Delete the first interaction "${allInteractions[0].name}"?`);
+      
+      if (confirmed) {
+        await performDeleteOperation(interactions, allInteractions[0]);
+      } else {
+        console.log('\nDelete operation skipped.');
+      }
+      return;
+    }
+    
+    console.log(`\n${INFO_PREFIX} Found ${testInteractions.length} test interactions that can be safely deleted:`);
+    testInteractions.forEach((interaction, index) => {
+      console.log(`  ${index + 1}. ${interaction.name}`);
+    });
+    
+    // Delete test 1: Delete first test interaction
+    console.log(`\n${SECTION_DIVIDER}`);
+    console.log('DELETE TEST 1: DELETE TEST INTERACTION');
+    console.log(SECTION_DIVIDER);
+    
+    const interactionToDelete = testInteractions[0];
+    const confirmed = await confirmAction(`Delete interaction "${interactionToDelete.name}"?`);
+    
+    if (confirmed) {
+      await performDeleteOperation(interactions, interactionToDelete);
+    } else {
+      console.log('\nDelete operation skipped.');
+    }
+    
+    // Delete test 2: Bulk delete if multiple test interactions
+    if (testInteractions.length > 1) {
+      console.log(`\n${SECTION_DIVIDER}`);
+      console.log('DELETE TEST 2: BULK DELETE TEST INTERACTIONS');
+      console.log(SECTION_DIVIDER);
+      
+      const remainingTestInteractions = testInteractions.slice(1);
+      console.log(`${INFO_PREFIX} ${remainingTestInteractions.length} remaining test interactions:`);
+      remainingTestInteractions.forEach((interaction, index) => {
+        console.log(`  ${index + 1}. ${interaction.name}`);
+      });
+      
+      const bulkConfirmed = await confirmAction(`Delete all ${remainingTestInteractions.length} remaining test interactions?`);
+      
+      if (bulkConfirmed) {
+        for (const interaction of remainingTestInteractions) {
+          await performDeleteOperation(interactions, interaction);
+        }
+      } else {
+        console.log('\nBulk delete operation skipped.');
+      }
+    }
+    
+  } catch (error) {
+    logger.error('Interactions DELETE operations failed', {
+      error: error.message,
+      stack: error.stack
+    });
+    console.error('\n❌ Error in Interactions DELETE operations:', error.message);
+  }
+}
+
+/**
+ * Helper function to perform delete operation
+ * @param {Interactions} interactions - Interactions instance
+ * @param {Object} interaction - Interaction to delete
+ */
+async function performDeleteOperation(interactions, interaction) {
+  console.log(`\n${INFO_PREFIX} Deleting interaction: "${interaction.name}"`);
+  
+  // Show what will be deleted
+  console.log(`${INFO_PREFIX} Interaction details:`);
+  console.log(`  - Name: ${interaction.name}`);
+  console.log(`  - File: ${interaction.url || 'No file'}`);
+  console.log(`  - Linked companies: ${Object.keys(interaction.linked_companies || {}).length}`);
+  
+  const deleteResult = await interactions.deleteObj(interaction.name);
+  logResult('deleteObj() [interaction deletion]', deleteResult, false);
+  
+  if (deleteResult[0]) {
+    console.log(`${SUCCESS_PREFIX} Interaction deleted successfully`);
+    console.log(`${INFO_PREFIX} Deleted: ${interaction.name}`);
+    
+    // Show what was cleaned up
+    const deletionData = deleteResult[2];
+    if (deletionData && deletionData.containers) {
+      console.log(`${INFO_PREFIX} Cleanup completed:`);
+      console.log('  - Interaction removed from container');
+      console.log('  - File deleted (if existed)');
+      console.log('  - Company links removed');
+    }
+  }
+}
+
+/**
  * Demonstrates Interactions operations
  * @param {string} token - GitHub token
  * @param {string} org - GitHub organization
@@ -790,6 +1336,44 @@ async function demonstrateInteractionsOperations(token, org, operations) {
       await demonstrateBranchOperations(interactions, org);
     }
     
+    // CREATE Operations
+    if (runAll || operations.includes('create')) {
+      // Load sample interaction data
+      const sampleDataPath = path.join(__dirname, 'sample_data', 'interactions.json');
+      console.log(`\n${INFO_PREFIX} Loading sample interaction data from: ${sampleDataPath}`);
+      
+      if (!fs.existsSync(sampleDataPath)) {
+        console.error(`${ERROR_PREFIX} Sample data file not found: ${sampleDataPath}`);
+        console.log(`${INFO_PREFIX} Please ensure the sample_data/interactions.json file exists`);
+        return;
+      }
+      
+      const sampleInteractions = JSON.parse(fs.readFileSync(sampleDataPath, 'utf8'));
+      
+      // Filter to only those with files for testing
+      const interactionsWithFiles = sampleInteractions.filter(interaction => 
+        interaction.url && interaction.url.startsWith('Interactions/')
+      );
+      
+      console.log(`${SUCCESS_PREFIX} Loaded ${sampleInteractions.length} sample interactions`);
+      console.log(`${INFO_PREFIX} Found ${interactionsWithFiles.length} interactions with files`);
+      
+      // Use first 4 interactions for testing
+      const testInteractions = interactionsWithFiles.slice(0, 4);
+      
+      await demonstrateInteractionsCreateOperations(interactions, testInteractions);
+    }
+    
+    // UPDATE Operations
+    if (runAll || operations.includes('update')) {
+      await demonstrateInteractionsUpdateOperations(interactions);
+    }
+    
+    // DELETE Operations
+    if (runAll || operations.includes('delete')) {
+      await demonstrateInteractionsDeleteOperations(interactions);
+    }
+    
   } catch (error) {
     logger.error('Error in Interactions operations', {
       organization: org,
@@ -798,9 +1382,6 @@ async function demonstrateInteractionsOperations(token, org, operations) {
       stack: error.stack
     });
     console.error(`\n${ERROR_PREFIX} Error in Interactions operations: ${error.message}`);
-    if (error.stack) {
-      console.error('Stack trace:', error.stack);
-    }
   } finally {
     operationTracker.end();
   }
@@ -811,42 +1392,38 @@ async function demonstrateInteractionsOperations(token, org, operations) {
  */
 async function main() {
   console.log(`${SECTION_DIVIDER}`);
-  console.log('MEDIUMROAST API - INTERACTIONS READ OPERATIONS EXAMPLE');
+  console.log('MEDIUMROAST API - INTERACTIONS OPERATIONS EXAMPLE');
   console.log(`${SECTION_DIVIDER}`);
   
   try {
-    // Get config file path
-    const configFile = path.join(__dirname, 'config.ini');
-    
-    // Check if config exists
-    if (!fs.existsSync(configFile)) {
-      console.error(`${ERROR_PREFIX} Config file not found at ${configFile}`);
-      console.error(`${INFO_PREFIX} Please create a config.ini file in the examples directory with your GitHub token and org.`);
-      console.error(`${INFO_PREFIX} The file should contain:`);
-      console.error('  [GitHub]');
-      console.error('  token = YOUR_GITHUB_TOKEN');
-      console.error('  org = YOUR_ORGANIZATION_NAME');
-      return;
-    }
-    
-    // Read config
+    // Load configuration
     const config = new ConfigParser();
-    config.read(configFile);
+    const configPath = path.join(__dirname, 'config.ini');
     
-    // Get GitHub token and org from config
-    if (!config.hasSection('GitHub') || !config.hasKey('GitHub', 'token') || !config.hasKey('GitHub', 'org')) {
-      console.error(`${ERROR_PREFIX} GitHub configuration not found in config.ini.`);
-      console.error(`${INFO_PREFIX} Please make sure you have [GitHub] section with 'token' and 'org' settings.`);
+    if (!fs.existsSync(configPath)) {
+      console.error(`${ERROR_PREFIX} Configuration file not found: ${configPath}`);
+      console.log(`${INFO_PREFIX} Please create a config.ini file with your GitHub token and organization.`);
+      console.log(`${INFO_PREFIX} Example config.ini:`);
+      console.log('[GitHub]');
+      console.log('token = YOUR_GITHUB_TOKEN');
+      console.log('org = YOUR_ORGANIZATION_NAME');
       return;
     }
     
+    config.read(configPath);
     const token = config.get('GitHub', 'token');
     const org = config.get('GitHub', 'org');
     
-    console.log(`${INFO_PREFIX} Using organization: ${org}`);
+    if (!token || !org) {
+      console.error(`${ERROR_PREFIX} Missing GitHub token or organization in config.ini`);
+      return;
+    }
+    
+    logger.info('Starting GitHub Interactions example', { organization: org });
     
     // Check prerequisites
     const prerequisitesPassed = await checkPrerequisites(token, org);
+    
     if (!prerequisitesPassed) {
       console.log(`\n${ERROR_PREFIX} Prerequisites not met. Please resolve the issues above before running the example.`);
       return;
@@ -862,7 +1439,16 @@ async function main() {
     console.log(`\n${SECTION_DIVIDER}`);
     console.log(`${SUCCESS_PREFIX} Example completed successfully!`);
     console.log(`${INFO_PREFIX} You can run specific operations by passing arguments:`);
-    console.log(`${INFO_PREFIX} node examples/github-interactions.js basic fuzzy analysis metadata branch`);
+    console.log(`${INFO_PREFIX} node examples/github-interactions.js basic fuzzy analysis metadata branch create update delete`);
+    console.log(`${INFO_PREFIX} Available operations:`);
+    console.log(`${INFO_PREFIX} - basic: Basic read operations (getAll, findByName)`);
+    console.log(`${INFO_PREFIX} - fuzzy: Fuzzy search demonstrations`);
+    console.log(`${INFO_PREFIX} - analysis: Interaction analysis and filtering`);
+    console.log(`${INFO_PREFIX} - metadata: Content type and metadata exploration`);
+    console.log(`${INFO_PREFIX} - branch: Branch status operations`);
+    console.log(`${INFO_PREFIX} - create: Create interactions with file uploads and company linking`);
+    console.log(`${INFO_PREFIX} - update: Update interactions with file handling and company linking`);
+    console.log(`${INFO_PREFIX} - delete: Delete interactions with file cleanup and company unlinking`);
     
   } catch (error) {
     logger.error('Unhandled error in GitHub Interactions example', {

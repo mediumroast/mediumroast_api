@@ -28,22 +28,168 @@ export class Interactions extends BaseObjects {
   }
 
   /**
-   * Override deleteObj to handle cross-entity references
+   * Override deleteObj to handle file deletion and company unlinking
    * @param {string} objName - Name of the interaction to delete
+   * @param {Object} options - Options for deletion
    * @returns {Promise<Array>} Operation result
    */
-  async deleteObj(objName) {
+  async deleteObj(objName, options = {}) {
     // Track this operation
     const tracking = logger.trackOperation ? 
       logger.trackOperation(this.objType, 'deleteObj') : 
       { end: () => {} };
     
     try {
-      const source = {
-        from: 'Interactions',
-        to: ['Companies']
-      };
-      return await super.deleteObj(objName, source);
+      // Validate parameters
+      const validationError = this._validateParams(
+        { objName },
+        { objName: 'string' }
+      );
+          
+      if (validationError) return validationError;
+      
+      // Use transaction pattern for safer operations
+      let interactionContainerData = null;
+      let companiesContainerData = null;
+      let interactionToDelete = null;
+      let repoMetadata = null;
+      
+      return this._executeTransaction([
+        // Step 1: Catch containers and find interaction
+        async () => {
+          logger.debug('Catching containers for interaction deletion', {
+            interactionName: objName,
+            options
+          });
+          
+          repoMetadata = {
+            containers: {
+              Interactions: {},
+              Companies: {}
+            }, 
+            branch: {}
+          };
+          
+          const containerResult = await this.serverCtl.catchContainer(repoMetadata);
+          if (!containerResult[0]) {
+            return containerResult;
+          }
+          
+          // Extract container data
+          repoMetadata = containerResult[2];
+          interactionContainerData = repoMetadata.containers.Interactions;
+          companiesContainerData = repoMetadata.containers.Companies;
+          
+          // Find the interaction to delete
+          const existingInteractions = interactionContainerData.objects || [];
+          interactionToDelete = existingInteractions.find(i => i.name === objName);
+          
+          if (!interactionToDelete) {
+            return this._createError(`Interaction not found: ${objName}`, null, 404);
+          }
+          
+          return this._createSuccess('Containers caught and interaction found');
+        },
+        
+        // Step 2: Delete associated file
+        async () => {
+          if (interactionToDelete.url && interactionToDelete.url.startsWith('Interactions/')) {
+            logger.debug('Deleting interaction file', {
+              fileName: interactionToDelete.url
+            });
+            
+            const fileName = interactionToDelete.url.replace('Interactions/', '');
+            
+            // Get file SHA
+            const fileResult = await this.serverCtl.getSha('Interactions', fileName, interactionContainerData.branch);
+            if (fileResult[0]) {
+              const deleteResult = await this.serverCtl.deleteBlob(
+                'Interactions',
+                fileName,
+                interactionContainerData.branch,
+                fileResult[2]
+              );
+              
+              if (!deleteResult[0]) {
+                return deleteResult;
+              }
+            }
+          }
+          
+          return this._createSuccess('File deleted successfully');
+        },
+        
+        // Step 3: Remove interaction from container
+        async () => {
+          logger.debug('Removing interaction from container', {
+            interactionName: objName
+          });
+          
+          const existingInteractions = interactionContainerData.objects || [];
+          const filteredInteractions = existingInteractions.filter(i => i.name !== objName);
+          
+          const writeResult = await this.serverCtl.writeObject(
+            'Interactions',
+            filteredInteractions,
+            repoMetadata.branch.name,
+            interactionContainerData.objectSha
+          );
+          
+          return writeResult;
+        },
+        
+        // Step 4: Remove links from companies
+        async (deleteResult) => {
+          logger.debug('Removing interaction links from companies', {
+            interactionName: objName
+          });
+          
+          const existingCompanies = companiesContainerData.objects || [];
+          let companiesModified = false;
+          
+          // Remove interaction links from all companies
+          for (const company of existingCompanies) {
+            if (company.linked_interactions && company.linked_interactions[objName]) {
+              delete company.linked_interactions[objName];
+              companiesModified = true;
+            }
+          }
+          
+          if (companiesModified) {
+            const companiesWriteResult = await this.serverCtl.writeObject(
+              'Companies',
+              existingCompanies,
+              repoMetadata.branch.name,
+              companiesContainerData.objectSha
+            );
+            
+            if (!companiesWriteResult[0]) {
+              return companiesWriteResult;
+            }
+          }
+          
+          return deleteResult;
+        },
+        
+        // Step 5: Release containers
+        async () => {
+          logger.debug('Releasing containers after interaction deletion');
+          
+          const releaseResult = await this.serverCtl.releaseContainer(repoMetadata);
+          if (!releaseResult[0]) {
+            return releaseResult;
+          }
+          
+          return this._createSuccess(
+            `Successfully deleted interaction: ${objName}`,
+            {
+              deletedInteraction: interactionToDelete,
+              containers: releaseResult[2]
+            }
+          );
+        }
+      ], `delete-interaction-${objName}`);
+      
     } finally {
       tracking.end();
     }
@@ -528,6 +674,448 @@ export class Interactions extends BaseObjects {
         error,
         500
       );
+    } finally {
+      tracking.end();
+    }
+  }
+
+  /**
+   * Override createObj to handle file uploads and company linking
+   * @param {Array} objs - Array of interaction objects to create
+   * @param {Object} options - Options for creation including file handling
+   * @returns {Promise<Array>} Operation result
+   */
+  async createObj(objs, options = {}) {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'createObj') : 
+      { end: () => {} };
+    
+    try {
+      // Validate parameters
+      const validationError = this._validateParams(
+        { objs },
+        { objs: 'array' }
+      );
+          
+      if (validationError) return validationError;
+      
+      logger.debug('Starting interaction creation', {
+        interactionCount: objs.length,
+        options
+      });
+      
+      // Use transaction pattern for safer operations with both containers
+      let interactionContainerData = null;
+      let companiesContainerData = null;
+      let branchInfo = null;
+      let repoMetadata = null;
+      
+      return this._executeTransaction([
+        // Step 1: Catch both containers (Interactions and Companies)
+        async () => {
+          logger.debug('Catching containers for interaction creation', {
+            interactionCount: objs.length,
+            hasFiles: objs.some(obj => obj.filePath)
+          });
+          
+          repoMetadata = {
+            containers: {
+              Interactions: {},
+              Companies: {}
+            }, 
+            branch: {}
+          };
+          
+          const containerResult = await this.serverCtl.catchContainer(repoMetadata);
+          if (!containerResult[0]) {
+            return containerResult;
+          }
+          
+          // Extract container data
+          repoMetadata = containerResult[2];
+          interactionContainerData = repoMetadata.containers.Interactions;
+          companiesContainerData = repoMetadata.containers.Companies;
+          branchInfo = repoMetadata.branch;
+          
+          return this._createSuccess(
+            'Containers caught successfully',
+            {
+              interactions: interactionContainerData,
+              companies: companiesContainerData,
+              branch: branchInfo
+            }
+          );
+        },
+        
+        // Step 2: Upload files if they exist
+        // eslint-disable-next-line no-unused-vars
+        async (_containerData) => {
+          logger.debug('Uploading files for interactions', {
+            interactionCount: objs.length
+          });
+          
+          const fileUploadResults = [];
+          
+          for (const obj of objs) {
+            if (obj.filePath && obj.fileName) {
+              // Read file content
+              const fs = await import('fs');
+              const fileContent = fs.readFileSync(obj.filePath);
+              const base64Content = fileContent.toString('base64');
+              
+              // Upload to Interactions directory
+              const uploadResult = await this.serverCtl.writeBlob(
+                'Interactions',
+                obj.fileName,
+                base64Content,
+                branchInfo.name,
+                null // No SHA for new files
+              );
+              
+              if (!uploadResult[0]) {
+                return uploadResult;
+              }
+              
+              fileUploadResults.push({
+                fileName: obj.fileName,
+                result: uploadResult
+              });
+              
+              // Set the URL in the interaction object
+              obj.url = `Interactions/${obj.fileName}`;
+            }
+          }
+          
+          return this._createSuccess(
+            `Files uploaded successfully: ${fileUploadResults.length}`,
+            fileUploadResults
+          );
+        },
+        
+        // Step 3: Create interactions
+        async (uploadResults) => {
+          logger.debug('Creating interaction objects', {
+            interactionCount: objs.length
+          });
+          
+          // Get current interactions
+          const existingInteractions = interactionContainerData.objects || [];
+          
+          // Add new interactions
+          const updatedInteractions = [...existingInteractions, ...objs];
+          
+          // Write updated interactions
+          const writeResult = await this.serverCtl.writeObject(
+            'Interactions',
+            updatedInteractions,
+            branchInfo.name,
+            interactionContainerData.objectSha
+          );
+          
+          if (!writeResult[0]) {
+            return writeResult;
+          }
+          
+          return this._createSuccess(
+            `Created ${objs.length} interactions successfully`,
+            {
+              interactions: writeResult[2],
+              uploadResults: uploadResults[2]
+            }
+          );
+        },
+        
+        // Step 4: Update company links
+        async (creationResults) => {
+          logger.debug('Updating company links', {
+            interactionCount: objs.length
+          });
+          
+          const companiesUpdateResults = [];
+          
+          // Get current companies
+          const existingCompanies = companiesContainerData.objects || [];
+          
+          // Update companies with new interaction links
+          for (const obj of objs) {
+            if (obj.linked_companies && Object.keys(obj.linked_companies).length > 0) {
+              for (const companyName of Object.keys(obj.linked_companies)) {
+                const companyIndex = existingCompanies.findIndex(c => c.name === companyName);
+                if (companyIndex !== -1) {
+                  if (!existingCompanies[companyIndex].linked_interactions) {
+                    existingCompanies[companyIndex].linked_interactions = {};
+                  }
+                  existingCompanies[companyIndex].linked_interactions[obj.name] = obj.linked_companies[companyName];
+                  companiesUpdateResults.push({
+                    company: companyName,
+                    interaction: obj.name,
+                    action: 'linked'
+                  });
+                }
+              }
+            }
+          }
+          
+          // Write updated companies if any were modified
+          if (companiesUpdateResults.length > 0) {
+            const companiesWriteResult = await this.serverCtl.writeObject(
+              'Companies',
+              existingCompanies,
+              branchInfo.name,
+              companiesContainerData.objectSha
+            );
+            
+            if (!companiesWriteResult[0]) {
+              return companiesWriteResult;
+            }
+          }
+          
+          return this._createSuccess(
+            `Updated company links: ${companiesUpdateResults.length}`,
+            {
+              interactions: creationResults[2],
+              companyLinks: companiesUpdateResults
+            }
+          );
+        },
+        
+        // Step 5: Release containers
+        async (linkResults) => {
+          logger.debug('Releasing containers after interaction creation');
+          
+          // Release containers using the complete repoMetadata
+          const releaseResult = await this.serverCtl.releaseContainer(repoMetadata);
+          if (!releaseResult[0]) {
+            return releaseResult;
+          }
+          
+          return this._createSuccess(
+            `Successfully created ${objs.length} interactions with file uploads and company linking`,
+            {
+              interactions: linkResults[2],
+              containers: releaseResult[2]
+            }
+          );
+        }
+      ], `create-interactions-${objs.length}`);
+      
+    } finally {
+      tracking.end();
+    }
+  }
+
+  /**
+   * Override updateObj to handle file updates and company linking
+   * @param {Object} objToUpdate - Interaction object to update
+   * @param {Object} options - Options for update including file handling
+   * @returns {Promise<Array>} Operation result
+   */
+  async updateObj(objToUpdate, options = {}) {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'updateObj') : 
+      { end: () => {} };
+    
+    try {
+      // Validate parameters
+      const validationError = this._validateParams(
+        { objToUpdate },
+        { objToUpdate: 'object' }
+      );
+          
+      if (validationError) return validationError;
+      
+      logger.debug('Starting interaction update', {
+        interactionName: objToUpdate.name,
+        options
+      });
+      
+      // Use transaction pattern for safer operations
+      let interactionContainerData = null;
+      let companiesContainerData = null;
+      let repoMetadata = null;
+      
+      return this._executeTransaction([
+        // Step 1: Catch both containers
+        async () => {
+          logger.debug('Catching containers for interaction update', {
+            interactionName: objToUpdate.name
+          });
+          
+          repoMetadata = {
+            containers: {
+              Interactions: {},
+              Companies: {}
+            }, 
+            branch: {}
+          };
+          
+          const containerResult = await this.serverCtl.catchContainer(repoMetadata);
+          if (!containerResult[0]) {
+            return containerResult;
+          }
+          
+          // Extract container data
+          repoMetadata = containerResult[2];
+          interactionContainerData = repoMetadata.containers.Interactions;
+          companiesContainerData = repoMetadata.containers.Companies;
+          
+          return this._createSuccess('Containers caught successfully');
+        },
+        
+        // Step 2: Update file if needed
+        async () => {
+          if (objToUpdate.filePath && objToUpdate.fileName) {
+            logger.debug('Updating file for interaction', {
+              fileName: objToUpdate.fileName
+            });
+            
+            const fs = await import('fs');
+            const fileContent = fs.readFileSync(objToUpdate.filePath);
+            const base64Content = fileContent.toString('base64');
+            
+            // Get existing file SHA if it exists
+            const existingFile = await this.serverCtl.getSha('Interactions', objToUpdate.fileName, repoMetadata.branch.name);
+            const fileSha = existingFile[0] ? existingFile[2] : null;
+            
+            const uploadResult = await this.serverCtl.writeBlob(
+              'Interactions',
+              objToUpdate.fileName,
+              base64Content,
+              repoMetadata.branch.name,
+              fileSha
+            );
+            
+            if (!uploadResult[0]) {
+              return uploadResult;
+            }
+            
+            // Update URL in object
+            objToUpdate.url = `Interactions/${objToUpdate.fileName}`;
+          }
+          
+          return this._createSuccess('File updated successfully');
+        },
+        
+        // Step 3: Update interaction
+        async () => {
+          logger.debug('Updating interaction object', {
+            interactionName: objToUpdate.name
+          });
+          
+          const existingInteractions = interactionContainerData.objects || [];
+          const interactionIndex = existingInteractions.findIndex(i => i.name === objToUpdate.name);
+          
+          if (interactionIndex === -1) {
+            return this._createError(`Interaction not found: ${objToUpdate.name}`, null, 404);
+          }
+          
+          // Update the interaction
+          existingInteractions[interactionIndex] = { ...existingInteractions[interactionIndex], ...objToUpdate };
+          
+          const writeResult = await this.serverCtl.writeObject(
+            'Interactions',
+            existingInteractions,
+            repoMetadata.branch.name,
+            interactionContainerData.objectSha
+          );
+          
+          return writeResult;
+        },
+        
+        // Step 4: Update company links if needed
+        async (updateResult) => {
+          if (objToUpdate.linked_companies) {
+            logger.debug('Updating company links', {
+              interactionName: objToUpdate.name
+            });
+            
+            const existingCompanies = companiesContainerData.objects || [];
+            let companiesModified = false;
+            
+            // Update company links
+            for (const companyName of Object.keys(objToUpdate.linked_companies)) {
+              const companyIndex = existingCompanies.findIndex(c => c.name === companyName);
+              if (companyIndex !== -1) {
+                if (!existingCompanies[companyIndex].linked_interactions) {
+                  existingCompanies[companyIndex].linked_interactions = {};
+                }
+                existingCompanies[companyIndex].linked_interactions[objToUpdate.name] = objToUpdate.linked_companies[companyName];
+                companiesModified = true;
+              }
+            }
+            
+            if (companiesModified) {
+              const companiesWriteResult = await this.serverCtl.writeObject(
+                'Companies',
+                existingCompanies,
+                repoMetadata.branch.name,
+                companiesContainerData.objectSha
+              );
+              
+              if (!companiesWriteResult[0]) {
+                return companiesWriteResult;
+              }
+            }
+          }
+          
+          return this._createSuccess('Company links updated successfully', updateResult);
+        },
+        
+        // Step 5: Release containers
+        async (result) => {
+          logger.debug('Releasing containers after interaction update');
+          
+          const releaseResult = await this.serverCtl.releaseContainer(repoMetadata);
+          if (!releaseResult[0]) {
+            return releaseResult;
+          }
+          
+          return this._createSuccess(
+            `Successfully updated interaction: ${objToUpdate.name}`,
+            {
+              interaction: result[2],
+              containers: releaseResult[2]
+            }
+          );
+        }
+      ], `update-interaction-${objToUpdate.name}`);
+      
+    } finally {
+      tracking.end();
+    }
+  }
+
+  /**
+   * Bulk create interactions with file uploads
+   * @param {Array} interactions - Array of interaction objects with file paths
+   * @param {Object} options - Options for bulk creation
+   * @returns {Promise<Array>} Operation result
+   */
+  async bulkCreateWithFiles(interactions, options = {}) {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'bulkCreateWithFiles') : 
+      { end: () => {} };
+    
+    try {
+      // Validate parameters
+      const validationError = this._validateParams(
+        { interactions },
+        { interactions: 'array' }
+      );
+          
+      if (validationError) return validationError;
+      
+      logger.info('Starting bulk create with files', {
+        interactionCount: interactions.length,
+        hasFiles: interactions.filter(i => i.filePath).length
+      });
+      
+      // Use createObj which handles the full workflow
+      return await this.createObj(interactions, options);
+      
     } finally {
       tracking.end();
     }

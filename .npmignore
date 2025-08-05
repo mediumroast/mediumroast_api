@@ -48,3 +48,10 @@ cleanup-json-files.js
 
 # Files to exclude from npm package
 *_deprecate.js
+
+# Github Actions and CI files
+.github/
+
+# Examples and documentation that shouldn't be published
+examples/
+docs/
