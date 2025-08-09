@@ -730,6 +730,33 @@ class GitHubFunctions {
     }
 
     try {
+      // If no SHA is provided, first check if the file exists
+      if (!sha) {
+        try {
+          const existingFile = await this.octCtl.rest.repos.getContent({
+            owner: this.orgName,
+            repo: this.repoName,
+            path: `${containerName}/${shortFilename}`,
+            ref: branchName
+          });
+          
+          // If file exists, we need its SHA for update
+          if (existingFile.data && existingFile.data.sha) {
+            octoObj.sha = existingFile.data.sha;
+          }
+        } catch (existError) {
+          // File doesn't exist, which is fine for creation
+          // 404 error is expected for new files
+          if (existError.status !== 404) {
+            return [
+              false, 
+              `ERROR: unable to check if file exists [${shortFilename}] in container [${containerName}]: ${existError.message}`, 
+              existError
+            ];
+          }
+        }
+      }
+
       const writeResponse = await this.octCtl.rest.repos.createOrUpdateFileContents(octoObj);
       return [
         true, 

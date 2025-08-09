@@ -59,6 +59,7 @@ MICROSCOPE="🔬"
 SCRIPT_NAME="CRUR Workflow Test"
 SCRIPT_VERSION="3.0.0"
 START_TIME=$(date)
+START_TIMESTAMP=$(date +%s)
 
 # Logging functions
 log_header() {
@@ -346,16 +347,26 @@ generate_summary_report() {
     log_header "${BOOK} WORKFLOW COMPLETION SUMMARY"
     
     local end_time=$(date)
-    local duration=$(($(date +%s) - $(date -d "$START_TIME" +%s) 2>/dev/null || echo "N/A"))
+    local end_timestamp=$(date +%s)
+    local duration=$((end_timestamp - START_TIMESTAMP))
+    local duration_formatted="N/A"
+    
+    if [[ $duration -ge 0 ]]; then
+        if [[ $duration -ge 60 ]]; then
+            local minutes=$((duration / 60))
+            local seconds=$((duration % 60))
+            duration_formatted="${minutes}m ${seconds}s"
+        else
+            duration_formatted="${duration}s"
+        fi
+    fi
     
     log_success "CRUR Workflow Test completed successfully!"
     echo ""
     log_info "Script: $SCRIPT_NAME v$SCRIPT_VERSION"
     log_info "Start time: $START_TIME"
     log_info "End time: $end_time"
-    if [[ "$duration" != "N/A" ]]; then
-        log_info "Duration: ${duration} seconds"
-    fi
+    log_info "Duration: $duration_formatted"
     echo ""
     log_success "Completed workflows:"
     log_success "  ${ROCKET} Repository setup and Actions installation"
