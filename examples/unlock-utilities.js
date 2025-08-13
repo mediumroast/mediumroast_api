@@ -58,8 +58,8 @@ const SUCCESS_PREFIX = '✅';
 const ERROR_PREFIX = '❌';
 const SECTION_DIVIDER = '='.repeat(80);
 
-// Container types available for unlocking
-const CONTAINER_TYPES = ['Studies', 'Companies', 'Interactions', 'Users', 'Actions'];
+// Container types available for unlocking (only these containers support locking)
+const CONTAINER_TYPES = ['Studies', 'Companies', 'Interactions'];
 
 /**
  * Creates a readline interface for user input
@@ -103,7 +103,7 @@ function displayHelp() {
   console.log('  node examples/unlock-utilities.js [options]');
   console.log('');
   console.log('Options:');
-  console.log('  --container <name>  Unlock specific container (Studies, Companies, Interactions, Users, Actions)');
+  console.log('  --container <name>  Unlock specific container (Studies, Companies, Interactions)');
   console.log('  --all              Unlock all containers');
   console.log('  --status           Show lock status of all containers');
   console.log('  --force            Force unlock even if lock seems valid');
@@ -125,7 +125,7 @@ function displayHelp() {
 }
 
 /**
- * Check if a container is locked
+ * Check if a container is locked by looking for ANY .lock files
  * @param {GitHubFunctions} github - GitHub functions instance
  * @param {string} containerName - Name of the container
  * @returns {Promise<Object>} Lock status information
@@ -138,29 +138,61 @@ async function checkContainerLockStatus(github, containerName) {
   try {
     logger.debug('Checking container lock status', { container: containerName });
     
-    // Try to check if container is locked using the GitHubFunctions method
-    const lockCheckResult = await github.checkForLock(containerName);
+    // Use direct GitHub API access to check for ANY .lock files
+    const octokit = github.octCtl; // Access the octokit instance from GitHubFunctions
+    const orgName = github.orgName;
+    const repoName = github.repoName;
     
-    if (lockCheckResult[0]) {
-      // Successfully checked lock status
-      const isLocked = lockCheckResult[2];
-      const lockInfo = lockCheckResult[2];
-      
-      return {
-        success: true,
-        exists: true,
-        locked: isLocked,
-        lockInfo: lockInfo,
-        message: isLocked ? 'Container is locked' : 'Container is not locked'
-      };
-    } else {
-      // Could not check lock status - might be because container doesn't exist
+    // Get the latest commit
+    const latestCommit = await octokit.rest.repos.getCommit({
+      owner: orgName,
+      repo: repoName,
+      ref: 'main',
+    });
+
+    // Check if container directory exists and get its contents
+    let containerContents;
+    try {
+      containerContents = await octokit.rest.repos.getContent({
+        owner: orgName,
+        repo: repoName,
+        ref: latestCommit.data.sha,
+        path: containerName
+      });
+    } catch (err) {
       return {
         success: false,
         exists: false,
         locked: false,
-        error: lockCheckResult[1],
-        message: `Could not check lock status: ${lockCheckResult[1]}`
+        error: err.message,
+        message: `Container ${containerName} does not exist or is not accessible: ${err.message}`
+      };
+    }
+
+    // Find any .lock files
+    const lockFiles = containerContents.data.filter(item => 
+      item.name.endsWith('.lock')
+    );
+
+    if (lockFiles.length > 0) {
+      logger.debug('Lock files found', { container: containerName, lockFiles: lockFiles.map(f => f.name) });
+      
+      return {
+        success: true,
+        exists: true,
+        locked: true,
+        lockFiles: lockFiles,
+        lockInfo: lockFiles.map(f => ({ name: f.name, size: f.size, path: f.path })),
+        message: `Container is locked with ${lockFiles.length} lock file(s): ${lockFiles.map(f => f.name).join(', ')}`
+      };
+    } else {
+      return {
+        success: true,
+        exists: true,
+        locked: false,
+        lockFiles: [],
+        lockInfo: null,
+        message: 'Container is not locked'
       };
     }
     
@@ -183,7 +215,7 @@ async function checkContainerLockStatus(github, containerName) {
 }
 
 /**
- * Attempt to unlock a container using a simulated release operation
+ * Attempt to unlock a container by deleting its lock files
  * @param {GitHubFunctions} github - GitHub functions instance
  * @param {string} containerName - Name of the container to unlock
  * @param {boolean} force - Force unlock even if lock seems valid
@@ -204,6 +236,16 @@ async function unlockContainer(github, containerName, force = false, dryRun = fa
     
     if (dryRun) {
       console.log(`${INFO_PREFIX} [DRY RUN] Would attempt to unlock container: ${containerName}`);
+      
+      // Still check for locks to show what would be done
+      const lockStatus = await checkContainerLockStatus(github, containerName);
+      if (lockStatus.locked && lockStatus.lockFiles) {
+        console.log(`${INFO_PREFIX} [DRY RUN] Would delete ${lockStatus.lockFiles.length} lock file(s):`);
+        lockStatus.lockFiles.forEach(lockFile => {
+          console.log(`${INFO_PREFIX} [DRY RUN]   - ${lockFile.name}`);
+        });
+      }
+      
       return {
         success: true,
         action: 'dry-run',
@@ -231,11 +273,13 @@ async function unlockContainer(github, containerName, force = false, dryRun = fa
     }
     
     // If not forcing, warn about potentially valid locks
-    if (!force && lockStatus.lockInfo) {
-      console.log(`${WARNING_PREFIX} Container ${containerName} appears to be locked by a valid process`);
-      console.log(`${INFO_PREFIX} Lock info:`, JSON.stringify(lockStatus.lockInfo, null, 2));
+    if (!force && lockStatus.lockFiles && lockStatus.lockFiles.length > 0) {
+      console.log(`${WARNING_PREFIX} Container ${containerName} has ${lockStatus.lockFiles.length} lock file(s):`);
+      lockStatus.lockFiles.forEach(lockFile => {
+        console.log(`${INFO_PREFIX}   - ${lockFile.name} (${lockFile.size} bytes)`);
+      });
       
-      const confirmUnlock = await confirmAction('Do you want to force unlock this container?');
+      const confirmUnlock = await confirmAction('Do you want to delete these lock files?');
       if (!confirmUnlock) {
         return {
           success: false,
@@ -245,97 +289,80 @@ async function unlockContainer(github, containerName, force = false, dryRun = fa
       }
     }
     
-    // Attempt to unlock the container by creating a minimal metadata and releasing
-    console.log(`${INFO_PREFIX} Attempting to unlock container: ${containerName}`);
+    // Delete each lock file
+    console.log(`${INFO_PREFIX} Deleting ${lockStatus.lockFiles.length} lock file(s) from ${containerName}...`);
     
-    try {
-      // Create minimal repo metadata for the unlock operation
-      const repoMetadata = {
-        containers: {
-          [containerName]: {}
-        },
-        branch: {
-          name: `unlock-${containerName}-${Date.now()}`,
-          sha: null
-        }
-      };
-      
-      // Try to catch the container first to get proper metadata
-      const catchResult = await github.catchContainer(repoMetadata);
-      
-      if (catchResult[0]) {
-        // Successfully caught container, now release it to unlock
-        const releaseResult = await github.releaseContainer(catchResult[2]);
+    const octokit = github.octCtl;
+    const orgName = github.orgName;
+    const repoName = github.repoName;
+    const deleteResults = [];
+    
+    for (const lockFile of lockStatus.lockFiles) {
+      try {
+        console.log(`${INFO_PREFIX} Deleting ${lockFile.name}...`);
         
-        if (releaseResult[0]) {
-          logger.info('Container unlocked successfully via release', { container: containerName });
-          return {
-            success: true,
-            action: 'unlocked',
-            message: `Successfully unlocked ${containerName} via container release`,
-            result: releaseResult[2]
-          };
-        } else {
-          logger.error('Failed to release container for unlock', { 
-            container: containerName, 
-            error: releaseResult[1] 
-          });
-          return {
-            success: false,
-            action: 'failed',
-            message: `Failed to release ${containerName} for unlock: ${releaseResult[1]}`,
-            error: releaseResult[1]
-          };
-        }
-      } else {
-        // Could not catch container - try direct unlock with getSha
-        console.log(`${INFO_PREFIX} Container catch failed, trying direct unlock...`);
+        // Get the file SHA first
+        const fileInfo = await octokit.rest.repos.getContent({
+          owner: orgName,
+          repo: repoName,
+          path: lockFile.path,
+          ref: 'main'
+        });
         
-        // Get the current commit SHA for the main branch
-        const shaResult = await github.getSha(containerName, `${containerName}/${containerName}.json`);
+        // Delete the file
+        const deleteResult = await octokit.rest.repos.deleteFile({
+          owner: orgName,
+          repo: repoName,
+          path: lockFile.path,
+          message: `Unlock container ${containerName}: Remove stuck lock file ${lockFile.name}`,
+          sha: fileInfo.data.sha,
+          branch: 'main'
+        });
         
-        if (shaResult[0]) {
-          const unlockResult = await github.unlockContainer(containerName, shaResult[2]);
-          
-          if (unlockResult[0]) {
-            logger.info('Container unlocked successfully via direct unlock', { container: containerName });
-            return {
-              success: true,
-              action: 'unlocked',
-              message: `Successfully unlocked ${containerName} via direct unlock`,
-              result: unlockResult[2]
-            };
-          } else {
-            logger.error('Failed to unlock container directly', { 
-              container: containerName, 
-              error: unlockResult[1] 
-            });
-            return {
-              success: false,
-              action: 'failed',
-              message: `Failed to unlock ${containerName} directly: ${unlockResult[1]}`,
-              error: unlockResult[1]
-            };
-          }
-        } else {
-          return {
-            success: false,
-            action: 'failed',
-            message: `Could not get commit SHA for ${containerName}: ${shaResult[1]}`,
-            error: shaResult[1]
-          };
-        }
+        deleteResults.push({
+          file: lockFile.name,
+          success: true,
+          sha: deleteResult.data.commit.sha
+        });
+        
+        console.log(`${SUCCESS_PREFIX} Deleted ${lockFile.name}`);
+        
+      } catch (error) {
+        deleteResults.push({
+          file: lockFile.name,
+          success: false,
+          error: error.message
+        });
+        
+        console.log(`${ERROR_PREFIX} Failed to delete ${lockFile.name}: ${error.message}`);
       }
-    } catch (unlockError) {
-      logger.error('Error during unlock attempt', {
-        container: containerName,
-        error: unlockError.message
+    }
+    
+    const successfulDeletes = deleteResults.filter(r => r.success);
+    const failedDeletes = deleteResults.filter(r => !r.success);
+    
+    if (successfulDeletes.length === lockStatus.lockFiles.length) {
+      logger.info('Container unlocked successfully', { 
+        container: containerName, 
+        deletedFiles: successfulDeletes.length 
+      });
+      return {
+        success: true,
+        action: 'unlocked',
+        message: `Successfully unlocked ${containerName} by deleting ${successfulDeletes.length} lock file(s)`,
+        result: { deleted: successfulDeletes, failed: failedDeletes }
+      };
+    } else {
+      logger.error('Partial unlock failure', { 
+        container: containerName, 
+        successful: successfulDeletes.length,
+        failed: failedDeletes.length
       });
       return {
         success: false,
-        action: 'error',
-        message: `Error during unlock: ${unlockError.message}`,
-        error: unlockError.message
+        action: 'partial',
+        message: `Partially unlocked ${containerName}: ${successfulDeletes.length} deleted, ${failedDeletes.length} failed`,
+        result: { deleted: successfulDeletes, failed: failedDeletes }
       };
     }
     

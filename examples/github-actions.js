@@ -516,24 +516,42 @@ async function demonstrateActionsDeleteOperations(actions) {
   console.log(SECTION_DIVIDER);
   
   try {
-    // Always check current installation status, don't rely on potentially stale data
+    // Always check current installation status and repository state
     console.log('\n🔍 Checking current installation status...');
     const currentStatus = await actions.getInstallationStatus();
     
-    if (!currentStatus.installed) {
-      console.log('\n📋 No Actions workflows are currently installed.');
+    // Also check the actual repository state for action files
+    console.log('\n🔍 Analyzing repository state...');
+    const repoState = await actions.analyzeActionsState();
+    
+    const hasWorkflows = repoState[0] && repoState[2].workflow_files && repoState[2].workflow_files.length > 0;
+    const hasActionFiles = repoState[0] && repoState[2].action_files && repoState[2].action_files.length > 0;
+    
+    if (!currentStatus.installed && !hasWorkflows && !hasActionFiles) {
+      console.log('\n📋 No Actions workflows or action files are currently present.');
       console.log('Nothing to delete.');
       return;
     }
     
-    console.log('\n📋 Current Actions installation:');
-    console.log(`Version: ${currentStatus.version}`);
-    console.log(`Workflows: ${currentStatus.workflows.join(', ')}`);
+    console.log('\n📋 Current repository state:');
+    if (currentStatus.installed) {
+      console.log(`Version: ${currentStatus.version}`);
+      console.log(`Workflows: ${currentStatus.workflows.join(', ')}`);
+    }
+    if (hasWorkflows) {
+      console.log(`Workflow files found: ${repoState[2].workflow_files.length}`);
+    }
+    if (hasActionFiles) {
+      console.log(`Action directories found: ${repoState[2].action_files.length}`);
+      repoState[2].action_files.forEach(action => {
+        console.log(`  - ${action.name} (${action.path})`);
+      });
+    }
     
-    console.log(`\n${WARNING_PREFIX} WARNING: This will permanently delete all GitHub Actions workflows!`);
+    console.log(`\n${WARNING_PREFIX} WARNING: This will permanently delete all GitHub Actions workflows and action files!`);
     console.log('This action cannot be undone.');
     
-    const confirmed = await confirmAction('Are you sure you want to delete all Actions workflows?');
+    const confirmed = await confirmAction('Are you sure you want to delete all Actions workflows and action files?');
     
     if (!confirmed) {
       console.log('\nDelete operation cancelled by user.');
@@ -541,28 +559,36 @@ async function demonstrateActionsDeleteOperations(actions) {
     }
     
     // Final confirmation
-    const finalConfirmed = await confirmAction('This is your final confirmation. Delete ALL Actions workflows?');
+    const finalConfirmed = await confirmAction('This is your final confirmation. Delete ALL Actions workflows and action files?');
     
     if (!finalConfirmed) {
       console.log('\nDelete operation cancelled by user.');
       return;
     }
     
-    console.log('\n🗑️  Deleting Actions workflows...');
-    const deleteResult = await actions.deleteActions();
+    console.log('\n🗑️  Deleting Actions workflows and action files...');
+    // Include action files in deletion since we found some
+    const deleteResult = await actions.deleteActions(null, true);
     formatResult('deleteActions()', deleteResult);
     
     if (deleteResult[0]) {
-      console.log('\n✅ Actions workflows deleted successfully!');
+      console.log('\n✅ Actions workflows and action files deleted successfully!');
       
       // Verify deletion
       console.log('\n🔍 Verifying deletion...');
-      const verifyResult = await actions.getCurrentVersion();
+      const verifyResult = await actions.analyzeActionsState();
       
-      if (verifyResult[0] && !verifyResult[2].installed) {
-        console.log('\n✅ Deletion verified - no Actions workflows found.');
+      if (verifyResult[0]) {
+        const remainingWorkflows = verifyResult[2].workflow_files || [];
+        const remainingActions = verifyResult[2].action_files || [];
+        
+        if (remainingWorkflows.length === 0 && remainingActions.length === 0) {
+          console.log('\n✅ Deletion verified - no Actions workflows or action files found.');
+        } else {
+          console.log(`\n⚠️  Deletion verification: ${remainingWorkflows.length} workflows and ${remainingActions.length} action files may remain.`);
+        }
       } else {
-        console.log('\n⚠️  Deletion verification inconclusive - some workflows may remain.');
+        console.log('\n⚠️  Could not verify deletion.');
       }
     }
     

@@ -157,6 +157,36 @@ class RepositoryManager {
   }
 
   /**
+   * Deletes the repository
+   * @returns {Promise<Array>} ResponseFactory result
+   */
+  async deleteRepository() {
+    try {
+      const response = await this.octokit.rest.repos.delete({
+        owner: this.orgName,
+        repo: this.repoName
+      });
+      return ResponseFactory.success(`Successfully deleted repository ${this.repoName}`, response.data);
+    } catch (err) {
+      if (err.status === 403) {
+        return ResponseFactory.error(
+          `Insufficient permissions to delete repository ${this.repoName}. Admin access required.`,
+          err,
+          403
+        );
+      }
+      if (err.status === 404) {
+        return ResponseFactory.error(
+          `Repository ${this.repoName} not found`,
+          err,
+          404
+        );
+      }
+      return ResponseFactory.error(`Failed to delete repository: ${err.message}`, err, err.status || 500);
+    }
+  }
+
+  /**
    * Gets organization information
    * @returns {Promise<Array>} ResponseFactory result
    */

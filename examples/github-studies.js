@@ -70,6 +70,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // For formatting output
+const SUCCESS_PREFIX = '✅ ';
+const ERROR_PREFIX = '❌ ';
 const WARNING_PREFIX = '⚠️ ';
 const INFO_PREFIX = 'ℹ️ ';
 const SECTION_DIVIDER = '='.repeat(80);
@@ -719,14 +721,39 @@ async function demonstrateStudiesDeleteOperations(studies) {
     let failedCount = 0;
     
     for (const study of studiesToDelete) {
-      console.log(`\n🗑️ Deleting study: "${study.name}"`);
+      console.log(`\n🗑️ Processing study for deletion: "${study.name}"`);
+      console.log(`${INFO_PREFIX} Using catch/write/release pattern for safe deletion...`);
+      
+      // Check for linked companies and interactions
+      const linkedCompanies = study.linked_companies ? Object.keys(study.linked_companies) : [];
+      const linkedInteractions = study.linked_interactions ? Object.keys(study.linked_interactions) : [];
+      
+      if (linkedCompanies.length > 0 || linkedInteractions.length > 0) {
+        console.log(`${INFO_PREFIX} Found linked entities:`);
+        if (linkedCompanies.length > 0) {
+          console.log(`  📢 Companies (${linkedCompanies.length}): ${linkedCompanies.join(', ')}`);
+        }
+        if (linkedInteractions.length > 0) {
+          console.log(`  🤝 Interactions (${linkedInteractions.length}): ${linkedInteractions.slice(0, 3).join(', ')}${linkedInteractions.length > 3 ? '...' : ''}`);
+        }
+        
+        console.log(`${INFO_PREFIX} These links will be automatically cleaned during deletion using catch/write/release pattern`);
+      } else {
+        console.log(`${INFO_PREFIX} No linked entities found - proceeding with direct deletion`);
+      }
+      
+      // Perform deletion using catch/write/release pattern
+      console.log(`${INFO_PREFIX} Pattern: Catch containers → Delete study → Update references → Write containers → Release`);
       const deleteResult = await studies.deleteObj(study.name);
       
       if (deleteResult[0]) {
-        console.log(`✅ Successfully deleted: ${study.name}`);
+        console.log(`${SUCCESS_PREFIX} Successfully deleted study: ${study.name}`);
+        if (linkedCompanies.length > 0 || linkedInteractions.length > 0) {
+          console.log(`${SUCCESS_PREFIX} All linked entities automatically unlinked during deletion`);
+        }
         deletedCount++;
       } else {
-        console.error(`❌ Failed to delete: ${study.name}`);
+        console.error(`${ERROR_PREFIX} Failed to delete study: ${study.name}`);
         console.error(`Error message: ${deleteResult[1]?.status_msg || deleteResult[1]}`);
         if (deleteResult[2]) {
           console.error('Error details:', JSON.stringify(deleteResult[2], null, 2));

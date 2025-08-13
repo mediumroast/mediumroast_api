@@ -27,10 +27,16 @@ export class Interactions extends BaseObjects {
     this.cacheTimeouts.similar = 600000;   // 10 minutes for similarity results
   }
 
+  // Utility method to create standardized error responses for transaction steps
+  _createError(message, details = null) {
+    return [false, message, details];
+  }
+
   /**
    * Override deleteObj to handle file deletion and company unlinking
    * @param {string} objName - Name of the interaction to delete
    * @param {Object} options - Options for deletion
+   * @param {Object} options.useExistingContainer - If provided, use existing container metadata instead of catching
    * @returns {Promise<Array>} Operation result
    */
   async deleteObj(objName, options = {}) {
@@ -48,37 +54,52 @@ export class Interactions extends BaseObjects {
           
       if (validationError) return validationError;
       
+      // Check if we should use existing container metadata (for cross-entity operations)
+      const useExistingContainer = options.useExistingContainer;
+      
       // Use transaction pattern for safer operations
       let interactionContainerData = null;
       let companiesContainerData = null;
       let interactionToDelete = null;
       let repoMetadata = null;
+      let shouldReleaseContainer = !useExistingContainer;
       
       return this._executeTransaction([
-        // Step 1: Catch containers and find interaction
+        // Step 1: Catch containers or use existing
         async () => {
-          logger.debug('Catching containers for interaction deletion', {
-            interactionName: objName,
-            options
-          });
-          
-          repoMetadata = {
-            containers: {
-              Interactions: {},
-              Companies: {}
-            }, 
-            branch: {}
-          };
-          
-          const containerResult = await this.serverCtl.catchContainer(repoMetadata);
-          if (!containerResult[0]) {
-            return containerResult;
+          if (useExistingContainer) {
+            logger.debug('Using existing container metadata for interaction deletion', {
+              interactionName: objName
+            });
+            
+            // Use provided container metadata
+            repoMetadata = useExistingContainer;
+            interactionContainerData = repoMetadata.containers.Interactions;
+            companiesContainerData = repoMetadata.containers.Companies;
+          } else {
+            logger.debug('Catching containers for interaction deletion', {
+              interactionName: objName,
+              options
+            });
+            
+            repoMetadata = {
+              containers: {
+                Interactions: {},
+                Companies: {}
+              }, 
+              branch: {}
+            };
+            
+            const containerResult = await this.serverCtl.catchContainer(repoMetadata);
+            if (!containerResult[0]) {
+              return containerResult;
+            }
+            
+            // Extract container data
+            repoMetadata = containerResult[2];
+            interactionContainerData = repoMetadata.containers.Interactions;
+            companiesContainerData = repoMetadata.containers.Companies;
           }
-          
-          // Extract container data
-          repoMetadata = containerResult[2];
-          interactionContainerData = repoMetadata.containers.Interactions;
-          companiesContainerData = repoMetadata.containers.Companies;
           
           // Find the interaction to delete
           const existingInteractions = interactionContainerData.objects || [];
@@ -88,35 +109,66 @@ export class Interactions extends BaseObjects {
             return this._createError(`Interaction not found: ${objName}`, null, 404);
           }
           
-          return this._createSuccess('Containers caught and interaction found');
+          return this._createSuccess('Container ready and interaction found');
         },
         
-        // Step 2: Delete associated file
+        // Step 2: Delete associated file with proper path handling
         async () => {
           if (interactionToDelete.url && interactionToDelete.url.startsWith('Interactions/')) {
             logger.debug('Deleting interaction file', {
-              fileName: interactionToDelete.url
+              fileName: interactionToDelete.url,
+              interactionName: objName
             });
             
+            // Extract just the filename from the URL
             const fileName = interactionToDelete.url.replace('Interactions/', '');
             
-            // Get file SHA
-            const fileResult = await this.serverCtl.getSha('Interactions', fileName, interactionContainerData.branch);
-            if (fileResult[0]) {
-              const deleteResult = await this.serverCtl.deleteBlob(
-                'Interactions',
-                fileName,
-                interactionContainerData.branch,
-                fileResult[2]
-              );
-              
-              if (!deleteResult[0]) {
-                return deleteResult;
+            try {
+              // Get file SHA using the correct path
+              const fileResult = await this.serverCtl.getSha('Interactions', fileName, repoMetadata.branch.name);
+              if (fileResult[0]) {
+                const deleteResult = await this.serverCtl.deleteBlob(
+                  'Interactions',
+                  fileName,
+                  repoMetadata.branch.name,
+                  fileResult[2]
+                );
+                
+                if (!deleteResult[0]) {
+                  logger.error('Failed to delete interaction file', {
+                    fileName,
+                    error: deleteResult[1]
+                  });
+                  return deleteResult;
+                }
+                
+                logger.debug('Successfully deleted interaction file', {
+                  fileName,
+                  interactionName: objName
+                });
+              } else {
+                logger.warn('Could not get SHA for interaction file - may not exist', {
+                  fileName,
+                  branchName: repoMetadata.branch.name,
+                  error: fileResult[1]
+                });
+                // Continue even if file doesn't exist - metadata deletion is still valid
               }
+            } catch (error) {
+              logger.error('Error during file deletion', {
+                fileName,
+                error: error.message
+              });
+              // Continue even if file deletion fails - metadata deletion is still important
             }
+          } else {
+            logger.debug('No file to delete for interaction', {
+              interactionName: objName,
+              url: interactionToDelete.url
+            });
           }
           
-          return this._createSuccess('File deleted successfully');
+          return this._createSuccess('File deletion completed');
         },
         
         // Step 3: Remove interaction from container
@@ -163,30 +215,73 @@ export class Interactions extends BaseObjects {
               companiesContainerData.objectSha
             );
             
+            // Ensure proper response format validation
+            if (!companiesWriteResult || !Array.isArray(companiesWriteResult)) {
+              logger.error('Unexpected response format from writeObject for companies', {
+                response: companiesWriteResult
+              });
+              
+              // Check if this is a direct GitHub API response that indicates success
+              if (companiesWriteResult && companiesWriteResult.content && companiesWriteResult.commit) {
+                logger.debug('Detected successful GitHub API response format, converting to standard format');
+                logger.debug('Successfully updated companies to remove interaction links', {
+                  interactionName: objName
+                });
+                return deleteResult; // Continue with transaction
+              }
+              
+              return this._createError('Invalid response format from companies write operation', companiesWriteResult);
+            }
+            
+            if (companiesWriteResult.length < 3) {
+              logger.error('Invalid response array length from writeObject for companies', {
+                response: companiesWriteResult
+              });
+              return this._createError('Invalid response format from companies write operation', companiesWriteResult);
+            }
+            
             if (!companiesWriteResult[0]) {
+              logger.error('Failed to write companies container during interaction deletion', {
+                error: companiesWriteResult[1]
+              });
               return companiesWriteResult;
             }
+            
+            logger.debug('Successfully updated companies to remove interaction links', {
+              interactionName: objName
+            });
           }
           
           return deleteResult;
         },
         
-        // Step 5: Release containers
+        // Step 5: Release containers (only if we caught them ourselves)
         async () => {
-          logger.debug('Releasing containers after interaction deletion');
-          
-          const releaseResult = await this.serverCtl.releaseContainer(repoMetadata);
-          if (!releaseResult[0]) {
-            return releaseResult;
-          }
-          
-          return this._createSuccess(
-            `Successfully deleted interaction: ${objName}`,
-            {
-              deletedInteraction: interactionToDelete,
-              containers: releaseResult[2]
+          if (shouldReleaseContainer) {
+            logger.debug('Releasing containers after interaction deletion');
+            
+            const releaseResult = await this.serverCtl.releaseContainer(repoMetadata);
+            if (!releaseResult[0]) {
+              return releaseResult;
             }
-          );
+            
+            return this._createSuccess(
+              `Successfully deleted interaction: ${objName}`,
+              {
+                deletedInteraction: interactionToDelete,
+                containers: releaseResult[2]
+              }
+            );
+          } else {
+            logger.debug('Skipping container release - using external container management');
+            
+            return this._createSuccess(
+              `Successfully deleted interaction: ${objName} (container managed externally)`,
+              {
+                deletedInteraction: interactionToDelete
+              }
+            );
+          }
         }
       ], `delete-interaction-${objName}`);
       

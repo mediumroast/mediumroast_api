@@ -272,8 +272,9 @@ class ContainerOperations {
         });
         
         if (!unlockResult[0]) {
-          // Log error but continue with other containers
+          // Log error and continue with other containers
           // Note: This is a warning condition, not a fatal error
+          // Error details are captured in unlockResults for later analysis
         }
       }
 

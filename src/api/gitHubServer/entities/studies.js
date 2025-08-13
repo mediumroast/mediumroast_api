@@ -226,165 +226,97 @@ export class Studies extends BaseObjects {
         );
       }
       
-      return await this._executeTransaction([
-        // Step 1: Catch containers
-        async () => {
-          let repoMetadata = {
-            containers: {
-              Studies: {},
-              [entityType]: {}
-            }, 
-            branch: {}
-          };
-          return this.serverCtl.catchContainer(repoMetadata);
-        },
-              
-        // Step 2: Find study and entity
-        async (data) => {
-          // Find study
-          const studyResp = await this.findByX('name', studyName, data.containers.Studies.objects);
-          if (!studyResp[0]) {
-            return studyResp;
-          }
-                  
-          // Find entity
-          const entityClass = new BaseObjects(
-            this.serverCtl.token,
-            this.serverCtl.orgName,
-            'study-manager',
-            entityType
-          );
-                  
-          const entityResp = await entityClass.findByX(
-            'name', 
-            entityName, 
-            data.containers[entityType].objects
-          );
-                  
-          if (!entityResp[0]) {
-            return this._createError(
-              `${entityType} with name [${entityName}] not found`,
-              null,
-              404
-            );
-          }
-                  
-          // Store for next step
-          this._tempStudy = studyResp[2][0];
-          this._tempEntity = entityResp[2][0];
-          return this._createSuccess('Found study and entity');
-        },
-              
-        // Step 3: Update study
-        async (data) => {
-          // Initialize linked entities field if needed
-          const fieldName = `linked_${entityType.toLowerCase()}`;
-          if (!this._tempStudy[fieldName]) {
-            this._tempStudy[fieldName] = {};
-          }
-                  
-          // Add entity to study
-          this._tempStudy[fieldName][entityName] = {
-            linked_date: new Date().toISOString()
-          };
-                  
-          // Update study modification date
-          this._tempStudy.modification_date = new Date().toISOString();
-                  
-          // Update the study object in the container
-          for (let i = 0; i < data.containers.Studies.objects.length; i++) {
-            if (data.containers.Studies.objects[i].name === studyName) {
-              data.containers.Studies.objects[i] = this._tempStudy;
-              break;
-            }
-          }
-                  
-          return this._createSuccess('Updated study with link to entity');
-        },
-              
-        // Step 4: Update entity to reference study
-        async (data) => {
-          // Add study reference to entity
-          const fieldName = 'linked_studies';
-          if (!this._tempEntity[fieldName]) {
-            this._tempEntity[fieldName] = {};
-          }
-                  
-          // Add study to entity
-          this._tempEntity[fieldName][studyName] = {
-            linked_date: new Date().toISOString()
-          };
-                  
-          // Update entity modification date
-          this._tempEntity.modification_date = new Date().toISOString();
-                  
-          // Update the entity object in the container
-          for (let i = 0; i < data.containers[entityType].objects.length; i++) {
-            if (data.containers[entityType].objects[i].name === entityName) {
-              data.containers[entityType].objects[i] = this._tempEntity;
-              break;
-            }
-          }
-                  
-          return this._createSuccess('Updated entity with link to study');
-        },
-              
-        // Step 5: Write study container
-        async (data) => {
-          const studySha = await this.serverCtl.getSha(
-            'Studies', 
-            this.objectFiles.Studies, 
-            data.branch.name
-          );
-                  
-          if (!studySha[0]) {
-            return studySha;
-          }
-                  
-          return await this.serverCtl.writeObject(
-            'Studies',
-            data.containers.Studies.objects,
-            data.branch.name,
-            studySha[2]
-          );
-        },
-              
-        // Step 6: Write entity container
-        async (data) => {
-          const entitySha = await this.serverCtl.getSha(
-            entityType, 
-            this.objectFiles[entityType], 
-            data.branch.name
-          );
-                  
-          if (!entitySha[0]) {
-            return entitySha;
-          }
-                  
-          return await this.serverCtl.writeObject(
-            entityType,
-            data.containers[entityType].objects,
-            data.branch.name,
-            entitySha[2]
-          );
-        },
-              
-        // Step 7: Release containers
-        async (data) => {
-          const result = await this.serverCtl.releaseContainer(data);
-          if (result[0]) {
-            // Invalidate related caches
-            this._invalidateCache();
-                      
-            // Also invalidate the other entity's cache
-            this.cache.invalidate(`container_${entityType}`);
-            if (this.serverCtl.invalidateCache) {
-              this.serverCtl.invalidateCache(`container_${entityType}`);
-            }
-          }
-          return result;
+      // Step 1: Verify the study exists
+      const studyResp = await this.findByName(studyName);
+      if (!studyResp[0]) {
+        return this._createError(
+          `Study with name [${studyName}] not found`,
+          null,
+          404
+        );
+      }
+      const study = studyResp[2][0];
+      
+      // Step 2: Verify the entity exists
+      const entityClass = new BaseObjects(
+        this.serverCtl.token,
+        this.serverCtl.orgName,
+        'study-manager',
+        entityType
+      );
+      
+      const entityResp = await entityClass.findByName(entityName);
+      if (!entityResp[0]) {
+        return this._createError(
+          `${entityType} with name [${entityName}] not found`,
+          null,
+          404
+        );
+      }
+      const entity = entityResp[2][0];
+      
+      // Step 3: Update study to reference the entity using updateObj
+      const fieldName = `linked_${entityType.toLowerCase()}`;
+      const currentLinks = study[fieldName] || {};
+      
+      // Check if already linked
+      if (currentLinks[entityName]) {
+        return this._createWarning(
+          `${entityType} [${entityName}] is already linked to study [${studyName}]`,
+          null,
+          200
+        );
+      }
+      
+      // Add the new link
+      const updatedLinks = {
+        ...currentLinks,
+        [entityName]: {
+          linked_date: new Date().toISOString()
         }
-      ], `add-to-study-${studyName}-${entityName}`);
+      };
+      
+      const studyUpdateResult = await this.updateObj({
+        name: studyName,
+        key: fieldName,
+        value: updatedLinks
+      }, false, true); // dontWrite=false, system=true (bypasses whitelist)
+      
+      if (!studyUpdateResult[0]) {
+        return studyUpdateResult;
+      }
+      
+      // Step 4: Update entity to reference the study using updateObj
+      const entityStudyField = 'linked_studies';
+      const currentStudyLinks = entity[entityStudyField] || {};
+      
+      const updatedStudyLinks = {
+        ...currentStudyLinks,
+        [studyName]: {
+          linked_date: new Date().toISOString()
+        }
+      };
+      
+      const entityUpdateResult = await entityClass.updateObj({
+        name: entityName,
+        key: entityStudyField,
+        value: updatedStudyLinks
+      }, false, true); // dontWrite=false, system=true (bypasses whitelist)
+      
+      if (!entityUpdateResult[0]) {
+        return entityUpdateResult;
+      }
+      
+      return this._createSuccess(
+        `Successfully linked ${entityType} [${entityName}] to study [${studyName}]`,
+        {
+          study: studyName,
+          entity: entityName,
+          entityType: entityType,
+          linked_date: updatedLinks[entityName].linked_date
+        }
+      );
+      
     } catch (error) {
       return this._createError(
         `Error adding entity to study: ${error.message}`,

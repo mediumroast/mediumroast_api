@@ -70,15 +70,15 @@ export class BaseObjects {
         'google_maps_url', 'google_news_url', 'google_finance_url', 'google_patents_url',
         'cik', 'stock_symbol', 'stock_exchange', 'recent_10k_url', 'recent_10q_url', 'firmographic_url', 'filings_url', 'owner_tranasactions',
         'industry', 'industry_code', 'industry_group_code', 'industry_group_description', 'major_group_code', 'major_group_description',
-        'linked_interactions'
+        'linked_interactions', 'linked_studies'
       ],
       Interactions: [
         'status', 'content_type', 'file_size', 'reading_time', 'word_count', 'page_count', 'description', 'abstract',
         'region', 'country', 'city', 'state_province', 'zip_postal', 'street_address', 'latitude', 'longitude',
-        'public', 'groups'
+        'public', 'groups', 'linked_studies'
       ],
       Studies: [
-        'description', 'status', 'public', 'groups'
+        'description', 'status', 'public', 'groups', 'linked_companies', 'linked_interactions'
       ]
     };
         
@@ -212,7 +212,53 @@ export class BaseObjects {
                     
           if (!result[0]) {
             // Operation failed, abort transaction
-            const errorMessage = result[1]?.status_msg || result[1] || 'Unknown error';
+            let errorMessage = 'Unknown error';
+            
+            // Handle different error message formats
+            if (result[1]) {
+              if (typeof result[1] === 'string') {
+                errorMessage = result[1];
+              } else if (result[1].status_msg) {
+                errorMessage = result[1].status_msg;
+              } else if (result[1].message) {
+                errorMessage = result[1].message;
+              } else if (result[1].error && result[1].error.message) {
+                errorMessage = result[1].error.message;
+              } else {
+                // If it's an object without clear message, stringify it properly
+                try {
+                  errorMessage = JSON.stringify(result[1], null, 2);
+                } catch (stringifyError) {
+                  errorMessage = `Error object could not be stringified: ${String(result[1])}`;
+                }
+              }
+            }
+            
+            // Also check result[2] for mrJson and other data structures
+            if (result[2]) {
+              if (result[2].mrJson && typeof result[2].mrJson === 'string') {
+                errorMessage += ` | Data: ${result[2].mrJson}`;
+              } else if (result[2].message) {
+                errorMessage += ` | Message: ${result[2].message}`;
+              } else if (result[2].error) {
+                errorMessage += ` | Error: ${JSON.stringify(result[2].error)}`;
+              }
+            }
+            
+            // Also include the raw result data for debugging
+            logger.error('Transaction step failed with raw result:', {
+              transactionName,
+              operationName,
+              result: result,
+              resultStructure: {
+                success: result[0],
+                message: typeof result[1],
+                data: typeof result[2],
+                messageKeys: result[1] ? Object.keys(result[1]) : [],
+                dataKeys: result[2] ? Object.keys(result[2]) : []
+              }
+            });
+            
             return this._createError(
               `Transaction [${transactionName}] failed at step [${operationName}]: ${errorMessage}`,
               { 
