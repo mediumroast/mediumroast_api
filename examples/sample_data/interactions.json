@@ -1,0 +1,1862 @@
+[
+    {
+    "tags": {
+      "complex processes": 2.7304530139182015,
+      "consultation with a product expert": 2.815577351289981,
+      "key staff": 2.7304530139182015,
+      "player in the retail media": 2.815577351289981,
+      "privacy policy": 3.211500010418809,
+      "product expert security": 3.211500010418809
+    },
+    "topics": {
+      "1": {
+        "id": 0,
+        "excerpts": [
+          "says Jon.",
+          "And once we got our hands on it, it was easy to demonstrate quick wins, too, says Jon."
+        ],
+        "keywords": [
+          "quick",
+          "hands",
+          "wins",
+          "demonstrate",
+          "jon",
+          "says",
+          "got",
+          "easy"
+        ],
+        "pm_label": "The new product must enable users to quickly grasp its functionality upon initial use, allowing them to easily demonstrate immediate benefits or 'quick wins', as stated by jon.",
+        "analyst_label": "Jon states that upon acquiring something, they were able to easily showcase rapid successes, emphasizing the efficiency and effectiveness of the product.",
+        "frequency": 2
+      },
+      "2": {
+        "id": 1,
+        "excerpts": [
+          "We needed to have in built functionality along with the flexibility to do things our way.",
+          "So yes, we needed speed, but there was no room to compromise on reliability and security, says Jon.",
+          "Our success depends on building a high performing team where people feel connected to each other and our goals wherever theyre working."
+        ],
+        "keywords": [
+          "speed",
+          "agility",
+          "building",
+          "balancing",
+          "flexibility",
+          "functionality",
+          "moving",
+          "reliability",
+          "built",
+          "security"
+        ],
+        "pm_label": "The new product must be designed with built-in functionality that allows users the flexibility to operate according to their unique methods while ensuring speed does not compromise on reliability and security. it should facilitate seamless moving processes, enhance agility for efficient team building, promote balancing among diverse tasks, improve user flexibility in decision-making, ensure smooth integration of various components, and maintain robust security measures to protect data integrity and privacy.",
+        "analyst_label": "In the pursuit of achieving both speed and agility, companies must carefully balance built-in functionality with flexibility, ensuring that reliability and security are not compromised; success hinges on constructing high-performing teams where individuals feel connected to each other and shared objectives, regardless of their location.",
+        "frequency": 8
+      },
+      "3": {
+        "id": 2,
+        "excerpts": [
+          "They expect personalized and relevant communications driven by data insights.",
+          "Get a personalized consultation with a product expert Security | Terms and privacy | Privacy policy | Your privacy choices | Status |",
+          "We are privileged to communicate with a huge proportion of Australian shoppers online and in person across all demographics."
+        ],
+        "keywords": [
+          "privacy",
+          "personalized",
+          "expert",
+          "policy",
+          "terms",
+          "privileged",
+          "demographics",
+          "shoppers",
+          "consultation",
+          "agencies"
+        ],
+        "pm_label": "The engineering team is tasked with developing a platform that offers personalized communications tailored to individual shopper preferences based on data insights while ensuring robust privacy protection; this includes providing a secure personalized consultation feature with product experts, clearly displaying terms and privacy policy options for users to make informed choices, and guaranteeing the confidentiality of all interactions across diverse demographics.",
+        "analyst_label": "The market demands personalized communications that leverage data insights for relevance, while leading agencies offer specialized consultations with product experts, ensuring security, respecting privacy through clear policy and terms, and maintaining privileged access to diverse shopper demographics both online and offline.",
+        "frequency": 5
+      },
+      "4": {
+        "id": 3,
+        "excerpts": [
+          "In our first 12 months, Coles 360 has run over 2,000 product campaigns across 11 media channels   all managed with monday.com using features we have built and optimized in full flight!",
+          "Seamlessly managing omnichannel marketing campaigns Every day, Coles 360 teams collaborate with multinational conglomerates, local brands, and external agencies, all the while running campaigns across multiple channels and measuring results.",
+          "How Coles 360 relaunched and rapidly scaled its retail media network with monday.com saved per month campaigns run For more than 100 years, Coles supermarkets have served Australian While grocery is its core business, Coles is also a significant omnichannel Coles revamped retail media division, Coles 360, runs this network."
+        ],
+        "keywords": [
+          "coles",
+          "mondaycom",
+          "campaigns",
+          "brands",
+          "channels",
+          "business",
+          "grocery",
+          "marketing",
+          "retail",
+          "supermarkets"
+        ],
+        "pm_label": "The engineering team should develop a comprehensive platform that integrates seamlessly with monday.com to facilitate the execution of extensive marketing campaigns across various channels for brands and retailers within the grocery industry, specifically targeting coles supermarkets, ensuring efficient management and optimization of these campaigns in alignment with their successful implementation strategy over 2,000 product campaigns run by coles 360.",
+        "analyst_label": "Coles 360, leveraging monday.com for optimized campaign management across 11 channels, efficiently executes over 2,000 product campaigns annually, while also collaborating with diverse brands and agencies to scale retail media networks, significantly impacting the grocery and omnichannel marketing sectors in australia.",
+        "frequency": 11
+      },
+      "5": {
+        "id": 4,
+        "excerpts": [
+          "Because monday.com is a very cost effective solution and can scale as you go, the initial business case was straightforward.",
+          "A massive benefit of monday.com is the speed and time savings generated by efficient processes, says John.",
+          "By giving us a scalable and flexible business platform, monday.com has been a huge part of our rapid journey from a startup to a significant player in the retail media sector."
+        ],
+        "keywords": [
+          "mondaycom",
+          "business",
+          "benefit",
+          "journey",
+          "sector",
+          "scalable",
+          "rapid",
+          "john",
+          "cost",
+          "startup"
+        ],
+        "pm_label": "The engineering team is tasked with developing a scalable solution that integrates seamlessly into various business sectors, ensuring rapid deployment and cost-effectiveness comparable to monday.com, thereby facilitating smooth transitions from startup phase to significant market players, as exemplified by john's experience in the retail media sector, while also providing time-saving benefits through efficient processes.",
+        "analyst_label": "Monday.com offers a cost-effective, scalable solution that significantly accelerates business growth by streamlining processes, enabling startups like john's rapid transition into major players within their respective sectors through time savings and flexible platforms.",
+        "frequency": 4
+      },
+      "6": {
+        "id": 5,
+        "excerpts": [
+          "We were up and running on monday.com in a matter of weeks with our first campaign management boards.",
+          "As weve grown, weve found it so easy to onboard people into our ecosystem using an intuitive solution like monday.com."
+        ],
+        "keywords": [
+          "weve",
+          "ecosystem",
+          "weeks",
+          "onboard",
+          "solution",
+          "people",
+          "management",
+          "mondaycom",
+          "boards",
+          "campaign"
+        ],
+        "pm_label": "The engineering team is tasked with developing an intuitive onboarding solution that enables seamless integration of new personnel into the existing ecosystem within a period of weeks, leveraging boards from monday.com to manage campaign activities efficiently, ensuring smooth transition and immediate productivity enhancement post-onboarding.",
+        "analyst_label": "In just a few weeks, leveraging an intuitive solution like monday.com, our organization was successfully up and running on the platform for managing campaigns and easily onboarded new people into our thriving ecosystem.",
+        "frequency": 2
+      }
+    },
+    "status": 3,
+    "organization": "mediumroast",
+    "content_type": "application/pdf",
+    "file_size": "3.8 MB",
+    "reading_time": 4,
+    "word_count": 1022,
+    "page_count": 17,
+    "description": "Coles Supermarkets, operating for over a century, revamped its retail media division, Coles 360, to better serve Australian shoppers across all demographics. To succeed in the competitive retail media market, Coles 360 needed a cost-effective, reliable, and agile technology partner.",
+    "abstract": "Coles Supermarkets, operating for over a century, revamped its retail media division, Coles 360, to better serve Australian shoppers across all demographics. To succeed in the competitive retail media market, Coles 360 needed a cost-effective, reliable, and agile technology partner. They chose monday.com due to its proven track record within Coles Group and its ability to scale as needed. Within weeks, Coles 360 was managing campaigns across multiple channels using monday.com's features. In the first year, they ran over 2,000 product campaigns across 11 media channels, demonstrating monday.com's effectiveness in streamlining complex processes.",
+    "creator": "miha42-github",
+    "creator_id": 10818650,
+    "creator_name": "Michael Hay",
+    "linked_companies": {
+      "monday.com Ltd.": "580152e14db8bae9863084969fdbad0cac334abd36fbe258deb9337666d5f959"
+    },
+    "linked_studies": {},
+    "street_address": "Unknown",
+    "zip_postal": "Unknown",
+    "city": "Tel Aviv",
+    "state_province": "Unknown",
+    "country": "Unknown",
+    "latitude": 32.0735802,
+    "longitude": 34.7880511,
+    "region": "EMEA",
+    "public": true,
+    "groups": "mediumroast:miha42-github",
+    "creation_date": "2024-05-25T04:01:44.907Z",
+    "modification_date": "2024-12-02T03:35:00.606667",
+    "file_hash": "29f5b553d0a440d35b770cbfbf73905341f5a9cc78caa31df51836b6374dba4e",
+    "name": "Customer story: Coles 360 | monday.com",
+    "interaction_type": "Case Study",
+    "interaction_type_detail": {
+      "author": "monday.com",
+      "year": "Unknown",
+      "month": "Unknown",
+      "day": "Unknown",
+      "title": "How Coles 360 relaunched and rapidly scaled its retail media network with monday.com",
+      "url": "https://monday.com/customers/coles-360"
+    },
+    "url": "Interactions/Customer story: Coles 360 | monday.com.pdf",
+    "contact_name": "Michael Hay"
+  },
+  {
+    "tags": {
+      "developer team workflow": 2.461500010418809,
+      "integrations with tools": 3.7615000104188088,
+      "management software": 3.960906027836403,
+      "notifications to integrations": 2.2615000104188088,
+      "project management": 6.49195302433701,
+      "repetitive tasks": 2.7304530139182015,
+      "seat per month": 2.718448971231391,
+      "standup meeting": 2.7304530139182015,
+      "team workflow management": 3.211500010418809,
+      "tools such": 3,
+      "workflow management tool": 2.461500010418809
+    },
+    "topics": {
+      "0": {
+        "id": 0,
+        "excerpts": [
+          "Your vote of support is important to us and it helps us keep the content FREE.",
+          "You guys really are a part of our events and we really appreciate you coming and I know people appreciate the content you create as well   Andy Jassy",
+          "One click below supports our mission to provide free, deep, and relevant content."
+        ],
+        "keywords": [
+          "content",
+          "free",
+          "appreciate",
+          "events",
+          "helps",
+          "vote",
+          "support",
+          "andy",
+          "jassy",
+          "provide"
+        ],
+        "pm_label": "The new product requirement is: develop an interactive feature that enables users to easily cast their vote of support through the app, which will help maintain free content availability; this feature should also include a commendation system where user contributions are acknowledged during events, as highlighted by andy jassy, emphasizing how valued and appreciated they are for creating relevant content.",
+        "analyst_label": "The significance of user support, demonstrated through voting or direct assistance, is crucial for sustaining the availability of free content and enhancing engagement at events, as acknowledged by andy jassy, underlining its value in achieving the mission to provide high-quality, accessible information.",
+        "frequency": 3
+      },
+      "1": {
+        "id": 1,
+        "excerpts": [
+          "With monday dev connected with Work OS, product and dev teams will be able to collaborate more easily with the rest of the company and build on product roadmaps, sprints, release plans, customer feedback, backlogs and more.",
+          "Ran Toueg, a senior product manager at Monday.com, said monday dev would provide product and dev teams everything needed to plan, build and manage all their projects from research and development to design and develop products.",
+          "Monday.com launches a developer team workflow management tool Monday.com Ltd., a project management software company, today announced the launch of monday dev, a new product offering that centralizes software development tracking in one place so developers, engineers and administrators can collaborate more easily."
+        ],
+        "keywords": [
+          "dev",
+          "management",
+          "development",
+          "mondaycom",
+          "software",
+          "workflow",
+          "developers",
+          "tools",
+          "github",
+          "collaborate"
+        ],
+        "pm_label": "The engineering team is tasked to develop 'monday dev', a comprehensive management tool integrated into the work os platform, aimed at facilitating seamless collaboration between product and development teams with other company departments. this tool should enable efficient planning, execution, and oversight of projects from initial research through design and development stages, encompassing activities like roadmap creation, sprint management, release planning, customer feedback integration, backlog maintenance, and more, thereby enhancing productivity and streamlining workflows across the entire software development lifecycle.",
+        "analyst_label": "Monday dev, an innovative tool by monday.com, seamlessly integrates with the work os to facilitate enhanced collaboration between product and development teams, enabling them to efficiently manage various aspects of their projects including roadmaps, sprints, release plans, customer feedback, backlogs, and more, thereby streamlining the entire software development lifecycle.",
+        "frequency": 23
+      }
+    },
+    "status": 3,
+    "organization": "mediumroast",
+    "content_type": "application/pdf",
+    "file_size": "82.9 KB",
+    "reading_time": 3,
+    "word_count": 649,
+    "page_count": 4,
+    "description": "Monday.com Ltd., a project management software company, launched monday dev, a new tool for centralized software development tracking. It integrates with Monday.com's Work OS platform to facilitate collaboration among product, dev teams, and other departments.",
+    "abstract": "Monday.com Ltd., a project management software company, launched monday dev, a new tool for centralized software development tracking. It integrates with Monday.com's Work OS platform to facilitate collaboration among product, dev teams, and other departments. monday dev offers features like roadmap planning, sprint management, bug tracking, and task automation. It starts at $9 per seat per month, with additional features available in higher-tier plans.",
+    "creator": "miha42-github",
+    "creator_id": 10818650,
+    "creator_name": "Michael Hay",
+    "linked_companies": {
+      "monday.com Ltd.": "580152e14db8bae9863084969fdbad0cac334abd36fbe258deb9337666d5f959"
+    },
+    "linked_studies": {},
+    "street_address": "Unknown",
+    "zip_postal": "Unknown",
+    "city": "Tel Aviv",
+    "state_province": "Unknown",
+    "country": "Unknown",
+    "latitude": 32.0735802,
+    "longitude": 34.7880511,
+    "region": "EMEA",
+    "public": true,
+    "groups": "mediumroast:miha42-github",
+    "creation_date": "2024-05-25T04:01:44.907Z",
+    "modification_date": "2024-12-02T03:35:09.553395",
+    "file_hash": "3b60dcbbc445632d1bc35a6fce62e53b20b8e9cd458bf8b8ecfa383d076706cd",
+    "name": "Monday.com launches a developer team workflow management tool - SiliconANGLE",
+    "interaction_type": "Webpage",
+    "interaction_type_detail": {
+      "author": "KYT DOTSON",
+      "year": "2023",
+      "month": "05",
+      "day": "31",
+      "title": "Monday.com launches a developer team workflow management tool",
+      "url": "https://siliconangle.com/2023/05/31/monday-com-launches-developer-team-workflow-management-tool/"
+    },
+    "url": "Interactions/Monday.com launches a developer team workflow management tool - SiliconANGLE.pdf",
+    "contact_name": "Michael Hay"
+  },
+  {
+    "tags": {
+      "data infrastructure": 2.460906027836403,
+      "exceptional applications": 2.7304530139182015,
+      "mondaydb data": 2.7304530139182015,
+      "new schemaless architecture": 2.461500010418809,
+      "new use": 2.7304530139182015,
+      "performance the new": 3.75,
+      "platform performance": 3.210906027836403,
+      "project management tools": 3.211500010418809,
+      "time data": 2.7304530139182015,
+      "traditional project management": 2.461500010418809
+    },
+    "topics": {
+      "1": {
+        "id": 0,
+        "excerpts": [
+          "Described by the company as having a schemaless architecture  meaning that it has no predefined structure for how data is organized and stored  mondayDB strengthens the Work OS platform on top of which all of monday.coms suite of products are built.",
+          "Finally, mondayDB extends the monday.com open API, providing data If we talk long term, we really believe that the main thing that we need to invest in is the platform itself, so thats what were doing, Lereya said, adding that one of the companys strategic pillars is to make the platform more robust and keep increasing the number of capabilities available to customers.",
+          "New monday.com data infrastructure to speed platform performance The new schemaless architecture, dubbed mondayDB, will strengthen the work management companys Work OS platform and offer improved levels of scalability and speed to customers."
+        ],
+        "keywords": [
+          "platform",
+          "mondaydb",
+          "architecture",
+          "schemaless",
+          "data",
+          "mondaycom",
+          "customers",
+          "pillars",
+          "scale",
+          "suite"
+        ],
+        "pm_label": "The engineering team is tasked with developing a schemaless architecture-based data infrastructure named mondaydb that will significantly enhance the work os platform built on top of which all products within the monday.com suite are constructed, aiming to improve scalability, speed, robustness, and customer capabilities by extending the existing open api.",
+        "analyst_label": "Mondaydb, a schemaless architecture-based data infrastructure introduced by monday.com, significantly enhances the company's work os platform, offering improved scalability, speed, and robustness as part of their strategic pillars to increase platform capabilities for customers, all built on top of an open api suite.",
+        "frequency": 4
+      },
+      "2": {
+        "id": 1,
+        "excerpts": [
+          "With traditional project management tools each task or project has a rigid structure with a due date, assignees, and so forth, said Daniel Lereya, the newly appointed chief product and technology officer at monday.com.",
+          "The company said this second phase will enable dashboards to load 10 times faster, making it easier for customers to share reports and aggregate data from different boards.",
+          "The newly released foundational model of mondayDB allows boards and other items to load five times faster, while also offering customers new use cases and custom workflows, as well as extended API and data manipulation capabilities, the company said."
+        ],
+        "keywords": [
+          "customers",
+          "data",
+          "boards",
+          "board",
+          "platform",
+          "users",
+          "permissions",
+          "limits",
+          "layer",
+          "workflows"
+        ],
+        "pm_label": "The engineering team is tasked to develop a feature that significantly enhances user experience by enabling dashboards to load 10 times faster than before, thereby facilitating easier sharing of reports and aggregation of data from various boards for customers, while simultaneously improving the foundational model of mondaydb to allow boards and other items to load five times quicker. this enhancement should also introduce new use cases and customizable workflows for users, along with expanded api capabilities and advanced data manipulation features, aiming to provide a more dynamic and efficient platform experience.",
+        "analyst_label": "The introduction of mondaydb by monday.com accelerates board loading times significantly, enhancing user experience and efficiency, while also expanding customization options for workflows, data manipulation capabilities through apis, and enabling new use cases compared to traditional project management tools which offer a rigid structure with limited flexibility in permissions, limits, and layering.",
+        "frequency": 9
+      }
+    },
+    "status": 3,
+    "organization": "mediumroast",
+    "content_type": "application/pdf",
+    "file_size": "1.5 MB",
+    "reading_time": 2,
+    "word_count": 499,
+    "page_count": 3,
+    "description": "Monday.com introduces mondayDB, a schemaless architecture boosting platform performance. It enhances scalability and speed for customers using the Work OS platform.",
+    "abstract": "Monday.com introduces mondayDB, a schemaless architecture boosting platform performance. It enhances scalability and speed for customers using the Work OS platform. The new infrastructure allows for flexible use cases, unlike traditional rigid project management tools. MondayDB improves loading speeds fivefold and offers real-time data updates. Future phases aim to further enhance dashboard speeds and expand API capabilities.",
+    "creator": "miha42-github",
+    "creator_id": 10818650,
+    "creator_name": "Michael Hay",
+    "linked_companies": {
+      "monday.com Ltd.": "580152e14db8bae9863084969fdbad0cac334abd36fbe258deb9337666d5f959"
+    },
+    "linked_studies": {},
+    "street_address": "Unknown",
+    "zip_postal": "Unknown",
+    "city": "Tel Aviv",
+    "state_province": "Unknown",
+    "country": "Unknown",
+    "latitude": 32.0735802,
+    "longitude": 34.7880511,
+    "region": "EMEA",
+    "public": true,
+    "groups": "mediumroast:miha42-github",
+    "creation_date": "2024-05-25T04:01:44.907Z",
+    "modification_date": "2024-12-02T03:35:12.398368",
+    "file_hash": "e8725bcf1c37a8feb83ff721b8a43753d1226890a1831a257702123617c358b0",
+    "name": "New monday.com data infrastructure to speed platform performance – Computerworld",
+    "interaction_type": "Webpage",
+    "interaction_type_detail": {
+      "author": "Charlotte Trueman",
+      "year": "2023",
+      "month": "07",
+      "day": "06",
+      "title": "New monday.com data infrastructure to speed platform performance",
+      "url": "https://www.computerworld.com/article/1631996/new-mondaycom-data-infrastructure-to-speed-platform-performance.html"
+    },
+    "url": "Interactions/New monday.com data infrastructure to speed platform performance – Computerworld.pdf",
+    "contact_name": "Michael Hay"
+  },
+  {
+    "tags": {
+      "app for project": 3.0115000104188088,
+      "automation tools": 3.4804530139182015,
+      "document editors": 4.2304530139182015,
+      "editors such": 3.75,
+      "flagship project management": 3.211500010418809,
+      "management software": 2.7304530139182015,
+      "modern document": 2.7304530139182015,
+      "mondays automation": 3.4804530139182015,
+      "mondays flagship": 2.7304530139182015,
+      "monolithic project management": 3.223000020837618,
+      "range of drawing": 3.0115000104188088,
+      "suites of productivity": 3.0115000104188088
+    },
+    "topics": {
+      "1": {
+        "id": 0,
+        "excerpts": [
+          "In Workforms, for instance, users can view form responses in a table thats powered by Monday itself, and they can pull the chart directly into Monday for further collaboration.",
+          "Users can also tie charts into Mondays automation tools for instance, to send notifications when someone fills out a new form entry.",
+          "Canvas provides only a bare bones set of tools for drawing lines, boxes, and shapes; some alternatives, such as Miro, offer ready made templates and a wider range of drawing tools, while Figmas Figjam whiteboards support charts and code blocks."
+        ],
+        "keywords": [
+          "charts",
+          "tools",
+          "whiteboards",
+          "workforms",
+          "canvas",
+          "drawing",
+          "templates",
+          "forms",
+          "whiteboard",
+          "onboarding"
+        ],
+        "pm_label": "The engineering team is tasked to develop a comprehensive tool that integrates monday's platform with advanced drawing capabilities on a digital canvas, enabling users to create detailed workforms, visualize data through interactive charts, leverage automation tools for form submissions, and facilitate collaborative whiteboard sessions, all while providing access to pre-designed templates for streamlined onboarding processes.",
+        "analyst_label": "Workforms offers an integrated chart display feature that enhances collaboration by allowing users to view form responses in a monday-powered table and directly pull the chart into monday for further interaction, whereas canvas provides basic drawing tools but lacks specialized templates and advanced features like miro or figjam's whiteboards which support charts, code blocks, and offer a wider range of drawing functionalities.",
+        "frequency": 9
+      },
+      "2": {
+        "id": 1,
+        "excerpts": [
+          ".",
+          "and also capture new audiences, he says.",
+          "."
+        ],
+        "keywords": [
+          "capture",
+          "audiences",
+          "says",
+          "new"
+        ],
+        "pm_label": "The engineering team is required to develop a system that not only captures existing user interactions but also effectively captures new audiences as stated, ensuring comprehensive data collection across all demographics.",
+        "analyst_label": "The product aims to capture both existing and new audiences, according to the statement.",
+        "frequency": 3
+      },
+      "3": {
+        "id": 2,
+        "excerpts": [
+          "Its also an answer, of sorts, to modern document editors such as Notion and Coda, which have gradually fashioned themselves into all in one tools for project management.",
+          "The approach stands in contrast to rivals such as Airtable and Asana, which have focused on building monolithic project management tools with an expanding array of capabilities.",
+          "Those tech giants spent years building up successful suites of productivity tools, and are now trying to make themfeel less siloed from one another."
+        ],
+        "keywords": [
+          "tools",
+          "building",
+          "management",
+          "project",
+          "capabilities",
+          "editors",
+          "airtable",
+          "productivity",
+          "suites",
+          "tech"
+        ],
+        "pm_label": "The new product requirement is to create an integrated suite of building management tools that seamlessly combines project capabilities alongside advanced editors, aiming to provide a comprehensive solution akin to airtable while addressing the shortcomings highlighted in modern document editors like notion and coda, thereby offering users an experience that feels cohesive across different productivity tools, thus enhancing overall efficiency.",
+        "analyst_label": "The development emphasizes the integration of versatile 'tools' and 'editors', distinguishing itself from rivals like airtable by offering an all-in-one solution for project management that aims to unify productivity suites, addressing the need for less siloed functionalities compared to comprehensive tools such as notion and coda.",
+        "frequency": 3
+      },
+      "4": {
+        "id": 3,
+        "excerpts": [
+          "In addition to citing Microsoft and Google as examples, he points to Atlassianwhich acquired Trello in 2017 to complement its Jira, Confluence, and Bitbucket productsas an example of how companies will eventually want to branch out.",
+          "People are often very specific about what they need initially, and over time they want more aspects, which theyll discover through the ability move between different things that we offer, Zinman says.",
+          "Eran Zinman, Monday.coms co CEO, says that, by offering different tools for different jobs, the company can make each product better while attracting customers who otherwise might not have considered the companys software."
+        ],
+        "keywords": [
+          "time",
+          "mondaycoms",
+          "company",
+          "make",
+          "zinman",
+          "specific",
+          "players",
+          "points",
+          "trello",
+          "productsas"
+        ],
+        "pm_label": "The engineering team is tasked to develop a feature that allows users to specify their needs initially, which can evolve over time as they discover additional functionalities through the ability to switch between different tools offered by the company, aiming to enhance each product while attracting customers who might not have considered using monday.com's software, similar to how atlassian expanded its offerings with trello following its acquisition in 2017.",
+        "analyst_label": "Eran zinman from monday.com highlights that companies like atlassian exemplify strategic expansion through acquisitions to diversify their product offerings, while acknowledging user needs evolve over time, becoming more specific and seeking integration across various tools, thus driving the development of comprehensive platforms that attract a broader customer base beyond those initially considering the company's software.",
+        "frequency": 7
+      },
+      "5": {
+        "id": 4,
+        "excerpts": [
+          "While some of Mondays competitors are still focused on one app that does everything, Zinman argues that this wont last.",
+          "With apps for forms and whiteboards, Monday.com is building a suite Jared Newman While other software companies are trying to offer the One True App for project management, Monday.com is moving in the opposite direction.",
+          "To bundle or unbundle Even if theyre independent in some ways, both products will still lean on integration with the core Monday.com platformwhat the company calls its Work OSto stand out."
+        ],
+        "keywords": [
+          "mondaycom",
+          "core",
+          "mondays",
+          "apps",
+          "app",
+          "bundle",
+          "competitors",
+          "unbundle",
+          "benefits",
+          "osto"
+        ],
+        "pm_label": "The engineering team is tasked to develop a new feature that allows users to unbundle core monday.com functionalities into separate apps, such as forms and whiteboards, aiming to create a suite of specialized tools akin to monday.com's work os, challenging the market dominance of competitors who offer all-in-one solutions by providing more tailored benefits for project management tasks.",
+        "analyst_label": "Monday.com distinguishes itself from its competitors by strategically unbundling features into specialized apps like forms and whiteboards, creating a suite that complements their core platform work os, unlike other companies attempting to offer an all-encompassing single app for project management, as argued by jared newman and zinman.",
+        "frequency": 7
+      },
+      "6": {
+        "id": 5,
+        "excerpts": [
+          "I think its more of a phase, he says of companies offering just one app.",
+          "Right now, both of the new apps are fairly basic.",
+          "The new apps are a way to start with something simpler."
+        ],
+        "keywords": [
+          "apps",
+          "new",
+          "start",
+          "simpler",
+          "phase",
+          "basic",
+          "offering",
+          "companies",
+          "app",
+          "says"
+        ],
+        "pm_label": "Develop a new app that serves as a simplified starting point offering, designed to be the initial phase of a broader suite of applications, addressing concerns raised by industry experts who believe many companies are currently only providing single-app solutions; ensuring that while being basic in its current iteration, it lays foundational capabilities for future enhancements and expansions.",
+        "analyst_label": "During the current phase, companies launching new single-app solutions often perceive it as a strategic move to begin with a simpler, more basic offering, aiming to ease market entry before potentially expanding their portfolio.",
+        "frequency": 3
+      },
+      "7": {
+        "id": 6,
+        "excerpts": [
+          "[Image: courtesy of Monday] The resulting strategy looks somewhat like that of Google and Microsoft, but in reverse.",
+          "(In a nod to the app grid that appears on Googles websites, Workforce and Canvas even have an icon in the top right corner for switching between the companys products.)"
+        ],
+        "keywords": [
+          "googles",
+          "corner",
+          "nod",
+          "workforce",
+          "looks",
+          "icon",
+          "grid",
+          "switching",
+          "microsoft",
+          "canvas"
+        ],
+        "pm_label": "The engineering team is tasked to develop a new workforce management platform that integrates google's and microsoft's strategies but innovatively reverses their application; the interface should prominently feature an icon in the top right corner for users to easily switch between different tools akin to google's app grid on its websites, ensuring seamless navigation across workforce and canvas applications.",
+        "analyst_label": "The strategy being developed incorporates elements reminiscent of google's and microsoft's approaches, particularly in terms of user interface design, such as an icon-based grid system for switching between applications, which is a nod to the layout found on google's websites, thereby creating a cohesive experience akin to their product suite integration.",
+        "frequency": 2
+      }
+    },
+    "status": 3,
+    "organization": "mediumroast",
+    "content_type": "application/pdf",
+    "file_size": "41.7 KB",
+    "reading_time": 3,
+    "word_count": 823,
+    "page_count": 5,
+    "description": "Monday.com is expanding its project management suite with standalone apps: Workforms for forms and Canvas for collaborative whiteboards. Unlike rivals like Airtable or Asana, Monday.com aims to offer deep, specialized tools rather than a monolithic app.",
+    "abstract": "Monday.com is expanding its project management suite with standalone apps: Workforms for forms and Canvas for collaborative whiteboards. Unlike rivals like Airtable or Asana, Monday.com aims to offer deep, specialized tools rather than a monolithic app. The new apps cater to users seeking simpler solutions before committing to Monday.com's core platform. Both apps are basic but have independent development teams and roadmaps, with plans to improve over time. They integrate with Monday.com's Work OS for added functionality.",
+    "creator": "miha42-github",
+    "creator_id": 10818650,
+    "creator_name": "Michael Hay",
+    "linked_companies": {
+      "monday.com Ltd.": "580152e14db8bae9863084969fdbad0cac334abd36fbe258deb9337666d5f959"
+    },
+    "linked_studies": {},
+    "street_address": "Unknown",
+    "zip_postal": "Unknown",
+    "city": "Tel Aviv",
+    "state_province": "Unknown",
+    "country": "Unknown",
+    "latitude": 32.0735802,
+    "longitude": 34.7880511,
+    "region": "EMEA",
+    "public": true,
+    "groups": "mediumroast:miha42-github",
+    "creation_date": "2024-05-25T04:01:44.907Z",
+    "modification_date": "2024-12-02T03:35:15.329664",
+    "file_hash": "2473244a978606ca499a2826cb334c651c94e26a233ad397a94e3410e0853f18",
+    "name": "With apps for forms and whiteboards, Monday.com is building a suite - Fast Company",
+    "interaction_type": "Webpage",
+    "interaction_type_detail": {
+      "author": "JARED NEWMAN",
+      "year": "2022",
+      "month": "02",
+      "day": "23",
+      "title": "With apps for forms and whiteboards, Monday.com is building a suite",
+      "url": "https://www.fastcompany.com/90724310/monday-com-workforms-canvas"
+    },
+    "url": "Interactions/With apps for forms and whiteboards, Monday.com is building a suite - Fast Company.pdf",
+    "contact_name": "Michael Hay"
+  },
+  {
+    "tags": {
+      "chapter of product": 3.0115000104188088,
+      "key product": 2.7304530139182015,
+      "modern technology": 2.7304530139182015,
+      "monday.coms unique process of product": 2.3655773512899807,
+      "multi product": 2.7304530139182015,
+      "multiproduct company": 3.4804530139182015,
+      "product innovation": 3.4919530243370103,
+      "senior management": 2.7304530139182015,
+      "unique process of product development": 2.3655773512899807
+    },
+    "topics": {
+      "1": {
+        "id": 0,
+        "excerpts": [
+          "This dual leadership CPO/CTO model will allow Lereya to simultaneously lead the charge on the product and technology disciplines to drive innovation within monday.com.",
+          "monday.com appoints its first CPTO to stimulate product innovation Roy Edwards July 13, 2023 Monday.com has promoted Daniel Lereya as its first Chief Product and Technology Officer.",
+          "As part of the senior management team, Lereya is essential in using technology and innovation to drive monday.coms forward looking product strategy, vision, and execution."
+        ],
+        "keywords": [
+          "lereya",
+          "mondaycom",
+          "innovation",
+          "role",
+          "cpto",
+          "leadership",
+          "strategy",
+          "model",
+          "management",
+          "promoted"
+        ],
+        "pm_label": "The engineering team must develop a dual leadership model of chief product officer (cpo) and chief technology officer (cto), led by lereya as the first cpto at monday.com, to simultaneously drive innovation in product development and technology implementation, ensuring seamless integration of technological advancements into the forward-looking product strategy and vision.",
+        "analyst_label": "Lereya's promotion to chief product and technology officer at monday.com underlines the company's strategic commitment to innovation-led growth through a dual leadership model combining product expertise and technological advancements, as exemplified by their appointment of the first cpto to drive forward-looking product strategy and execution within the organization.",
+        "frequency": 9
+      },
+      "2": {
+        "id": 1,
+        "excerpts": [
+          "We combine multi disciplinary teams where team members bring their talent and industry knowledge to work together.",
+          "As well as sourcing candidates for the open roles of VP, Product Design and VP, Engineering.",
+          "Beginning with two internal promotions to the roles of VP, R&D, Infrastructure & Foundations, and VP, Product."
+        ],
+        "keywords": [
+          "vp",
+          "infrastructure",
+          "roles",
+          "hiring",
+          "departmental",
+          "engineering",
+          "industry",
+          "organisational",
+          "promotions",
+          "sourcing"
+        ],
+        "pm_label": "The engineering team is tasked with developing a comprehensive infrastructure solution that combines multi-disciplinary expertise, focusing on sourcing candidates not only for open roles like vp, product design and vp, engineering but also for internal promotions to positions such as vp, r&d, infrastructure & foundations, and vp, product, ensuring the integration of industry knowledge and talent across the departmental lines.",
+        "analyst_label": "The company successfully combines multi-disciplinary teams leveraging industry expertise for innovation, actively hires for key executive roles such as vp positions in product design and engineering through strategic sourcing, and internally promotes talent into critical leadership roles including vp, r&d infrastructure & foundations and vp, product, thereby demonstrating a robust organisational focus on internal growth and external talent acquisition.",
+        "frequency": 6
+      },
+      "3": {
+        "id": 2,
+        "excerpts": [
+          "To build the entire product, development, and design cycle in pursuit of our shared goals.",
+          "Innovation is dependant on having the right people available to make the right decisions."
+        ],
+        "keywords": [
+          "cycle",
+          "decisions",
+          "shared",
+          "make",
+          "goals",
+          "build",
+          "development",
+          "design",
+          "innovation",
+          "product"
+        ],
+        "pm_label": "The engineering team must design and build the entire product development cycle, ensuring that every decision made contributes towards our shared goals, while also fostering innovation by having the right people available to make those critical decisions.",
+        "analyst_label": "The successful integration of development, design cycles, and innovation requires aligning team capabilities with shared goals to make pivotal decisions that drive product growth.",
+        "frequency": 2
+      },
+      "4": {
+        "id": 3,
+        "excerpts": [
+          "The company has ambitious plans to propel the company into its next chapter of product innovation and R&D growth.",
+          "Enterprise Times: What this means for business Monday.com has grown from strength to strength over the past few years.",
+          "Its ongoing expansion to a multiproduct company with recent launches of monday sales CRM and monday dev."
+        ],
+        "keywords": [
+          "company",
+          "monday",
+          "strength",
+          "development",
+          "mondaycoms",
+          "addition",
+          "launched",
+          "enterprise",
+          "multiproduct",
+          "sales"
+        ],
+        "pm_label": "The engineering team is tasked with developing an innovative enterprise-level feature addition to monday.com that leverages the company's recent launches of monday sales crm and monday dev., aiming to further strengthen its position as a leading multiproduct company, propelling it into its next chapter of product innovation and r&d growth, based on the successful trajectory observed over the past few years.",
+        "analyst_label": "The company, having experienced consistent growth from strength to strength over the past few years as indicated by enterprise times, is now ambitiously planning for its next phase of innovation and r&d expansion, aiming to further solidify its position as a leading multiproduct enterprise with recent launches such as monday sales crm and monday dev.",
+        "frequency": 8
+      }
+    },
+    "status": 3,
+    "organization": "mediumroast",
+    "content_type": "application/pdf",
+    "file_size": "29.4 KB",
+    "reading_time": 2,
+    "word_count": 500,
+    "page_count": 2,
+    "description": "Monday.com has appointed Daniel Lereya as its first Chief Product and Technology Officer (CPTO). In this role, Lereya will lead product innovation and R&D growth, building on his seven-year tenure at monday.com where he previously headed R&D and oversaw Product teams.",
+    "abstract": "Monday.com has appointed Daniel Lereya as its first Chief Product and Technology Officer (CPTO). In this role, Lereya will lead product innovation and R&D growth, building on his seven-year tenure at monday.com where he previously headed R&D and oversaw Product teams. As CPTO, Lereya will focus on growing monday.com's multi-product vision, hiring across key teams, and driving innovation with a dual leadership CPO/CTO model. He will report to co-CEOs Roy Mann and Eran Zinman.",
+    "creator": "miha42-github",
+    "creator_id": 10818650,
+    "creator_name": "Michael Hay",
+    "linked_companies": {
+      "monday.com Ltd.": "580152e14db8bae9863084969fdbad0cac334abd36fbe258deb9337666d5f959"
+    },
+    "linked_studies": {},
+    "street_address": "Unknown",
+    "zip_postal": "Unknown",
+    "city": "Tel Aviv",
+    "state_province": "Unknown",
+    "country": "Unknown",
+    "latitude": 32.0735802,
+    "longitude": 34.7880511,
+    "region": "EMEA",
+    "public": true,
+    "groups": "mediumroast:miha42-github",
+    "creation_date": "2024-05-25T04:01:44.907Z",
+    "modification_date": "2024-12-02T03:35:18.430012",
+    "file_hash": "32d412d4e2347a3189935dcbf8367d7c39dc609ba774e71f7b0954bc3fa793cc",
+    "name": "monday.com appoints its first CPTO to stimulate product innovation -",
+    "interaction_type": "Press Release",
+    "interaction_type_detail": {
+      "author": "monday.com",
+      "year": "2023",
+      "month": "07",
+      "day": "11",
+      "title": "monday.com Appoints its First CPTO to Accelerate the Next Age of Innovation",
+      "url": "https://ir.monday.com/news-and-events/news-releases/news-details/2023/monday.com-Appoints-its-First-CPTO-to-Accelerate-the-Next-Age-of-Innovation/default.aspx"
+    },
+    "url": "Interactions/monday.com appoints its first CPTO to stimulate product innovation -.pdf",
+    "contact_name": "Michael Hay"
+  },
+  {
+    "tags": {
+      "billions of loading": 3.7615000104188088,
+      "data lambda architecture": 3.961500010418809,
+      "large quantities of data": 3.410906027836403,
+      "pre calculation of query": 3.410906027836403,
+      "quantities of data lambda": 4.160906027836403,
+      "speeds across billions": 3.7615000104188088,
+      "traditional data management": 3.211500010418809
+    },
+    "topics": {
+      "0": {
+        "id": 0,
+        "excerpts": [
+          "We always want to provide the broadest range of capabilities to our customers who rely on us for cutting edge solutions and technology to manage their work best for them, Lereya continued.",
+          "We have always invested in improving our infrastructure to provide our customers with optimal quality, performance, and user experience, said Daniel Lereya, chief product and technology officer at monday.com.",
+          "To address our long term business goals and company strategy, we had to invest in a new infrastructure that would completely overhaul how we adapt to the most extensive, complex work scenarios in the market, allowing organizations of any size to build and manage workflows at scale while enjoying exceptional performance."
+        ],
+        "keywords": [
+          "customers",
+          "infrastructure",
+          "technology",
+          "foundational",
+          "manage",
+          "performance",
+          "tech",
+          "overhaul",
+          "market",
+          "platforms"
+        ],
+        "pm_label": "The engineering team is tasked with developing a foundational technology platform that significantly overhauls the company's infrastructure capabilities to ensure it can provide customers with cutting-edge solutions, manage their work most efficiently, and maintain optimal performance across all platforms, thereby enhancing user experience and aligning with long-term business goals and market demands.",
+        "analyst_label": "Leveraging cutting-edge technology and investing significantly in infrastructure improvements, monday.com aims to provide customers with optimal quality, performance, and user experience, enabling organizations of any size to build and manage workflows efficiently while addressing long-term business goals and company strategy through a comprehensive overhaul of their platforms.",
+        "frequency": 8
+      },
+      "1": {
+        "id": 1,
+        "excerpts": [
+          "mondayDB 1.0s re engineered infrastructure dramatically improves performance speed, scalability, and flexibility monday.com, the provider of the work operating system (Work OS), is announcing the launch of mondayDB 1.0, the next iteration of the companys Work OS platform re engineered with a new infrastructure.",
+          "This enables mondayDB 1.0 to adapt to an enterprises work style as they continue to add new users, data tables, and query volume.",
+          "mondayDBs performance will continue to scale as an organization does, supporting both Columnar data structure, which provides flexible and efficient access to large quantities of data Lambda architecture patterns, which enable rapid pre calculation of query results Separated storage and compute layers, which allows each to scale horizontally, dynamically increasing or reducing the required transaction volume to match users needs mondayDB 1.0 also highlights its ability to provide elasticity at scale, powered by its schema less architecture."
+        ],
+        "keywords": [
+          "mondaydb",
+          "data",
+          "architecture",
+          "schema",
+          "mondaycom",
+          "infrastructure",
+          "boards",
+          "tables",
+          "mondaydbs",
+          "workflows"
+        ],
+        "pm_label": "The engineering team is tasked with developing the mondaydb 1.0's data architecture that integrates a flexible schema-less design, supports both columnar data structure and lambda architecture patterns for efficient query processing, enables dynamic scaling of storage and compute layers to match varying user transaction volumes, and provides elasticity at scale, ensuring improved performance speed, scalability, and flexibility as part of monday.com's work os platform.",
+        "analyst_label": "Mondaydb 1.0, introduced by monday.com as part of their work os platform, significantly enhances performance speed, scalability, and flexibility through re-engineered infrastructure, featuring columnar data structure for efficient large data access, lambda architecture patterns for rapid query result calculations, separated storage and compute layers that scale horizontally to dynamically adjust transaction volume based on user needs, all powered by a schema-less architecture enabling elasticity at scale.",
+        "frequency": 18
+      }
+    },
+    "status": 3,
+    "organization": "mediumroast",
+    "content_type": "application/pdf",
+    "file_size": "25.8 KB",
+    "reading_time": 3,
+    "word_count": 647,
+    "page_count": 3,
+    "description": "Monday.com launches mondayDB 1.0, a reengineered infrastructure for its Work OS platform, offering dramatic improvements in speed and scalability. The new version also provides extended functionality for flexibility when building applications on the platform.",
+    "abstract": "Monday.com launches mondayDB 1.0, a reengineered infrastructure for its Work OS platform, offering dramatic improvements in speed and scalability. The new version also provides extended functionality for flexibility when building applications on the platform. MondayDB continues to innovate with its schema-less architecture, enabling organizations of any size to manage complex workflows at scale. Daniel Lereya, Chief Product and Technology Officer at monday.com, states that the company invested in a new infrastructure to adapt to extensive work scenarios and provide optimal performance for users. MondayDB 1.0 offers major performance improvements, supporting both Columnar data structure and Lambda architecture patterns, allowing it to scale as an organization grows. The schema-less architecture provides elasticity at scale, accommodating enterprises with unique needs. With mondayDB 1.0, customers enjoy enhanced capabilities such as quick-loading dashboards and boards with hundreds of thousands of leads. Over 186,000 customers have successfully adopted the new infrastructure, with plans for future updates including mondayDB 1.1 later this year and mondayDB 2.0 in early 2024.",
+    "creator": "miha42-github",
+    "creator_id": 10818650,
+    "creator_name": "Michael Hay",
+    "linked_companies": {
+      "monday.com Ltd.": "580152e14db8bae9863084969fdbad0cac334abd36fbe258deb9337666d5f959"
+    },
+    "linked_studies": {},
+    "street_address": "Unknown",
+    "zip_postal": "Unknown",
+    "city": "Tel Aviv",
+    "state_province": "Unknown",
+    "country": "Unknown",
+    "latitude": 32.0735802,
+    "longitude": 34.7880511,
+    "region": "EMEA",
+    "public": true,
+    "groups": "mediumroast:miha42-github",
+    "creation_date": "2024-05-25T04:01:44.907Z",
+    "modification_date": "2024-12-02T03:35:21.398378",
+    "file_hash": "ac766223dde02af5b69d666d5751ddd79316f723b1f315a8583e5ba2e705020a",
+    "name": "mondayDB 1.0’s re-engineered infrastructure dramatically improves performance speed, scalability, and flexibility",
+    "interaction_type": "Press Release",
+    "interaction_type_detail": {
+      "author": "monday.com",
+      "year": "2023",
+      "month": "07",
+      "day": "26",
+      "title": "monday.com Enhances Core Data Infrastructure with mondayDB",
+      "url": "https://ir.monday.com/news-and-events/news-releases/news-details/2023/monday.com-Enhances-Core-Data-Infrastructure-with-mondayDB/default.aspx"
+    },
+    "url": "Interactions/mondayDB 1.0’s re-engineered infrastructure dramatically improves performance speed, scalability, and flexibility.pdf",
+    "contact_name": "Michael Hay"
+  },
+  {
+    "tags": {
+      "content upkeep folder": 5.461500010418809,
+      "customer support": 6.210906027836403,
+      "intensive content upkeep": 6.211500010418809,
+      "internal knowledge": 6.4804530139182015,
+      "knowledge management": 7.2304530139182015,
+      "knowledge via salient": 6.011500010418809,
+      "labor intensive": 6,
+      "management real": 6.75,
+      "other mission": 5.7304530139182015,
+      "real time": 9.096030365208183,
+      "salient entry": 4.9804530139182015,
+      "search bar": 5.74195302433701
+    },
+    "topics": {
+      "1": {
+        "id": 0,
+        "excerpts": [
+          "Confluence makes distributed work easier, whether synchronous or not  across time zones, locations, and working hours, teams can work together easily in real time or async to get work done fast.Robust integrations with Microsoft Teams and Google Meet bring Confluence pages into your meetings, with the ability to create, edit, and collaborate on pages in real time.",
+          "Confluences native Jira integration makes it easy for any team using Jira to connect their work on one platform  program managers using Jira Work Management for tracking a campaign, customer SharePoint is not specifically designed to help development External knowledge sharing Confluence has three options for external access: anonymous access, single page guests, and public links.",
+          "embedded Jira issues, creating a Confluence page from a Jira issue view); because Confluence and Jira exist in a shared platform, knowledge, context, and tasks are seamlessly connected in one place Related pages automatically generate suggestions for further reading, based on pages that are viewed or are organized together, at the bottom of a Confluence page so that you get context faster and can discover relevant articles in a knowledge base with related pages Page trees help organize information in a way that is more visible than any other knowledge sharing structure, helping you navigate quickly between related pages faster than ever Hundreds of marketplace apps and integrations that unite data, visuals, and key information for easy customization based on your organizations tool stack."
+        ],
+        "keywords": [
+          "confluence",
+          "jira",
+          "knowledge",
+          "pages",
+          "templates",
+          "sharepoint",
+          "integrations",
+          "tasks",
+          "confluences",
+          "collaborating"
+        ],
+        "pm_label": "The engineering team is tasked to develop a feature that enables seamless integration between confluence and sharepoint, allowing users to share knowledge pages across both platforms while also incorporating robust jira task management capabilities, ensuring that tasks, knowledge, and context are interconnected within one unified environment for efficient collaboration and productivity enhancement.",
+        "analyst_label": "Confluence, by facilitating seamless integration with tools like jira, microsoft teams, google meet, sharepoint, and offering robust templates, embedded tasks, and extensive external knowledge sharing options via anonymous access, single page guests, or public links, empowers teams to collaborate efficiently across different time zones and locations, making distributed work easier both in real-time and asynchronously.",
+        "frequency": 43
+      },
+      "2": {
+        "id": 1,
+        "excerpts": [
+          "SharePoint is a file repository.",
+          "Microsoft 365 Business Standard: Includes the desktop, web, and mobile versions of Word, Excel, PowerPoint, Outlook, Teams, SharePoint, OneDrive, and Lists.",
+          "Where SharePoint sets itself apart is its native integration with the Microsoft 365 package, which might cause teams that already operate on Microsoft products to see SharePoint as a default tool."
+        ],
+        "keywords": [
+          "sharepoint",
+          "microsoft",
+          "onedrive",
+          "excel",
+          "slack",
+          "chat",
+          "tools",
+          "app",
+          "outlook",
+          "mobile"
+        ],
+        "pm_label": "The engineering team is tasked with developing a new app that seamlessly integrates sharepoint's file repository capabilities with microsoft 365 tools including excel, outlook, teams, onedrive, and mobile versions of word and powerpoint, enhancing collaboration through chat features similar to slack while ensuring smooth user experience across desktop, web, and mobile platforms.",
+        "analyst_label": "The competitive insight highlights that sharepoint, being deeply integrated into the microsoft 365 suite including apps like excel, outlook, and onedrive, offers a cohesive ecosystem advantage for teams already using microsoft products, potentially positioning it as their go-to tool due to seamless integration and access across desktop, web, mobile platforms.",
+        "frequency": 27
+      },
+      "3": {
+        "id": 2,
+        "excerpts": [
+          "Taken together, pages, whiteboards, and spaces make it easy to collaborate on written or visual projects, search and iterate on content, and keep all work organized in one place.",
+          "With intranet pages, SharePoint users can create customizable pages, pull in Like Confluence, theres also a mobile app where colleagues can access and edit SharePoint files, which makes it easy to access information faster or when laptops arent readily available, such as during informal chats between colleagues.",
+          "Fewer and more limited integrations with non Microsoft tools Limited native workflows and macros, leading to more labor intensive content upkeep Folder structure makes files less visible and findable, encouraging information silos and operational inefficienciesFewer ready made templates, which adds an extra burden of customization to users Closed by default knowledge sharing philosophy slows work, as information and files are private unless intentionally shared."
+        ],
+        "keywords": [
+          "spaces",
+          "pages",
+          "content",
+          "layout",
+          "files",
+          "space",
+          "whiteboards",
+          "organized",
+          "sharepoint",
+          "intranet"
+        ],
+        "pm_label": "The new product requirement is to develop an enhanced sharepoint intranet feature that allows seamless integration of pages, whiteboards, and spaces, enabling users to collaborate effectively on both written and visual projects, search and refine content efficiently, and maintain organization in one centralized location; additionally, it should include a mobile app for quick access and editing of sharepoint files during informal colleague interactions, improve the visibility and findability of files through an optimized folder structure, introduce more customizable templates, facilitate easier knowledge sharing by allowing default access to information unless intentionally set as private, thereby reducing operational inefficiencies and promoting a collaborative work environment.",
+        "analyst_label": "The integration of pages, whiteboards, spaces, and organized content within sharepoint facilitates collaborative written or visual project management, efficient content iteration, and centralized organization, while its mobile app ensures swift access to information even when laptops are unavailable, thus streamlining workflow and enhancing productivity in both formal and informal work environments.",
+        "frequency": 19
+      },
+      "4": {
+        "id": 3,
+        "excerpts": [
+          "Marketing teams use whiteboards to facilitate team brainstorms, even when working remotely.",
+          "Think of it this way: knowledge silos naturally appear around teams, since most teams dont share all their information with other teams.",
+          "The answer usually comes down to logistics  each team uses a different tool to document work, formats and organizes that information differently, and holds to their own ways of working."
+        ],
+        "keywords": [
+          "teams",
+          "team",
+          "communication",
+          "information",
+          "tool",
+          "teamsdevelopment",
+          "tier",
+          "proximity",
+          "organizes",
+          "logistics"
+        ],
+        "pm_label": "The new product requirement is: develop a communication tool designed specifically for teams that facilitates seamless information sharing across different tiers, minimizes knowledge silos by enabling collaborative workspaces regardless of geographical proximity, organizes logistics efficiently through unified documentations and workflows, and supports remote brainstorming sessions similar to traditional whiteboard use in marketing teams.",
+        "analyst_label": "In the realm of teams development, organizations often face challenges due to knowledge silos emerging among different teams, which can be attributed to logistical issues like each team using distinct tools for documenting work, organizing information uniquely, and adhering to their individual working methodologies, thereby impacting effective communication and collaboration.",
+        "frequency": 13
+      },
+      "5": {
+        "id": 4,
+        "excerpts": [
+          "$5/user per month.",
+          "$11.55/user per month for up to 100 users.",
+          "$6.05/user per month for up to 100 users."
+        ],
+        "keywords": [
+          "month",
+          "pricing",
+          "users",
+          "estimate",
+          "5user",
+          "1250user",
+          "1155user",
+          "605user",
+          "calculator",
+          "sharepoints"
+        ],
+        "pm_label": "The engineering team is tasked with developing a user-based pricing calculator that estimates monthly costs for different user capacities; the tool should provide options of $5/user per month for up to 5 users, $11.55/user per month for up to 1250 users, and $6.05/user per month for up to 1155 users, ensuring seamless sharing capabilities through sharepoint integration.",
+        "analyst_label": "The pricing model varies significantly across different user tiers, ranging from $5/user per month for the '5user' plan to $6.05/user per month for up to 100 users, showcasing a competitive landscape that accommodates various budget constraints and scales of operation.",
+        "frequency": 9
+      },
+      "6": {
+        "id": 5,
+        "excerpts": [
+          "SharePoint workflows can automate tasks.",
+          "You can also create task lists in SharePoint.",
+          "A moveable interface, rich with timers, votes, and more, allows for easy task or process visualization."
+        ],
+        "keywords": [
+          "task",
+          "automate",
+          "votes",
+          "timers",
+          "interface",
+          "visualization",
+          "tasks",
+          "process",
+          "lists",
+          "workflows"
+        ],
+        "pm_label": "The engineering team is tasked to develop a sharepoint-based application that automates various tasks through workflows, enables the creation of interactive task lists, incorporates a moveable interface rich with timers, votes, and other features for easy visualization of tasks or processes, thereby enhancing productivity and user experience.",
+        "analyst_label": "The integration of sharepoint workflows not only automates tasks but also facilitates the creation of task lists, offering users an interactive interface equipped with features like timers, votes, and additional tools for seamless visualization of both tasks and processes.",
+        "frequency": 3
+      },
+      "7": {
+        "id": 6,
+        "excerpts": [
+          "Together, Atlassian and Microsoft integrations enable the seamless flow of work across your organization without compromising on the best tool for the job.",
+          "Atlassian Intelligence features are available for all Premium and Enterprise users to help speed up work  write better, search faster, summarize information, and more.",
+          "Enterprise: Designed for global companies that operate at the largest scale, with the highest level of support and security features available on the Atlassian platform."
+        ],
+        "keywords": [
+          "atlassian",
+          "enterprise",
+          "features",
+          "flow",
+          "seamless",
+          "security",
+          "speed",
+          "global",
+          "platform",
+          "organization"
+        ],
+        "pm_label": "The engineering team is tasked to develop an enterprise-level atlassian platform that seamlessly integrates global operations while ensuring top-notch security features; this platform should incorporate advanced intelligence capabilities to expedite workflow processes and enhance user productivity across the organization, aligning perfectly with microsoft integrations for a cohesive work environment without compromising on tool-specific efficiencies.",
+        "analyst_label": "Atlassian's enterprise solutions offer seamless integration capabilities and a suite of intelligence features designed for global organizations to enhance workflow efficiency, speed up tasks, improve information management, while ensuring top-level security and support on their robust platform.",
+        "frequency": 3
+      },
+      "8": {
+        "id": 7,
+        "excerpts": [
+          "Unlimited storage.",
+          "Up to 250 GB of storage.",
+          "Caps at 2 GB of storage."
+        ],
+        "keywords": [
+          "storage",
+          "gb",
+          "unlimited",
+          "caps",
+          "250"
+        ],
+        "pm_label": "The new product requires unlimited storage capacity, however, it should cap at 250 gb to ensure efficient resource management, providing users the flexibility of storing large amounts of data while maintaining system performance.",
+        "analyst_label": "The product offerings vary widely in terms of storage capacity, ranging from unlimited options to capped plans at 2 gb or up to 250 gb, highlighting the diverse needs and preferences among consumers.",
+        "frequency": 3
+      },
+      "9": {
+        "id": 8,
+        "excerpts": [
+          "Documenting important detailed processes, like technical product requirements and design decisions.",
+          "When engineering begins working on that fix, customer success is able to relay an estimated timeline for a fix  and sales is able to address that potential concern should it ever come up."
+        ],
+        "keywords": [
+          "fix",
+          "engineering",
+          "concern",
+          "processes",
+          "requirements",
+          "relay",
+          "documenting",
+          "sales",
+          "technical",
+          "design"
+        ],
+        "pm_label": "The engineering team must document important detailed processes including technical product requirements and design decisions, ensuring customer success can relay an estimated timeline for any fixes to sales, who will address potential concerns should they arise.",
+        "analyst_label": "The integration of detailed documentation on technical product requirements and design decisions facilitates smoother communication between engineering teams and other departments like sales and customer success, enabling quicker identification and resolution of potential concerns, as well as providing a transparent estimated timeline for fixes which enhances overall customer satisfaction and trust in the product's reliability.",
+        "frequency": 2
+      }
+    },
+    "status": 3,
+    "organization": "mediumroast",
+    "content_type": "application/pdf",
+    "file_size": "486.7 KB",
+    "reading_time": 12,
+    "word_count": 2968,
+    "page_count": 13,
+    "description": "**Summary:** Confluence is a connected workspace designed for teams needing a hub for company-wide knowledge sharing, benefiting from its open-by-default design that breaks down silos. It offers real-time collaboration on pages, whiteboards, and spaces, with popular integrations like Jira, Microsoft Teams, and Google Meet.",
+    "abstract": "**Summary:** Confluence is a connected workspace designed for teams needing a hub for company-wide knowledge sharing, benefiting from its open-by-default design that breaks down silos. It offers real-time collaboration on pages, whiteboards, and spaces, with popular integrations like Jira, Microsoft Teams, and Google Meet. Confluence is best suited for teams looking to collaborate across tools and platforms, while SharePoint excels as a file repository with native integration into the Microsoft 365 suite. The choice between Confluence and SharePoint depends on whether you prioritize collaboration or file storage and management.",
+    "creator": "miha42-github",
+    "creator_id": 10818650,
+    "creator_name": "Michael Hay",
+    "linked_companies": {
+      "Atlassian Corp": "d7651f0c19343026ddb49e9f668c6f86ddedde6702008a6e7ec124a9c3731ca2"
+    },
+    "linked_studies": {},
+    "street_address": "350 BUSH STREET FLOOR 13",
+    "zip_postal": "94104",
+    "city": "SAN FRANCISCO",
+    "state_province": "CA",
+    "country": "USA",
+    "latitude": 37.791121018953,
+    "longitude": -122.403374976666,
+    "region": "AMER",
+    "public": true,
+    "groups": "mediumroast:miha42-github",
+    "creation_date": "2024-05-05T21:10:19.490Z",
+    "modification_date": "2024-12-02T03:34:48.413361",
+    "file_hash": "5ffcccaf6653d08cdb59b51d81bf359b5261453b6dc67f0750d581c14d35d106",
+    "name": "Confluence vs SharePoint - When to use which? - Work Life by Atlassian",
+    "interaction_type": "Blog Post",
+    "interaction_type_detail": {
+      "author": "Cindy Ji",
+      "year": "2024",
+      "month": "01",
+      "day": "19",
+      "title": "Confluence vs. SharePoint: When to use which?",
+      "blog": "Confluence Blog",
+      "url": "https://www.atlassian.com/blog/confluence/vs-sharepoint"
+    },
+    "url": "Interactions/Confluence vs SharePoint - When to use which? - Work Life by Atlassian.pdf",
+    "contact_name": "Michael Hay"
+  },
+  {
+    "tags": {
+      "cases for custom": 3.0115000104188088,
+      "custom checkbox": 3.4804530139182015,
+      "custom fields": 3.691359041754604,
+      "custom formula": 5.003453034755819,
+      "different field": 2.7304530139182015,
+      "edit for each field": 3.210906027836403,
+      "examples of use": 3.0115000104188088,
+      "field options": 3.210906027836403,
+      "formula type": 2.7304530139182015,
+      "more details on custom": 2.660906027836403,
+      "options section": 3.210906027836403,
+      "use a custom": 3
+    },
+    "topics": {
+      "1": {
+        "id": 0,
+        "excerpts": [
+          "Discovery projects Built in and custom fields also have field types, which refers to the format of the field option, like a How do I create and edit fields?",
+          "Add a field name and select a field type To edit a field: In the righthand panel that appears, hover over any field and click the gear icon to edit the field Formatting beautiful fields Managing and viewing a project is much easier to navigate when you add formatting like colors and emojis   plus its visually pleasing!",
+          "To add formatting to a field: In the righthand panel that appears, hover over any field and click the gear icon to edit Above the space to write a description, click the emoji icon to add an emoji next to the field In the Options section below, hover over any field option, click the three dots, and select Edit For each field option, you can add an emoji, associate it with a color, and toggle on row highlighting Did you know you can add weighting to each field option to define its relative importance?"
+        ],
+        "keywords": [
+          "field",
+          "fields",
+          "click",
+          "formatting",
+          "emoji",
+          "icon",
+          "hover",
+          "panel",
+          "modifying",
+          "navigate"
+        ],
+        "pm_label": "The engineering team is tasked with developing a feature that allows users to create and modify custom fields by adding names, selecting field types, and applying formatting options such as colors and emojis through hover actions on the gear icon next to each field; additionally, an emoji icon should be available above the description space for adding emojis beside fields. users can further navigate their projects more efficiently by editing field options in the right-hand panel, where they can associate colors with these options and toggle row highlighting, also having the ability to add weighting to each option to define its relative importance.",
+        "all_excerpts": "",
+        "analyst_label": "The product offers customizable fields with various formats such as text or dropdowns, enabling users to tailor their project management experience; through the use of icons for emojis and hover features for editing, navigation becomes streamlined and visually appealing, while also allowing for advanced formatting options like colors and weighting on field importance, enhancing both functionality and user engagement.",
+        "frequency": 11
+      },
+      "2": {
+        "id": 1,
+        "excerpts": [
+          "If you have specific methods to prioritize your ideas, such as RICE scoring, you may want to create a custom formula field.",
+          "See an example or watch a demo on how to recreate Create custom fields and a custom formula to leverage the RICE scoring method for prioritizing a list of ideas based on Reach, Impact, Confidence, and Effort.",
+          "Find inspiration in some examples of Use a custom checkbox field named Triage so PMs can easily control and track when new ideas are submitted Create a custom formula field named Impact vs Effort with a simple formula, {Impact}/{Effort} , to help prioritize a list of ideas Use a custom select field to create a parent/child or opportunity/solution relationship among ideas."
+        ],
+        "keywords": [
+          "ideas",
+          "prioritize",
+          "rice",
+          "impact",
+          "scoring",
+          "methods",
+          "parentchild",
+          "prioritization",
+          "prioritizing",
+          "track"
+        ],
+        "pm_label": "The engineering team is tasked with developing a feature that allows users to prioritize their ideas using the rice scoring method by creating custom formula fields, including a 'triage' custom checkbox field for project managers to easily manage incoming ideas, an 'impact vs effort' custom formula field calculating {impact}/{effort} to aid in prioritization, and implementing a custom select field that establishes a parent-child or opportunity/solution relationship among the ideas being tracked.",
+        "all_excerpts": "",
+        "analyst_label": "To effectively prioritize ideas using methods like rice scoring, one can create custom formula fields such as impact vs effort ({impact}/{effort}) or a triage system for tracking, alongside leveraging custom checkbox and select fields to establish relationships between parent-child or opportunity/solution ideas, ensuring efficient management and decision-making processes.",
+        "frequency": 6
+      },
+      "3": {
+        "id": 2,
+        "excerpts": [
+          "number, checkbox, multi select values, rating, or a custom formula.",
+          "There are three options you can use when creating a formula field: Weighted score   calculates the value of an idea relative to other ideas in your project Roll up   the sum of different field values."
+        ],
+        "keywords": [
+          "values",
+          "sum",
+          "multi",
+          "calculates",
+          "score",
+          "weighted",
+          "rating",
+          "roll",
+          "checkbox",
+          "value"
+        ],
+        "pm_label": "The engineering team is tasked with developing a feature that allows users to create custom formula fields using options such as 'number', 'checkbox', 'multi select values', 'rating', or a 'custom formula'. users should be able to choose between calculating a 'weighted score' which determines the value of an idea relative to others in their project, or 'rolling up' different field values by summing them. this feature aims to provide users with flexible and powerful tools for scoring and rating their ideas or data points based on predefined criteria or custom logic they define.",
+        "all_excerpts": "",
+        "analyst_label": "The product offers versatile formula creation options including weighted scores that assess the relative importance of ideas within a project, summed values through roll-up for aggregating different fields, or custom formulas combining number, checkbox, multi-select values, ratings, and more.",
+        "frequency": 2
+      },
+      "4": {
+        "id": 3,
+        "excerpts": [
+          "How do I create a custom formula?",
+          "For example, a roll up formula could be the addition of Write your own   write your own simple formula using addition, subtraction, multiplication, and Visit our documentation for more details on custom formulas.",
+          "To create a custom formula: In the righthand panel that appears, click on the blue Create a new field button Type a field name, select Custom formula as your field type, and select a custom formula type Purchasing & licensing"
+        ],
+        "keywords": [
+          "formula",
+          "custom",
+          "formulas",
+          "addition",
+          "calculate",
+          "purchasing",
+          "licensing",
+          "multiplication",
+          "subtraction",
+          "value"
+        ],
+        "pm_label": "The engineering team is tasked to develop a feature that enables users to create custom formulas by adding, subtracting, multiplying, or dividing values; this can be achieved through the use of a 'create a new field' button on the right-hand panel where users type in a field name and select 'custom formula' as their field type. the system should allow for the creation of complex calculations using basic mathematical operations, which will provide more value to users when purchasing or licensing specific features.",
+        "all_excerpts": "",
+        "analyst_label": "To create a custom formula, users can utilize various mathematical operations such as addition, subtraction, multiplication, and division; visit the documentation for detailed guidance on formulating these calculations, and when needed, purchasing or licensing options are available to enhance functionality.",
+        "frequency": 5
+      }
+    },
+    "status": 3,
+    "organization": "mediumroast",
+    "content_type": "application/pdf",
+    "file_size": "363.2 KB",
+    "reading_time": 2,
+    "word_count": 616,
+    "page_count": 1,
+    "description": "In this guide, you're instructed to choose between weighing options by number or rating. After following steps 1 and 2, click 'Add weighting' in the 'Field Options' section.",
+    "abstract": "In this guide, you're instructed to choose between weighing options by number or rating. After following steps 1 and 2, click 'Add weighting' in the 'Field Options' section. For discovery projects, both built-in and custom fields have field types that determine the format of field options. To create a new field, provide a name and select a type. Editing a field is done by hovering over it and clicking the gear icon on the right-hand panel. Formatting fields with colors and emojis enhances visual appeal and ease of navigation. Emojis can be added next to fields using the emoji icon above the description space. Each field option can have an associated emoji, color, and row highlighting toggle. You can also add weighting to each field option for prioritization. For specific methods like RICE scoring, create a custom formula field. Examples include a 'Triage' checkbox field or an 'Impact vs Effort' formula field to help prioritize ideas based on reach, impact, confidence, and effort. When creating a custom formula field, choose between weighted score (relative value) or roll up (sum of values). To create a custom formula, use the right-hand panel's 'Create a new field' button, type a name, select 'Custom formula' as the type, and choose a custom formula type like purchasing & licensing.",
+    "creator": "miha42-github",
+    "creator_id": 10818650,
+    "creator_name": "Michael Hay",
+    "linked_companies": {
+      "Atlassian Corp": "d7651f0c19343026ddb49e9f668c6f86ddedde6702008a6e7ec124a9c3731ca2"
+    },
+    "linked_studies": {},
+    "street_address": "350 BUSH STREET FLOOR 13",
+    "zip_postal": "94104",
+    "city": "SAN FRANCISCO",
+    "state_province": "CA",
+    "country": "USA",
+    "latitude": 37.791121018953,
+    "longitude": -122.403374976666,
+    "region": "AMER",
+    "public": true,
+    "groups": "mediumroast:miha42-github",
+    "creation_date": "2024-11-18T03:37:27.466Z",
+    "modification_date": "2024-12-02T03:36:01.927664",
+    "file_hash": "71c005aef72b21598366a481784ee0a0718f09b368f73c2ec2da6dd9dec95175",
+    "name": "Introduction to Jira Product Discovery fields - Atlassian",
+    "interaction_type": "Product/Service Document",
+    "interaction_type_detail": {
+      "author": "Atlassian",
+      "year": "Unknown",
+      "month": "Unknown",
+      "day": "Unknown",
+      "title": "Introduction to Jira Product Discovery fields",
+      "url": "https://www.atlassian.com/software/jira/product-discovery/guides/fields/overview#what-are-fields"
+    },
+    "url": "Interactions/Introduction to Jira Product Discovery fields - Atlassian.pdf"
+  },
+  {
+    "tags": {
+      "button in the top": 3,
+      "create button": 3.4804530139182015,
+      "decisions solution": 2.7304530139182015,
+      "description board": 2.7304530139182015,
+      "discovery project": 2.460906027836403,
+      "fields in a product": 2.460906027836403,
+      "fields relevant": 3,
+      "idea without a description": 3.210906027836403,
+      "other fields": 2.7419530243370103,
+      "product discovery": 3.210906027836403,
+      "relevant for that other": 3,
+      "upper right hand": 3.973000020837618,
+      "view of any idea": 2.6718120556728056
+    },
+    "topics": {
+      "1": {
+        "id": 0,
+        "excerpts": [
+          "To use a template, click into an idea and click on Templates under the idea description.",
+          "There are a 2 ways to create an idea: Click on the blue Create button in the top navigation to fill in a pre defined set of fields, or Depending on your view, follow the steps below List view   Click the blue Create an idea button to quickly create an idea without a create an idea without a description Board view   Click + Add idea to create an idea for a specific column Once your idea is created, you can click into it to refine your description, update field values, and add What are description templates?",
+          "Tabs   Tabs contain information specific to this individual idea, including comments, insights, linked delivery tickets from Jira Software, and history of edits and changes associated with the Pinned Fields   Users can customize this section and pin fields that are most important to them Fields in this view   Fields that appear in this section are specific to the view that youre in."
+        ],
+        "keywords": [
+          "fields",
+          "view",
+          "create",
+          "templates",
+          "template",
+          "discovery",
+          "tabs",
+          "button",
+          "standardize",
+          "project"
+        ],
+        "pm_label": "The engineering team is tasked with developing a feature allowing users to access templates by clicking into an idea and selecting 'templates' under the idea description; additionally, they should implement two methods for creating ideas: one involves using the blue 'create' button in the top navigation which fills out predefined fields, while the other requires following specific steps based on the user's view - either clicking a 'create an idea' button in list view or adding an idea through '+ add idea' in board view; once created, users can refine descriptions and update field values. furthermore, they should incorporate tabs that contain information specific to each idea such as comments, insights, linked delivery tickets from jira software, and history of edits, with the option for users to customize this section by pinning fields of importance. lastly, ensure that fields displayed are relevant to the user's current view.",
+        "all_excerpts": "",
+        "analyst_label": "The product offers versatile creation methods for ideas through either clicking on the 'create' button in top navigation which utilizes predefined fields or by following specific steps under different views like list view where users click 'create an idea' to swiftly generate ideas without descriptions or board view requiring '+ add idea' action for column-specific ideas, and upon creation, users can delve into refining their descriptions, updating field values, adding details, utilizing templates for what's described, managing tabs that contain relevant information such as comments, insights, linked delivery tickets from jira software, and tracking history of edits, all allowing customization by pinning important fields.",
+        "frequency": 13
+      },
+      "2": {
+        "id": 1,
+        "excerpts": [
+          "When you have a large list of ideas to manage or are triaging ideas that have been submitted, you need to be able to merge similar or duplicate ideas, or do away with ideas you wont commit to.",
+          "To clone an idea, click into the full view of any idea, and click Clone in the upper right hand When internal teams or customers submit ideas, you may find similar or identical ideas in a project that you can merge together.",
+          "To merge one or multiple ideas, click into the full view of any idea and click Merge in the upper right hand corner."
+        ],
+        "keywords": [
+          "merge",
+          "ideas",
+          "clone",
+          "click",
+          "similar",
+          "identical",
+          "commit",
+          "attachments",
+          "submit",
+          "submitted"
+        ],
+        "pm_label": "The product requires an interface that allows users to manage large lists of ideas by merging similar or duplicate entries, discarding those not worth committing to, and also provides functionalities to clone individual ideas through a click on the 'clone' button located in the upper right corner when viewing any idea's full details. additionally, it should enable users to merge one or multiple ideas by clicking on 'merge', again found in the upper right corner of each idea's detailed view, especially useful for managing submitted ideas from internal teams or customers that may contain duplicates or similar entries within a project.",
+        "all_excerpts": "",
+        "analyst_label": "When managing a large pool of submitted ideas, you can efficiently handle duplicates or similar suggestions by merging them together, while also cloning unique ideas for further development, ensuring streamlined project organization and decision-making processes.",
+        "frequency": 6
+      },
+      "3": {
+        "id": 2,
+        "excerpts": [
+          "To see your archived ideas, click Archive in your lefthand navigation.",
+          "If you have multiple ideas you want to archive at one time, go to your list view and select all ideas you wish to archive.",
+          "If you want to clean up your ideas backlog, but not delete ideas, you can archive ideas to retrieve at a later date."
+        ],
+        "keywords": [
+          "archive",
+          "archived",
+          "restore",
+          "retrieve",
+          "delete",
+          "backlog",
+          "click",
+          "navigation",
+          "list",
+          "view"
+        ],
+        "pm_label": "The product requires the implementation of an 'archive' feature accessible via left-hand navigation that allows users to click on it to view their archived ideas. additionally, there should be a functionality enabling multiple selection of ideas within list view for simultaneous archiving, and an option for users to clean up their backlog by archiving ideas without deletion, ensuring these can be restored at any later point.",
+        "all_excerpts": "",
+        "analyst_label": "The product offers an intuitive navigation feature allowing users to easily click on 'archive' for viewing their saved or past ideas, providing the flexibility to manage multiple selections simultaneously through list view while also enabling them to clean up their backlog without deletion, ensuring these archived ideas can be conveniently retrieved at a later date.",
+        "frequency": 6
+      },
+      "4": {
+        "id": 3,
+        "excerpts": [
+          "How do I create an idea?",
+          "To create an idea you must either be a Creator, or if a Contributor, be given permissions from a Creator.",
+          "How do I create an idea?"
+        ],
+        "keywords": [
+          "creator",
+          "create",
+          "permissions",
+          "given",
+          "contributor",
+          "idea",
+          "manage",
+          "ideas"
+        ],
+        "pm_label": "The product requirement is: \"develop a feature that enables users to create ideas; this action can be performed by a creator directly or, if the user is a contributor, they must first obtain permissions from an existing creator as specified.\"",
+        "all_excerpts": "",
+        "analyst_label": "To create an idea, one must either hold the creator status or receive permissions from a creator if acting as a contributor.",
+        "frequency": 4
+      },
+      "5": {
+        "id": 4,
+        "excerpts": [
+          ":#slack insightsInourpursuitofinnovationandenhancedsecurity,thepotentialofbiometricscannotbeignored.Biometricsauthentication,whichusesuniquephysicalorbehavioralattributeslikefingerprints,facial+Createatemplate What is the anatomy of an idea?",
+          "In order to prioritize ideas, you need supporting information and context.",
+          "Ideas have descriptions, comments, fields, insights and delivery tickets to capture information and traits."
+        ],
+        "keywords": [
+          "anatomy",
+          "information",
+          "traits",
+          "slack",
+          "prioritize",
+          "order",
+          "descriptions",
+          "context",
+          "comments",
+          "insights"
+        ],
+        "pm_label": "The engineering team is tasked with creating a comprehensive biometric authentication system using slack, which will prioritize ideas based on supporting information, context, descriptions, comments, fields, insights, and delivery tickets; the system aims to capture unique physical or behavioral traits like fingerprints and facial recognition for enhanced security and innovation.",
+        "all_excerpts": "",
+        "analyst_label": "To effectively prioritize innovative biometric security solutions like those utilizing unique physical or behavioral attributes such as fingerprints and facial recognition, one must first gather comprehensive supporting information, context, insightful descriptions, comments, and delivery tickets that capture the essential traits of each idea.",
+        "frequency": 4
+      }
+    },
+    "status": 3,
+    "organization": "mediumroast",
+    "content_type": "application/pdf",
+    "file_size": "879.6 KB",
+    "reading_time": 3,
+    "word_count": 693,
+    "page_count": 1,
+    "description": "In a recent solution retrospective review, Jesse Clarkson proposed implementing biometrics for enhanced security and user experience in their system. This idea sparked further exploration and research, as it could potentially revolutionize their security system.",
+    "abstract": "In a recent solution retrospective review, Jesse Clarkson proposed implementing biometrics for enhanced security and user experience in their system. This idea sparked further exploration and research, as it could potentially revolutionize their security system. To manage ideas effectively, users can clone ideas within a project, use templates under the idea description, or create new ideas via the blue 'Create' button or '+ Add idea' option depending on the view. Once created, ideas can be refined with detailed descriptions and pinned fields for easy access to important information. When managing numerous ideas, users can merge similar ones, archive unwanted ones, or delete them entirely. To create an idea, one must have Creator permissions or be granted access by a Creator. Each idea contains descriptions, comments, fields, insights, and delivery tickets to capture relevant information.",
+    "creator": "miha42-github",
+    "creator_id": 10818650,
+    "creator_name": "Michael Hay",
+    "linked_companies": {
+      "Atlassian Corp": "d7651f0c19343026ddb49e9f668c6f86ddedde6702008a6e7ec124a9c3731ca2"
+    },
+    "linked_studies": {},
+    "street_address": "350 BUSH STREET FLOOR 13",
+    "zip_postal": "94104",
+    "city": "SAN FRANCISCO",
+    "state_province": "CA",
+    "country": "USA",
+    "latitude": 37.791121018953,
+    "longitude": -122.403374976666,
+    "region": "AMER",
+    "public": true,
+    "groups": "mediumroast:miha42-github",
+    "creation_date": "2024-11-18T03:37:27.466Z",
+    "modification_date": "2024-12-02T03:36:04.793907",
+    "file_hash": "e93eb921d729215ddb6cb71ad721c50d9fc4f92ca878a22074ed43b986621549",
+    "name": "Introduction to Jira Product Discovery ideas - Atlassian",
+    "interaction_type": "Product/Service Document",
+    "interaction_type_detail": {
+      "author": "Atlassian",
+      "year": "Unknown",
+      "month": "Unknown",
+      "day": "Unknown",
+      "title": "Introduction to Jira Product Discovery ideas",
+      "url": "https://www.atlassian.com/software/jira/product-discovery/guides/ideas/overview#what-is-idea"
+    },
+    "url": "Interactions/Introduction to Jira Product Discovery ideas - Atlassian.pdf"
+  },
+  {
+    "tags": {
+      "bottom right": 3.4804530139182015,
+      "chrome extension": 5.191359041754604,
+      "icon on the bottom": 3.210906027836403,
+      "messaging apps many organizations": 2.960906027836403,
+      "right of the chrome": 3.960906027836403,
+      "third party messaging apps": 3.710906027836403
+    },
+    "topics": {
+      "1": {
+        "id": 0,
+        "excerpts": [
+          "Links can be anything like a research article, or from integrations with tools like Jira Service Management or Slack.",
+          "Insights can take the form of plain text, URL, or integration and are composed of the following traits: description to a link youve pasted for more context."
+        ],
+        "keywords": [
+          "form",
+          "service",
+          "management",
+          "links",
+          "integrations",
+          "research",
+          "text",
+          "traits",
+          "slack",
+          "tools"
+        ],
+        "pm_label": "The engineering team is tasked with developing a feature that allows users to easily integrate links from various sources such as research articles or tools like jira service management and slack into the system; these links can be in the form of plain text or urls, and upon integration, they should be accompanied by descriptive insights which provide context about the linked content.",
+        "analyst_label": "The competitive insight highlights that effective service management strategies often involve leveraging diverse links from various sources such as research articles or integrations with tools like jira service management and slack, where insights can be presented in the form of plain text, urls, or detailed descriptions for better context understanding.",
+        "frequency": 2
+      },
+      "2": {
+        "id": 1,
+        "excerpts": [
+          "Click the blue Add button and your insights will automatically be added Adding insights from third party messaging apps Many organizations also have group channels dedicated to customer feedback or support, or receive feedback on the fly in conversations that are had.",
+          "To add insights using the Chrome extension: and select the discovery project and idea you want to add the insight to.",
+          "Select the Insights tab at the top of the panel Adding insights from the Chrome extension If your work also happens in other tools or around the web, the Jira Product Discovery Chrome extension will help you stay focused on the task at hand, while also giving you a quick way to add insights to your ideas."
+        ],
+        "keywords": [
+          "insights",
+          "extension",
+          "chrome",
+          "discovery",
+          "ideas",
+          "panel",
+          "insight",
+          "jira",
+          "typing",
+          "button"
+        ],
+        "pm_label": "The new product requirement is: develop an extension for chrome that enables users to click the blue add button to automatically incorporate insights from third-party messaging apps into their projects on jira; this feature should allow adding insights directly to specific discovery projects and ideas within jira, facilitating a seamless workflow by integrating web-based feedback collection with in-app idea management.",
+        "analyst_label": "To enhance productivity and streamline feedback collection, organizations can leverage the chrome extension for adding insights directly into their jira product discovery projects or ideas, facilitating real-time customer engagement through various channels including third-party messaging apps and group discussions, while also utilizing the insights tab in a dedicated panel to manage and incorporate these inputs efficiently.",
+        "frequency": 9
+      }
+    },
+    "status": 3,
+    "organization": "mediumroast",
+    "content_type": "application/pdf",
+    "file_size": "1005.5 KB",
+    "reading_time": 1,
+    "word_count": 287,
+    "page_count": 3,
+    "description": "Jira Product Discovery's insights can be plain text, URLs, or integrations, each with a description and source. They're automatically pulled from links for context.",
+    "abstract": "Jira Product Discovery's insights can be plain text, URLs, or integrations, each with a description and source. They're automatically pulled from links for context. Insights can come from various sources like research articles, Jira Service Management, Slack, or other tools. To add insights to an idea, use the right-side panel, Chrome extension (select project, idea, add description/labels), or third-party messaging apps like Slack and Microsoft Teams with provided instructions.",
+    "creator": "miha42-github",
+    "creator_id": 10818650,
+    "creator_name": "Michael Hay",
+    "linked_companies": {
+      "Atlassian Corp": "d7651f0c19343026ddb49e9f668c6f86ddedde6702008a6e7ec124a9c3731ca2"
+    },
+    "linked_studies": {},
+    "street_address": "350 BUSH STREET FLOOR 13",
+    "zip_postal": "94104",
+    "city": "SAN FRANCISCO",
+    "state_province": "CA",
+    "country": "USA",
+    "latitude": 37.791121018953,
+    "longitude": -122.403374976666,
+    "region": "AMER",
+    "public": true,
+    "groups": "mediumroast:miha42-github",
+    "creation_date": "2024-11-18T03:37:27.466Z",
+    "modification_date": "2024-12-02T03:36:07.555781",
+    "file_hash": "1cdc0c0ede5f1c895297ed6d2e4d891d65fc4f1d3a9ac36c08976ca011dbcca5",
+    "name": "Introduction to Jira Product Discovery insights - Atlassian",
+    "interaction_type": "Product/Service Document",
+    "interaction_type_detail": {
+      "author": "Atlassian",
+      "year": "Unknown",
+      "month": "Unknown",
+      "day": "Unknown",
+      "title": "Introduction to Jira Product Discovery insights",
+      "url": "https://www.atlassian.com/software/jira/product-discovery/guides/insights/overview#what-are-insights"
+    },
+    "url": "Interactions/Introduction to Jira Product Discovery insights - Atlassian.pdf"
+  },
+  {
+    "tags": {
+      "key elements": 1.7109060278364028,
+      "more autonomy over processes": 1.9109060278364027,
+      "new one in the top navigation": 1.7419530243370103,
+      "team level for more autonomy": 1.6155773512899807,
+      "top navigation under the projects": 2.065577351289981
+    },
+    "topics": {
+      "0": {
+        "id": 0,
+        "excerpts": [
+          "Views are highly customizable and can be formatted as a list, matrix, board, or timeline.",
+          "Its where your uncertain work happens   evaluating ideas, validating them with insights, and testing prototypes.",
+          "Insights can be customer quotes or feedback, product data, market research, or feedback from customer facing teams."
+        ],
+        "keywords": [
+          "insights",
+          "feedback",
+          "data",
+          "opportunities",
+          "views",
+          "evaluating",
+          "prototypes",
+          "research",
+          "stakeholders",
+          "business"
+        ],
+        "pm_label": "The engineering team is tasked to develop a customizable insights platform that enables stakeholders to evaluate uncertain work by integrating various data sources such as customer quotes or feedback, product data, market research, and feedback from customer-facing teams; this platform should facilitate the creation of views formatted as lists, matrices, boards, or timelines for better visualization and understanding, and also support the testing and validation of prototypes based on gathered insights.",
+        "analyst_label": "The process of generating competitive insights involves leveraging customizable views to evaluate ideas, validate them through the collection of diverse data such as customer quotes, product metrics, market research, and feedback from front-line teams, all while testing prototypes, ensuring a comprehensive understanding of opportunities in the business landscape.",
+        "frequency": 8
+      },
+      "1": {
+        "id": 1,
+        "excerpts": [
+          "What are the key elements of a Jira Product Discovery project Discovery projects are made up of a few key elements to help you stay organized during product discovery.",
+          "Jira Product Discovery projects overview What is a discovery project?",
+          "Jira Product Discovery projects are team  managed only, meaning projects are administered and managed at the team level for more autonomy over processes and practices within a self  contained space."
+        ],
+        "keywords": [
+          "projects",
+          "discovery",
+          "project",
+          "jira",
+          "organize",
+          "practices",
+          "organized",
+          "roadmaps",
+          "software",
+          "company"
+        ],
+        "pm_label": "The engineering team is required to develop a software solution that enables seamless organization of discovery projects using jira, focusing on incorporating key elements essential for effective project management during the discovery phase. this solution should support team-managed projects, allowing autonomy over processes and practices within a self-contained space, thereby facilitating the creation and maintenance of organized roadmaps for company software development initiatives.",
+        "analyst_label": "The key elements of jira product discovery projects include organization to help maintain structure during product discovery, focusing on team management for autonomy over processes and practices within a self-contained space, thereby providing an overview of what constitutes a discovery project in the context of software company practices.",
+        "frequency": 8
+      }
+    },
+    "status": 3,
+    "organization": "mediumroast",
+    "content_type": "application/pdf",
+    "file_size": "493.5 KB",
+    "reading_time": 1,
+    "word_count": 248,
+    "page_count": 2,
+    "description": "Jira Product Discovery projects serve as dedicated spaces to collect, organize, and evaluate ideas for teams or products. They facilitate uncertain work like idea evaluation and prototype testing.",
+    "abstract": "Jira Product Discovery projects serve as dedicated spaces to collect, organize, and evaluate ideas for teams or products. They facilitate uncertain work like idea evaluation and prototype testing. These team-managed projects offer autonomy over processes and practices within self-contained spaces, with changes implemented independently without admin assistance. Key elements include opportunities/problems, insights (data/feedback), and views for comparing/prioritizing ideas using customizable fields and formats.",
+    "creator": "miha42-github",
+    "creator_id": 10818650,
+    "creator_name": "Michael Hay",
+    "linked_companies": {
+      "Atlassian Corp": "d7651f0c19343026ddb49e9f668c6f86ddedde6702008a6e7ec124a9c3731ca2"
+    },
+    "linked_studies": {},
+    "street_address": "350 BUSH STREET FLOOR 13",
+    "zip_postal": "94104",
+    "city": "SAN FRANCISCO",
+    "state_province": "CA",
+    "country": "USA",
+    "latitude": 37.791121018953,
+    "longitude": -122.403374976666,
+    "region": "AMER",
+    "public": true,
+    "groups": "mediumroast:miha42-github",
+    "creation_date": "2024-11-18T03:37:27.466Z",
+    "modification_date": "2024-12-02T03:36:13.433534",
+    "file_hash": "4a4aa653b87a019a4650309f7901182ad7f480e45f47986069cdd93dcbe9f321",
+    "name": "Introduction to Jira Product Discovery projects - Atlassian",
+    "interaction_type": "Product/Service Document",
+    "interaction_type_detail": {
+      "author": "Atlassian",
+      "year": "Unknown",
+      "month": "Unknown",
+      "day": "Unknown",
+      "title": "Introduction to Jira Product Discovery projects",
+      "url": "https://www.atlassian.com/software/jira/product-discovery/guides/projects/overview#what-is-product-discovery-project"
+    },
+    "url": "Interactions/Introduction to Jira Product Discovery projects - Atlassian.pdf"
+  },
+  {
+    "tags": {
+      "group ideas": 1.7109060278364028,
+      "high level with a birds eye": 1.7419530243370103,
+      "ideas by a stream": 2.460906027836403,
+      "ideas in a list": 1.7109060278364028,
+      "level with a birds eye view": 1.7419530243370103,
+      "present data": 1.9804530139182015,
+      "stream of work": 2.273000020837618,
+      "title of any field": 1.7109060278364028
+    },
+    "topics": {
+      "1": {
+        "id": 0,
+        "excerpts": [
+          "To sort ideas in a list view, hover over the title of any field column, and click the 3 dots to choose ascending or descending.",
+          "The main reason to customize a view is to tailor the information presented for a specific purpose or a specific audience, like a view to show how ideas ladder up to each company goal.",
+          "Sorting views Sorting ideas lets you compare ideas, ascending or descending, based on a specific field."
+        ],
+        "keywords": [
+          "sorting",
+          "views",
+          "view",
+          "descending",
+          "customize",
+          "ideas",
+          "sort",
+          "ascending",
+          "votes",
+          "organizing"
+        ],
+        "pm_label": "The engineering team is tasked with developing a feature that allows users to customize views of their ideas list by sorting them either in ascending or descending order based on any field column; this customization aims to facilitate the organization and comparison of ideas according to specific criteria or company goals, thereby enhancing user productivity and decision-making efficiency.",
+        "analyst_label": "Customizing views allows users to sort ideas either in ascending or descending order based on specific fields, enhancing the ability to tailor information presentation for various purposes or audiences, thereby facilitating easier comparison and organization of ideas aligned with company goals.",
+        "frequency": 9
+      },
+      "2": {
+        "id": 1,
+        "excerpts": [
+          "And when it comes to sharing with leadership or other teams, you may not want to share everything.",
+          "But for leadership   you may want to keep it high level with a birds eye view of whats coming when.",
+          "You might want to include all details like comments, insights, and due dates for your immediate team."
+        ],
+        "keywords": [
+          "leadership",
+          "eye",
+          "details",
+          "comments",
+          "sharing",
+          "teams",
+          "insights",
+          "level",
+          "team",
+          "view"
+        ],
+        "pm_label": "The engineering team is required to develop a feature that allows users to customize the level of detail they share with leadership or other teams; when sharing with top management, it should provide a high-level overview with a bird's eye view of upcoming activities, whereas for immediate teams, all details including comments, insights, and due dates should be included.",
+        "analyst_label": "In crafting communications for both leadership and internal teams, it's strategic to tailor the level of detail: providing high-level summaries with a birds-eye view for top management while ensuring immediate teams receive comprehensive information including all comments, insights, and due dates.",
+        "frequency": 3
+      },
+      "3": {
+        "id": 2,
+        "excerpts": [
+          "You can group all ideas by assignee or group ideas by a stream of work to act as a swimlane.",
+          "To filter a view: Grouping views Grouping ideas allows you to visually bucket multiple ideas together based on a field.",
+          "When you group ideas, you can also hide or expand groups to declutter and organize your view."
+        ],
+        "keywords": [
+          "ideas",
+          "group",
+          "filtering",
+          "grouping",
+          "view",
+          "groups",
+          "swimlane",
+          "views",
+          "organize",
+          "filter"
+        ],
+        "pm_label": "The engineering team is tasked with developing a feature that enables users to group all ideas by assignee or categorize them into streams of work as swimlanes. this grouping should allow for the creation of custom views where ideas can be visually bucketed together based on specific fields. additionally, users should have the capability to filter these views by hiding or expanding groups to maintain a clear and organized view, thereby decluttering their interface and enhancing usability.",
+        "analyst_label": "The ability to group all ideas by assignee or stream of work acts as an effective swimlane visualization tool, while filtering a view through grouping allows for the bucketing of multiple ideas based on specific fields, enabling users to declutter and organize their perspective efficiently by hiding or expanding groups.",
+        "frequency": 4
+      }
+    },
+    "status": 3,
+    "organization": "mediumroast",
+    "content_type": "application/pdf",
+    "file_size": "483.1 KB",
+    "reading_time": 2,
+    "word_count": 375,
+    "page_count": 3,
+    "description": "When evaluating ideas, consider different views for organizing data based on audience needs. Jira Product Discovery offers four customizable views to tailor information presentation.",
+    "abstract": "When evaluating ideas, consider different views for organizing data based on audience needs. Jira Product Discovery offers four customizable views to tailor information presentation. Customize views by adding fields, then filter, group, or sort ideas for specific purposes or audiences.",
+    "creator": "miha42-github",
+    "creator_id": 10818650,
+    "creator_name": "Michael Hay",
+    "linked_companies": {
+      "Atlassian Corp": "d7651f0c19343026ddb49e9f668c6f86ddedde6702008a6e7ec124a9c3731ca2"
+    },
+    "linked_studies": {},
+    "street_address": "350 BUSH STREET FLOOR 13",
+    "zip_postal": "94104",
+    "city": "SAN FRANCISCO",
+    "state_province": "CA",
+    "country": "USA",
+    "latitude": 37.791121018953,
+    "longitude": -122.403374976666,
+    "region": "AMER",
+    "public": true,
+    "groups": "mediumroast:miha42-github",
+    "creation_date": "2024-11-18T03:37:27.466Z",
+    "modification_date": "2024-12-02T03:36:16.225188",
+    "file_hash": "091c848acec1823eb33e15cc344cd9c061f701a30868c2c8fe5dde601d96966d",
+    "name": "Introduction to Jira Product Discovery views - Atlassian",
+    "interaction_type": "Product/Service Document",
+    "interaction_type_detail": {
+      "author": "Atlassian",
+      "year": "Unknown",
+      "month": "Unknown",
+      "day": "Unknown",
+      "title": "Introduction to Jira Product Discovery views",
+      "url": "https://www.atlassian.com/software/jira/product-discovery/guides/views/overview#what-is-list-view"
+    },
+    "url": "Interactions/Introduction to Jira Product Discovery views - Atlassian.pdf"
+  },
+  {
+    "tags": {
+      "leadership for alignment": 1.511500010418809,
+      "multiple support ideas with customer insights": 2.14195302433701,
+      "product teams": 1.7109060278364028,
+      "progress of delivery": 1.511500010418809,
+      "roadmaps with leadership": 1.511500010418809,
+      "third party": 2.460906027836403
+    },
+    "topics": {
+      "1": {
+        "id": 0,
+        "excerpts": [
+          "Track the progress of delivery tickets directly from Jira Product Discovery, no tool switching required.",
+          "Add these in directly, from third party apps, or using our Chrome See it all at a glance Use a list view to organize, sort, and filter ideas to only show Jira Product Discovery is helping us do the right things, in the right order, and at the right time, focusing on work that will deliver on benefits.",
+          "Purpose built for product teams to work the way you do Prioritize high impact ideas using Create custom views to evaluate ideas Connect the ideas on your roadmap custom fields and formulas based on and share roadmaps tailored to different with any Jira issue type to track delivery criteria your team cares about."
+        ],
+        "keywords": [
+          "jira",
+          "discovery",
+          "tool",
+          "ideas",
+          "track",
+          "tickets",
+          "development",
+          "custom",
+          "roadmaps",
+          "powerpoints"
+        ],
+        "pm_label": "The new product requirement is: develop a tool that integrates directly into jira product discovery, enabling seamless tracking of delivery tickets within the platform itself; incorporate functionalities to add ideas from third-party apps or through chrome extensions for comprehensive visibility. this tool should prioritize impactful ideas based on their benefits and deliverables, allowing teams to organize, sort, and filter these ideas using a list view while adhering to custom views tailored to individual team needs. ensure that roadmaps created within this system can be customized with fields and formulas specific to the team's criteria for tracking delivery progress effectively, all while sharing these tailored roadmaps among team members efficiently.",
+        "analyst_label": "Jira product discovery offers a comprehensive solution for product teams to efficiently manage ideas, prioritize high-impact initiatives, create custom roadmaps tailored to specific team needs, track delivery criteria using any jira issue type, all while seamlessly integrating third-party apps without the need for tool switching, enabling teams to focus on work that delivers tangible benefits and aligns with strategic objectives.",
+        "frequency": 9
+      },
+      "2": {
+        "id": 1,
+        "excerpts": [
+          "Evaluate and validate your ideas before it hits your Organize your ideas single place   no more searching through multiple Support ideas with customer insights and research.",
+          "Use board and timeline views to build individualized Communicate your plans Share roadmaps with leadership for alignment, or high priority customers to get them excited about your vision.",
+          "Whether you prefer the RICE method or your own scoring framework, custom formulas make it possible to prioritize Use list and matrix views to easily see how ideas compare to one another, and what to tackle now versus later."
+        ],
+        "keywords": [
+          "ideas",
+          "priorities",
+          "plans",
+          "views",
+          "fields",
+          "teams",
+          "prioritize",
+          "strategy",
+          "stakeholders",
+          "leadership"
+        ],
+        "pm_label": "The engineering team is tasked with creating a centralized platform that allows users to evaluate and validate their ideas before they are implemented, ensuring all ideas are organized in one place for easy access and no more scattered searches through multiple locations. the system should support the integration of customer insights and research to strengthen idea substantiation. additionally, it must provide board and timeline views for building individualized plans, enabling seamless communication of these plans with leadership and high-priority customers via shared roadmaps that align their visions. prioritization capabilities are essential, allowing users to customize formulas based on methods like rice or other scoring frameworks to decide which ideas should be tackled now versus later using list and matrix views for comparison analysis.",
+        "analyst_label": "In the realm of product marketeering, prioritizing ideas effectively requires integrating customer insights and research for validation, organizing them in a centralized location to streamline access, utilizing board and timeline views for individualized planning, communicating plans clearly to leadership and high-priority stakeholders to ensure alignment and excitement around the vision, employing scoring frameworks like rice or custom formulas to prioritize initiatives based on their potential impact, and leveraging list and matrix views to efficiently compare ideas and determine their urgency versus long-term relevance.",
+        "frequency": 9
+      }
+    },
+    "status": 3,
+    "organization": "mediumroast",
+    "content_type": "application/pdf",
+    "file_size": "809.2 KB",
+    "reading_time": 2,
+    "word_count": 468,
+    "page_count": 1,
+    "description": "**Jira Product Discovery**: A tool designed for product teams to manage ideas, prioritize tasks using custom views and fields, integrate with Jira issues, and collaborate on roadmaps. It helps organize ideas in one place, supports customer insights, and allows teams to engage and align using board and timeline views.",
+    "abstract": "**Jira Product Discovery**: A tool designed for product teams to manage ideas, prioritize tasks using custom views and fields, integrate with Jira issues, and collaborate on roadmaps. It helps organize ideas in one place, supports customer insights, and allows teams to engage and align using board and timeline views. The tool combines discovery and delivery processes within Jira, reducing the need for external tools like spreadsheets or presentations.",
+    "creator": "miha42-github",
+    "creator_id": 10818650,
+    "creator_name": "Michael Hay",
+    "linked_companies": {
+      "Atlassian Corp": "d7651f0c19343026ddb49e9f668c6f86ddedde6702008a6e7ec124a9c3731ca2"
+    },
+    "linked_studies": {},
+    "street_address": "350 BUSH STREET FLOOR 13",
+    "zip_postal": "94104",
+    "city": "SAN FRANCISCO",
+    "state_province": "CA",
+    "country": "USA",
+    "latitude": 37.791121018953,
+    "longitude": -122.403374976666,
+    "region": "AMER",
+    "public": true,
+    "groups": "mediumroast:miha42-github",
+    "creation_date": "2024-11-18T03:37:27.466Z",
+    "modification_date": "2024-12-02T03:36:21.936051",
+    "file_hash": "ced72af31a992d70cf3c5696b9c49f788095b96e184f000590c1fe5b99b3b636",
+    "name": "Jira Product Discovery features overview - Atlassian",
+    "interaction_type": "Product/Service Document",
+    "interaction_type_detail": {
+      "author": "Atlassian",
+      "year": "Unknown",
+      "month": "Unknown",
+      "day": "Unknown",
+      "title": "Jira Product Discovery features overview",
+      "url": "https://www.atlassian.com/software/jira/product-discovery/features"
+    },
+    "url": "Interactions/Jira Product Discovery features overview - Atlassian.pdf"
+  }
+]

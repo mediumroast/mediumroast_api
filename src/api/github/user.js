@@ -65,56 +65,6 @@ class UserManager {
       );
     }
   }
-
-  /**
-   * Adds a user to the repository with specified permissions
-   * @param {String} username - GitHub username to add
-   * @param {String} permission - Permission level ('pull', 'push', 'admin', 'maintain', 'triage')
-   * @returns {Promise<Array>} ResponseFactory result
-   */
-  async addUserToRepository(username, permission = 'pull') {
-    try {
-      const response = await this.octokit.rest.repos.addCollaborator({
-        owner: this.orgName,
-        repo: this.repoName,
-        username: username,
-        permission: permission
-      });
-      return ResponseFactory.success(
-        `Successfully added user ${username} to repository with ${permission} permissions`,
-        response.data
-      );
-    } catch (err) {
-      return ResponseFactory.error(
-        `Failed to add user ${username} to repository: ${err.message}`,
-        err
-      );
-    }
-  }
-
-  /**
-   * Removes a user from the repository
-   * @param {String} username - GitHub username to remove
-   * @returns {Promise<Array>} ResponseFactory result
-   */
-  async removeUserFromRepository(username) {
-    try {
-      const response = await this.octokit.rest.repos.removeCollaborator({
-        owner: this.orgName,
-        repo: this.repoName,
-        username: username
-      });
-      return ResponseFactory.success(
-        `Successfully removed user ${username} from repository`,
-        response.data
-      );
-    } catch (err) {
-      return ResponseFactory.error(
-        `Failed to remove user ${username} from repository: ${err.message}`,
-        err
-      );
-    }
-  }
 }
 
 export default UserManager;
