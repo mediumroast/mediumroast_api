@@ -35,7 +35,7 @@ export class BaseObjects {
     this.objType = objType || 'BaseObject';
     
     // Initialize GitHub API client
-    this.serverCtl = new GitHub(this.token, this.org);
+    this.serverCtl = new GitHub(this.token, this.org, this.processName);
     
     // Initialize cache manager
     this.cache = new CacheManager();
@@ -56,10 +56,10 @@ export class BaseObjects {
     
     // Define object file names for containers
     this.objectFiles = {
-      Studies: 'studies.json',
-      Companies: 'companies.json',
-      Interactions: 'interactions.json',
-      Users: 'users.json' // Add users even though GitHub API doesn't store it the same way
+      Studies: 'Studies.json',
+      Companies: 'Companies.json',
+      Interactions: 'Interactions.json',
+      Users: 'Users.json' // Add users even though GitHub API doesn't store it the same way
     };
     
     // Define field whitelists centrally
@@ -69,15 +69,16 @@ export class BaseObjects {
         'region', 'country', 'city', 'state_province', 'zip_postal', 'street_address', 'latitude', 'longitude', 'phone',
         'google_maps_url', 'google_news_url', 'google_finance_url', 'google_patents_url',
         'cik', 'stock_symbol', 'stock_exchange', 'recent_10k_url', 'recent_10q_url', 'firmographic_url', 'filings_url', 'owner_tranasactions',
-        'industry', 'industry_code', 'industry_group_code', 'industry_group_description', 'major_group_code', 'major_group_description'
+        'industry', 'industry_code', 'industry_group_code', 'industry_group_description', 'major_group_code', 'major_group_description',
+        'linked_interactions', 'linked_studies'
       ],
       Interactions: [
         'status', 'content_type', 'file_size', 'reading_time', 'word_count', 'page_count', 'description', 'abstract',
         'region', 'country', 'city', 'state_province', 'zip_postal', 'street_address', 'latitude', 'longitude',
-        'public', 'groups'
+        'public', 'groups', 'linked_studies'
       ],
       Studies: [
-        'description', 'status', 'public', 'groups'
+        'description', 'status', 'public', 'groups', 'linked_companies', 'linked_interactions'
       ]
     };
         
@@ -121,7 +122,6 @@ export class BaseObjects {
    * @returns {Array} Standardized error response
    */
   _createError(message, data = null, statusCode = 400) {
-    logger.error(message, { data, statusCode });
     return [false, { status_code: statusCode, status_msg: message }, data];
   }
     
@@ -135,6 +135,19 @@ export class BaseObjects {
    */
   _createSuccess(message, data = null, statusCode = 200) {
     logger.debug(message);
+    return [true, { status_code: statusCode, status_msg: message }, data];
+  }
+    
+  /**
+   * Creates a standardized warning response
+   * @private
+   * @param {String} message - Warning message
+   * @param {Object} data - Response data
+   * @param {Number} statusCode - HTTP status code
+   * @returns {Array} Standardized warning response
+   */
+  _createWarning(message, data = null, statusCode = 200) {
+    logger.warn(message, { data });
     return [true, { status_code: statusCode, status_msg: message }, data];
   }
     
@@ -199,15 +212,62 @@ export class BaseObjects {
                     
           if (!result[0]) {
             // Operation failed, abort transaction
+            let errorMessage = 'Unknown error';
+            
+            // Handle different error message formats
+            if (result[1]) {
+              if (typeof result[1] === 'string') {
+                errorMessage = result[1];
+              } else if (result[1].status_msg) {
+                errorMessage = result[1].status_msg;
+              } else if (result[1].message) {
+                errorMessage = result[1].message;
+              } else if (result[1].error && result[1].error.message) {
+                errorMessage = result[1].error.message;
+              } else {
+                // If it's an object without clear message, stringify it properly
+                try {
+                  errorMessage = JSON.stringify(result[1], null, 2);
+                } catch (stringifyError) {
+                  errorMessage = `Error object could not be stringified: ${String(result[1])}`;
+                }
+              }
+            }
+            
+            // Also check result[2] for mrJson and other data structures
+            if (result[2]) {
+              if (result[2].mrJson && typeof result[2].mrJson === 'string') {
+                errorMessage += ` | Data: ${result[2].mrJson}`;
+              } else if (result[2].message) {
+                errorMessage += ` | Message: ${result[2].message}`;
+              } else if (result[2].error) {
+                errorMessage += ` | Error: ${JSON.stringify(result[2].error)}`;
+              }
+            }
+            
+            // Also include the raw result data for debugging
+            logger.error('Transaction step failed with raw result:', {
+              transactionName,
+              operationName,
+              result: result,
+              resultStructure: {
+                success: result[0],
+                message: typeof result[1],
+                data: typeof result[2],
+                messageKeys: result[1] ? Object.keys(result[1]) : [],
+                dataKeys: result[2] ? Object.keys(result[2]) : []
+              }
+            });
+            
             return this._createError(
-              `Transaction [${transactionName}] failed at step [${operationName}]: ${result[1].status_msg}`,
+              `Transaction [${transactionName}] failed at step [${operationName}]: ${errorMessage}`,
               { 
                 transactionId,
                 failedStep: operationName,
                 stepResult: result,
                 completedSteps: i
               },
-              result[1].status_code || 500
+              result[1]?.status_code || 500
             );
           }
         } catch (err) {
@@ -355,13 +415,17 @@ export class BaseObjects {
    * @async
    * @function findByName
    * @description Find all objects by name from the mediumroast.io application
+   * @param {string} name - The name to search for
+   * @param {boolean} fuzzy - Whether to perform fuzzy search (partial string matching). Default: false
+   * @param {Object} allObjects - Optional pre-fetched objects to search within
+   * @returns {Promise<Array>} Array containing [success, statusObject, results]
    */
-  async findByName(name) {
+  async findByName(name, fuzzy = true, allObjects = null) {
     const tracking = logger.trackOperation ? 
       logger.trackOperation(this.objType, 'findByName') : 
       { end: () => {} };
     try {
-      return await this.findByX('name', name);
+      return await this.findByX('name', name, allObjects, fuzzy);
     } finally {
       tracking.end();
     }
@@ -383,10 +447,15 @@ export class BaseObjects {
    * @async
    * @function findByX
    * @description Find all objects by attribute and value pair
+   * @param {string} attribute - The attribute to search by
+   * @param {*} value - The value to search for
+   * @param {Object} allObjects - Optional pre-fetched objects to search within
+   * @param {boolean} fuzzy - Whether to perform fuzzy search (partial string matching). Default: false
+   * @returns {Promise<Array>} Array containing [success, statusObject, results]
    */
-  async findByX(attribute, value, allObjects=null) {
-    // Create a cache key for this operation
-    const cacheKey = `${this._cacheKeys.byAttribute}_${attribute}_${value}`;
+  async findByX(attribute, value, allObjects = null, fuzzy = false) {
+    // Create a cache key for this operation (include fuzzy flag in cache key)
+    const cacheKey = `${this._cacheKeys.byAttribute}_${attribute}_${value}_${fuzzy}`;
     
     // Track this operation
     const tracking = logger.trackOperation ? 
@@ -433,21 +502,38 @@ export class BaseObjects {
             attribute == 'name' ? 
               currentObject = allObjects[obj][attribute]?.toLowerCase() : 
               currentObject = allObjects[obj][attribute];
+            
+            // Skip if current object value is null or undefined
+            if(currentObject === null || currentObject === undefined) {
+              continue;
+            }
                       
-            if(currentObject === value) {
+            // Perform exact or fuzzy matching based on fuzzy flag
+            let isMatch = false;
+            if(fuzzy && typeof currentObject === 'string' && typeof value === 'string') {
+              // Fuzzy search: check if the value is contained within the current object
+              isMatch = currentObject.includes(value);
+            } else {
+              // Exact search: direct equality comparison
+              isMatch = currentObject === value;
+            }
+            
+            if(isMatch) {
               myObjects.push(allObjects[obj]);
             }
           }
        
           if (myObjects.length === 0) { 
+            const searchType = fuzzy ? 'containing' : 'equal to';
             return this._createError(
-              `No ${this.objType} found where ${attribute} = ${value}`,
+              `No ${this.objType} found where ${attribute} is ${searchType} ${value}`,
               null,
               404
             );
           } else {
+            const searchType = fuzzy ? 'containing' : 'equal to';
             return this._createSuccess(
-              `Found ${myObjects.length} objects where ${attribute} = ${value}`,
+              `Found ${myObjects.length} objects where ${attribute} is ${searchType} ${value}`,
               myObjects
             );
           }
@@ -478,6 +564,8 @@ export class BaseObjects {
     if (validationError) return validationError;
 
     // Use transaction pattern for safer operations
+    let containerData = null; // Store container data for use in later steps
+    
     return this._executeTransaction([
       // Step 1: Catch container
       async () => {
@@ -487,7 +575,11 @@ export class BaseObjects {
           },
           branch: {}
         };
-        return await this.serverCtl.catchContainer(repoMetadata);
+        const result = await this.serverCtl.catchContainer(repoMetadata);
+        if (result[0]) {
+          containerData = result[2]; // Store container data for later use
+        }
+        return result;
       },
             
       // Step 2: Get SHA
@@ -500,23 +592,23 @@ export class BaseObjects {
       },
             
       // Step 3: Merge and write objects
-      async (sha, data) => {
-        // Append the new object to the existing objects
-        const mergedObjects = [...data.containers[this.objType].objects, ...objs];
+      async (sha) => {
+        // Use stored container data and the SHA from previous step
+        const mergedObjects = [...containerData.containers[this.objType].objects, ...objs];
                 
         // Write the new objects to the container
         return await this.serverCtl.writeObject(
           this.objType, 
           mergedObjects, 
-          data.branch.name,
+          containerData.branch.name,
           sha
         );
       },
             
       // Step 4: Release container
-      async (data) => {
-        // Release the container
-        const result = await this.serverCtl.releaseContainer(data);
+      async () => {
+        // Release the container using stored container data
+        const result = await this.serverCtl.releaseContainer(containerData);
                 
         // Invalidate cache if successful
         if (result[0]) {

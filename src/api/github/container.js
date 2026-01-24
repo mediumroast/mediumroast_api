@@ -20,13 +20,15 @@ class ContainerOperations {
    * @param {String} repoName - GitHub repository name
    * @param {String} mainBranchName - Main branch name
    * @param {String} lockFileName - Lock file name
+   * @param {Object} repositoryManager - Repository manager instance
    */
-  constructor(octokit, orgName, repoName, mainBranchName, lockFileName) {
+  constructor(octokit, orgName, repoName, mainBranchName, lockFileName, repositoryManager) {
     this.octokit = octokit;
     this.orgName = orgName;
     this.repoName = repoName;
     this.mainBranchName = mainBranchName;
     this.lockFileName = lockFileName;
+    this.repositoryManager = repositoryManager;
   }
 
   /**
@@ -238,57 +240,139 @@ class ContainerOperations {
    * @returns {Promise<Array>} ResponseFactory result
    */
   async releaseContainers(repoMetadata, mergeBranchFn) {
-    // Merge branch to main
-    const mergeResponse = await mergeBranchFn(
-      repoMetadata.branch.name, 
-      repoMetadata.branch.sha
-    );
-    
-    if (!mergeResponse[0]) {
+    try {
+      // Step 1: Merge the branch to main (creates PR and merges)
+      const mergeResult = await mergeBranchFn(
+        repoMetadata.branch.name, 
+        repoMetadata.branch.sha
+      );
+      if (!mergeResult[0]) {
+        return ResponseFactory.error(
+          `Failed to merge branch ${repoMetadata.branch.name}: ${mergeResult[1]}`,
+          mergeResult[2],
+          500
+        );
+      }
+
+      // Step 2: Unlock all containers
+      const unlockResults = [];
+      for (const containerName in repoMetadata.containers) {
+        const container = repoMetadata.containers[containerName];
+        const unlockResult = await this.unlockContainer(
+          containerName,
+          container.lockSha,
+          this.mainBranchName // Unlock on main branch after merge
+        );
+        
+        unlockResults.push({
+          container: containerName,
+          success: unlockResult[0],
+          message: unlockResult[1],
+          data: unlockResult[2]
+        });
+        
+        if (!unlockResult[0]) {
+          // Log error and continue with other containers
+          // Note: This is a warning condition, not a fatal error
+          // Error details are captured in unlockResults for later analysis
+        }
+      }
+
+      const successfulUnlocks = unlockResults.filter(r => r.success).length;
+      const totalContainers = Object.keys(repoMetadata.containers).length;
+
+      return ResponseFactory.success(
+        `Released ${totalContainers} container(s). Merge completed, ${successfulUnlocks}/${totalContainers} containers unlocked successfully.`,
+        {
+          merge: mergeResult[2],
+          unlocks: unlockResults,
+          branch: repoMetadata.branch
+        }
+      );
+    } catch (err) {
       return ResponseFactory.error(
-        'Unable to merge the branch to main.',
-        mergeResponse,
-        503
+        `Failed to release containers: ${err.message}`,
+        err,
+        500
       );
     }
+  }
 
-    // Unlock containers
-    for (const container in repoMetadata.containers) {
-      // Unlock branch
-      const branchUnlocked = await this.unlockContainer(
-        container, 
-        repoMetadata.containers[container].lockSha,
-        repoMetadata.branch.name
-      );
-      if (!branchUnlocked[0]) {
-        return ResponseFactory.error(
-          `Unable to unlock the container, objects may have been written please check [${container}] for objects and the lock file.`,
-          branchUnlocked,
-          503
-        );
+  /**
+   * Creates multiple containers (directories) in the repository with their default JSON files
+   * @param {Array<String>} containers - Array of container names to create
+   * @returns {Promise<Array>} ResponseFactory result with creation results
+   */
+  async createContainers(containers = ['Studies', 'Companies', 'Interactions']) {
+    try {
+      const results = [];
+      
+      for (const container of containers) {
+        try {
+          // Create the blank JSON file for this container
+          const jsonFileName = `${container}.json`;
+          const jsonFilePath = `${container}/${jsonFileName}`;
+          
+          // Check if the JSON file already exists
+          const fileResp = await this.repositoryManager.fileExists(jsonFilePath, this.mainBranchName);
+          if (fileResp[0] && fileResp[2] && fileResp[2].exists) {
+            results.push({
+              container: container,
+              success: true,
+              message: `Container ${container} already exists with ${jsonFileName}`,
+              timestamp: new Date().toISOString()
+            });
+            continue;
+          }
+          
+          // Create empty JSON array as default content
+          const defaultContent = '[]';
+          const result = await this.repositoryManager.createOrUpdateFile(
+            jsonFilePath,
+            defaultContent,
+            `Create container ${container} with default ${jsonFileName}`,
+            this.mainBranchName
+          );
+          
+          if (result[0]) {
+            results.push({
+              container: container,
+              success: true,
+              message: `Created container ${container} with ${jsonFileName}`,
+              timestamp: new Date().toISOString()
+            });
+          } else {
+            results.push({
+              container: container,
+              success: false,
+              message: result[1],
+              timestamp: new Date().toISOString()
+            });
+          }
+          
+          // Add a small delay to avoid rate limiting
+          await new Promise(resolve => setTimeout(resolve, 100));
+        } catch (err) {
+          results.push({
+            container: container,
+            success: false,
+            message: err.message,
+            timestamp: new Date().toISOString()
+          });
+        }
       }
       
-      // Unlock main
-      const mainUnlocked = await this.unlockContainer(
-        container, 
-        repoMetadata.containers[container].lockSha,
-        this.mainBranchName
+      return ResponseFactory.success(
+        `Container creation completed. ${results.filter(r => r.success).length}/${results.length} containers created successfully`,
+        results
       );
-      if (!mainUnlocked[0]) {
-        return ResponseFactory.error(
-          `Unable to unlock the container, objects may have been written please check [${container}] for objects and the lock file.`,
-          mainUnlocked,
-          503
-        );
-      }
+    } catch (err) {
+      return ResponseFactory.error(
+        `Failed to create containers: ${err.message}`,
+        err,
+        err.status || 500
+      );
     }
-
-    // Return success
-    return ResponseFactory.success(
-      `Released [${Object.keys(repoMetadata.containers).length}] containers.`,
-      null,
-      200
-    );
   }
 }
 

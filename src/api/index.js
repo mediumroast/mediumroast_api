@@ -10,6 +10,10 @@ import {
   GitHubAuth
 } from './authorize.js';
 
+import GitHubFunctions from './github.js';
+
+import { logger } from './gitHubServer/logger.js';
+
 export {
   Interactions,
   Companies,
@@ -17,5 +21,7 @@ export {
   Users,
   Storage,
   Actions,
-  GitHubAuth
+  GitHubAuth,
+  GitHubFunctions,
+  logger
 };

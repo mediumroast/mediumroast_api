@@ -22,6 +22,11 @@ export class Companies extends BaseObjects {
     this.cacheTimeouts.profile = 600000; // 10 minutes for profiles
   }
 
+  // Utility method to create standardized error responses for transaction steps
+  _createError(message, details = null) {
+    return [false, message, details];
+  }
+
   /**
    * Generates company profile with analytics
    * @param {string} name - Company name
@@ -202,6 +207,238 @@ export class Companies extends BaseObjects {
         error,
         500
       );
+    } finally {
+      tracking.end();
+    }
+  }
+  
+  /**
+   * Override deleteObj to handle cross-entity references and linked interactions
+   * @param {string} objName - Name of the company to delete
+   * @param {Object} options - Options for deletion
+   * @returns {Promise<Array>} Operation result
+   */
+  async deleteObj(objName, options = {}) {
+    // Track this operation
+    const tracking = logger.trackOperation ? 
+      logger.trackOperation(this.objType, 'deleteObj') : 
+      { end: () => {} };
+    
+    try {
+      // Validate parameters
+      const validationError = this._validateParams(
+        { objName },
+        { objName: 'string' }
+      );
+          
+      if (validationError) return validationError;
+      
+      // Use transaction pattern for safer operations with SINGLE container lock
+      let companyContainerData = null;
+      let interactionsContainerData = null;
+      let companyToDelete = null;
+      let linkedInteractionsToDelete = [];
+      let repoMetadata = null;
+      
+      return this._executeTransaction([
+        // Step 1: Catch BOTH containers at once - prevents double locking
+        async () => {
+          logger.debug('Catching containers for company deletion', {
+            companyName: objName,
+            options
+          });
+          
+          repoMetadata = {
+            containers: {
+              Companies: {},
+              Interactions: {}
+            }, 
+            branch: {}
+          };
+          
+          const containerResult = await this.serverCtl.catchContainer(repoMetadata);
+          if (!containerResult[0]) {
+            return containerResult;
+          }
+          
+          // Extract container data
+          repoMetadata = containerResult[2];
+          companyContainerData = repoMetadata.containers.Companies;
+          interactionsContainerData = repoMetadata.containers.Interactions;
+          
+          // Find the company to delete
+          const existingCompanies = companyContainerData.objects || [];
+          companyToDelete = existingCompanies.find(c => c.name === objName);
+          
+          if (!companyToDelete) {
+            return this._createError(`Company not found: ${objName}`, null, 404);
+          }
+          
+          // Find linked interactions that should be deleted with company
+          if (companyToDelete.linked_interactions && Object.keys(companyToDelete.linked_interactions).length > 0) {
+            const existingInteractions = interactionsContainerData.objects || [];
+            linkedInteractionsToDelete = existingInteractions.filter(i => 
+              companyToDelete.linked_interactions[i.name]
+            );
+            
+            logger.debug('Found linked interactions to delete with company', {
+              companyName: objName,
+              linkedInteractions: linkedInteractionsToDelete.map(i => i.name)
+            });
+          }
+          
+          return this._createSuccess('Containers caught and company found');
+        },
+        
+        // Step 2: Delete linked interaction files
+        async () => {
+          let filesDeleted = 0;
+          
+          for (const interaction of linkedInteractionsToDelete) {
+            if (interaction.url && interaction.url.startsWith('Interactions/')) {
+              logger.debug('Deleting interaction file for company deletion', {
+                fileName: interaction.url,
+                interactionName: interaction.name
+              });
+              
+              const fileName = interaction.url.replace('Interactions/', '');
+              
+              // Get file SHA
+              const fileResult = await this.serverCtl.getSha('Interactions', fileName, repoMetadata.branch.name);
+              if (fileResult[0]) {
+                const deleteResult = await this.serverCtl.deleteBlob(
+                  'Interactions',
+                  fileName,
+                  repoMetadata.branch.name,
+                  fileResult[2]
+                );
+                
+                if (deleteResult[0]) {
+                  filesDeleted++;
+                } else {
+                  logger.warn('Failed to delete interaction file during company deletion', {
+                    fileName,
+                    error: deleteResult[1]
+                  });
+                }
+              }
+            }
+          }
+          
+          return this._createSuccess(`Deleted ${filesDeleted} interaction files`);
+        },
+        
+        // Step 3: Remove company from companies container
+        async () => {
+          logger.debug('Removing company from container', {
+            companyName: objName
+          });
+          
+          const existingCompanies = companyContainerData.objects || [];
+          const filteredCompanies = existingCompanies.filter(c => c.name !== objName);
+          
+          const writeResult = await this.serverCtl.writeObject(
+            'Companies',
+            filteredCompanies,
+            repoMetadata.branch.name,
+            companyContainerData.objectSha
+          );
+          
+          // Ensure proper response format
+          if (!writeResult || !Array.isArray(writeResult) || writeResult.length < 3) {
+            logger.error('Invalid response format from writeObject for companies', {
+              response: writeResult
+            });
+            return this._createError('Invalid response format from companies write operation', writeResult);
+          }
+          
+          if (!writeResult[0]) {
+            logger.error('Failed to write companies container', {
+              error: writeResult[1]
+            });
+            return writeResult;
+          }
+          
+          return writeResult;
+        },
+        
+        // Step 4: Remove linked interactions from interactions container
+        async (deleteResult) => {
+          if (linkedInteractionsToDelete.length > 0) {
+            logger.debug('Removing linked interactions from container', {
+              companyName: objName,
+              interactionsToDelete: linkedInteractionsToDelete.map(i => i.name)
+            });
+            
+            const existingInteractions = interactionsContainerData.objects || [];
+            const interactionNamesToDelete = new Set(linkedInteractionsToDelete.map(i => i.name));
+            const filteredInteractions = existingInteractions.filter(i => !interactionNamesToDelete.has(i.name));
+            
+            const interactionsWriteResult = await this.serverCtl.writeObject(
+              'Interactions',
+              filteredInteractions,
+              repoMetadata.branch.name,
+              interactionsContainerData.objectSha
+            );
+            
+            // Ensure proper response format
+            if (!interactionsWriteResult || !Array.isArray(interactionsWriteResult)) {
+              logger.error('Unexpected response format from writeObject for interactions', {
+                response: interactionsWriteResult
+              });
+              
+              // Check if this is a direct GitHub API response that indicates success
+              if (interactionsWriteResult && interactionsWriteResult.content && interactionsWriteResult.commit) {
+                logger.debug('Detected successful GitHub API response format, converting to standard format');
+                return deleteResult; // Continue with transaction
+              }
+              
+              return this._createError('Invalid response format from interactions write operation', interactionsWriteResult);
+            }
+            
+            if (interactionsWriteResult.length < 3) {
+              logger.error('Invalid response array length from writeObject for interactions', {
+                response: interactionsWriteResult
+              });
+              return this._createError('Invalid response format from interactions write operation', interactionsWriteResult);
+            }
+            
+            if (!interactionsWriteResult[0]) {
+              logger.error('Failed to write interactions container', {
+                error: interactionsWriteResult[1]
+              });
+              return interactionsWriteResult;
+            }
+            
+            logger.debug('Successfully removed linked interactions', {
+              companyName: objName,
+              removedCount: linkedInteractionsToDelete.length
+            });
+          }
+          
+          return deleteResult;
+        },
+        
+        // Step 5: Release containers (single release for both)
+        async () => {
+          logger.debug('Releasing containers after company deletion');
+          
+          const releaseResult = await this.serverCtl.releaseContainer(repoMetadata);
+          if (!releaseResult[0]) {
+            return releaseResult;
+          }
+          
+          return this._createSuccess(
+            `Successfully deleted company: ${objName} and ${linkedInteractionsToDelete.length} linked interactions`,
+            {
+              deletedCompany: companyToDelete,
+              deletedInteractions: linkedInteractionsToDelete,
+              containers: releaseResult[2]
+            }
+          );
+        }
+      ], `delete-company-${objName}`);
+      
     } finally {
       tracking.end();
     }
